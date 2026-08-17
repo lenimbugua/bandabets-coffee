@@ -26,22 +26,21 @@
    ========================================================================= */
 
 :root {
-  /* Coffee — the structural neutral. Values are the Aureate Obsidian spec's
-     Material-3 surface tokens: charcoal surface fills with warm on-surface
-     accents (steps 200–400 are the spec's warm outline/variant tokens);
-     only the 50 step is interpolated, to give the light theme an off-white
+  /* Coffee — the structural neutral. Values are the BANDA spec's
+     Material-3 surface tokens: warm coffee-brown surface fills; only the
+     50 step is interpolated, to give the light theme a warm off-white
      above on-surface. */
-  --palette-coffee-50:  #f6f5f4;
-  --palette-coffee-100: #e5e2e1;   /* on-surface */
+  --palette-coffee-50:  #fdf8f3;
+  --palette-coffee-100: #f1dfd1;   /* on-surface */
   --palette-coffee-200: #dbc2ad;   /* on-surface-variant */
   --palette-coffee-300: #a28d7a;   /* outline */
   --palette-coffee-400: #544434;   /* outline-variant */
-  --palette-coffee-500: #353534;   /* surface-container-highest */
-  --palette-coffee-600: #2a2a2a;   /* surface-container-high */
-  --palette-coffee-700: #201f1f;   /* surface-container */
-  --palette-coffee-800: #1c1b1b;   /* surface-container-low */
-  --palette-coffee-900: #131313;   /* surface / background */
-  --palette-coffee-950: #0e0e0e;   /* surface-container-lowest */
+  --palette-coffee-500: #3d3329;   /* surface-container-highest */
+  --palette-coffee-600: #32281f;   /* surface-container-high */
+  --palette-coffee-700: #271e15;   /* surface-container */
+  --palette-coffee-800: #231a11;   /* surface-container-low */
+  --palette-coffee-900: #1a120a;   /* surface / background */
+  --palette-coffee-950: #140d06;   /* surface-container-lowest */
 
   /* Coffee mid-tones. The spec's surface tokens compress this ramp's
      midrange — 400/500/600 are all near-black surface fills, so they read
@@ -153,8 +152,8 @@
 
 /* ── Dark theme (default) ────────────────────────────────────────────────── */
 :root {
-  /* Base — the page foundation is the warm coffee, per the Aureate
-     Obsidian 60/30 split: coffee shell, charcoal containers above it. */
+  /* Base — the page foundation is the warm coffee: coffee shell, coffee
+     containers above it. */
   --background: var(--palette-coffee-warm-950);
   --foreground: var(--palette-coffee-100);
 
@@ -196,9 +195,8 @@
   /* Branded chrome — the warm coffee surface for the header/nav shell. */
   --surface-coffee: var(--palette-coffee-warm-900);
 
-  /* Hairline strokes per the Obsidian spec — edges are defined by the
-     #2a2a2a container-high step, not the warm outline, which reads as
-     noise on the neutral charcoal surfaces. */
+  /* Hairline strokes — edges are defined by the container-high step,
+     not the warm outline, which reads as noise on the coffee surfaces. */
   --border: var(--palette-coffee-600);
   --input: var(--palette-coffee-800);
   --ring: var(--palette-gold-500);
@@ -299,15 +297,15 @@
   --danger-border: color-mix(in srgb, var(--destructive) 35%, transparent);
   --danger-text: var(--destructive);
 
-  /* Selection — active chips, pills and picked odds. Emerald, so chosen
-     state separates from the orange CTA/brand accent. */
-  --selected: var(--palette-betslip-400);
-  --selected-foreground: var(--palette-green-950);
+  /* Selection — active chips, pills and picked odds. Gold, matching the
+     bet CTA pairing (the pre-green theme). */
+  --selected: var(--palette-gold-500);
+  --selected-foreground: var(--palette-gold-900);
 
-  /* Selected pills & picked odds — deep structural green with warm gold
-     text (the market-chip pairing), applied app-wide. */
-  --pill-selected: var(--palette-green-500);
-  --pill-selected-foreground: var(--palette-gold-300);
+  /* Selected pills & picked odds share the same gold pairing,
+     applied app-wide. */
+  --pill-selected: var(--palette-gold-500);
+  --pill-selected-foreground: var(--palette-gold-900);
 
   /* Domain — odds cell states. Selected = the emerald selection role;
      up/down are the status colours, shown as a brief flash, never a
@@ -472,15 +470,15 @@
   --danger-border: color-mix(in srgb, var(--destructive) 35%, transparent);
   --danger-text: var(--destructive);
 
-  /* Selection — active chips, pills and picked odds. Emerald, so chosen
-     state separates from the orange CTA/brand accent. */
-  --selected: var(--palette-betslip-400);
-  --selected-foreground: var(--palette-green-950);
+  /* Selection — active chips, pills and picked odds. Gold, matching the
+     bet CTA pairing (the pre-green theme). */
+  --selected: var(--palette-gold-500);
+  --selected-foreground: var(--palette-gold-900);
 
-  /* Selected pills & picked odds — deep structural green with warm gold
-     text (the market-chip pairing), applied app-wide. */
-  --pill-selected: var(--palette-green-500);
-  --pill-selected-foreground: var(--palette-gold-300);
+  /* Selected pills & picked odds share the same gold pairing,
+     applied app-wide. */
+  --pill-selected: var(--palette-gold-500);
+  --pill-selected-foreground: var(--palette-gold-900);
 
   /* Domain — odds cell states. Selected = the emerald selection role;
      up/down are the status colours, shown as a brief flash, never a
