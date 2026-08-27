@@ -17,6 +17,23 @@ const { notification } = useModalTypes();
 const { switchToDark } = useThemeSwitch();
 const { currentMode } = useAppMode();
 
+// Task 5 (Lighthouse perf): preconnect to the matches API origin at runtime,
+// since the host is env-driven (NUXT_PUBLIC_MATCHES_URL) and not known at
+// build time. Guarded so an unset or malformed URL never throws during SSR.
+const { public: config } = useRuntimeConfig();
+const apiOrigin = (() => {
+  try {
+    return new URL(config.matchesUrl).origin;
+  } catch {
+    return null;
+  }
+})();
+useHead({
+  link: apiOrigin
+    ? [{ rel: "preconnect", href: apiOrigin, crossorigin: "" }]
+    : [],
+});
+
 onBeforeMount(() => switchToDark());
 
 onMounted(() => {

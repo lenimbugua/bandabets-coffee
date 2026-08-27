@@ -511,8 +511,16 @@ export default defineNuxtConfig({
         { rel: "icon", type: "image/png", sizes: "32x32", href: "/favicon-32x32.png" },
         { rel: "icon", type: "image/png", sizes: "16x16", href: "/favicon-16x16.png" },
         { rel: "manifest", href: "/site.webmanifest" },
-        { rel: "preconnect", href: "https://imagedelivery.net", crossorigin: "" },
-        { rel: "preconnect", href: "https://storage.googleapis.com", crossorigin: "" },
+        // imagedelivery.net and storage.googleapis.com preconnects removed
+        // (Task 5, Lighthouse perf): neither host is requested by the
+        // home-page render tree. imagedelivery.net is only referenced by
+        // formatStuff().formCloudflareImage (documented idle) and by
+        // components with zero template usages anywhere in the app
+        // (TopLeagues.vue, HotSection.vue, BetBuilderCompetition.vue,
+        // mobile/TopLeaguesGrid.vue) or reachable only via /casino-home
+        // (CasinoGameCard.vue), not the home page. storage.googleapis.com
+        // is only the BRAND_LOGO string embedded in JSON-LD structured data
+        // (useOrganizationSchema.js), which the browser never fetches.
       ],
     },
   },
