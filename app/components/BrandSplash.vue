@@ -34,7 +34,7 @@ onMounted(() => {
 /* Timeline (ms after first paint):
      0–450   mark settles in (ease-out-expo, no overshoot)
    120–570   rule draws left → right
-   700–1100  whole overlay lifts and fades; visibility flips to hidden at the end
+   700–1100  whole overlay lifts and fades; unmounted by JS at 1100 ms
    The overlay never intercepts pointer events, so a fast tap on SSR content
    still works during the hold. */
 .splash {
@@ -65,7 +65,6 @@ onMounted(() => {
   to {
     opacity: 0;
     transform: scale(1.012);
-    visibility: hidden;
   }
 }
 
