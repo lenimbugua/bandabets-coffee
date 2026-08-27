@@ -17,10 +17,17 @@ const phase2PlaceholderFile = fileURLToPath(
 // chunk via `cssCodeSplit` but reached only through STATIC imports get no
 // `src` at all in the manifest — just a bare `name` (the file's basename,
 // e.g. "SportsBetslip", "BandaLogo"), verified by dumping raw manifest
-// entries during this task. So `name` is matched against the real
-// `.vue` basenames on disk instead of trusting `src` for those chunks.
+// entries during this task. So for those `src`-less chunks only, `name` is
+// matched against the real `.vue` basenames on disk instead.
+//
+// Round 3, fix round 1: a bare basename can collide — "index", "[name]" and
+// other filenames repeat across app/pages, app/components, etc., and a
+// same-named vendor/composable chunk could in principle share one too. Any
+// basename that isn't unique under app/ is dropped from the Set entirely,
+// so the name-fallback only ever fires for a basename that unambiguously
+// identifies one single `.vue` file.
 const appVueBasenames = (() => {
-  const basenames = new Set();
+  const counts = new Map();
   const walk = (dir) => {
     let entries;
     try {
@@ -31,11 +38,16 @@ const appVueBasenames = (() => {
     for (const entry of entries) {
       const full = `${dir}/${entry.name}`;
       if (entry.isDirectory()) walk(full);
-      else if (entry.name.endsWith(".vue")) basenames.add(entry.name.slice(0, -4));
+      else if (entry.name.endsWith(".vue")) {
+        const base = entry.name.slice(0, -4);
+        counts.set(base, (counts.get(base) || 0) + 1);
+      }
     }
   };
   walk(fileURLToPath(new URL("./app", import.meta.url)));
-  return basenames;
+  const unique = new Set();
+  for (const [base, count] of counts) if (count === 1) unique.add(base);
+  return unique;
 })();
 
 // Route names that carried `meta: { requiresAuth: true }` in the deleted
@@ -257,13 +269,16 @@ export default defineNuxtConfig({
       // via Nuxt's own dynamic-import boundary); ordinary components split
       // into their own chunk via cssCodeSplit but reached only through
       // static imports have no `src` at all — just `name`, the file's
-      // basename — so those are matched against appVueBasenames instead
-      // (see the comment on its declaration above).
+      // basename. Fix round 1: only fall back to the `name` match when
+      // `src` is absent (a chunk that DOES carry a `src` is judged on that
+      // alone), and appVueBasenames itself already excludes any basename
+      // that isn't unique under app/ — see the comment on its declaration.
       for (const key in manifest) {
         const chunk = manifest[key];
         if (chunk.isEntry) continue;
-        const isVueModule =
-          (chunk.src ?? "").endsWith(".vue") || appVueBasenames.has(chunk.name ?? "");
+        const isVueModule = chunk.src
+          ? chunk.src.endsWith(".vue")
+          : appVueBasenames.has(chunk.name ?? "");
         if (isVueModule && Array.isArray(chunk.css) && chunk.css.length) {
           chunk.css = [];
         }
@@ -613,9 +628,15 @@ export default defineNuxtConfig({
       // CSS as a <style> tag in the SSR HTML, so the matching per-component
       // <link rel="stylesheet"> would be pure duplication on first load —
       // the build:manifest hook (hooks section) strips those links for .vue
-      // chunks. Client-side navigation is unaffected: Vite's preload helper
-      // embedded in the JS loads a chunk's CSS itself. Non-.vue CSS
-      // (swiper-vue, useFlyToBetslip) is not inlined and keeps its link.
+      // chunks. On first load, .vue CSS that the SSR render used is already
+      // inlined as <style>; any stripped stylesheet for a component not
+      // rendered on the server is re-added after hydration by Vite's
+      // preload helper, because the route chunk's dependency list includes
+      // the CSS files of every shared chunk (measured: 12 component
+      // <link>s present in the document after hydration on /, and modal
+      // components opened client-side have their scoped rules). Non-.vue
+      // CSS (swiper-vue, useFlyToBetslip) is not inlined and keeps its
+      // link, so it is never unstyled before hydration either.
       cssCodeSplit: true,
     },
   },
