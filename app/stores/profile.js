@@ -55,17 +55,18 @@ export const useProfileStore = defineStore("profile-store", {
     },
 
     depositDataLayer() {
-      const { pushDataLayerToGoogle } = useGoogleDataLayers();
+      const { pushDataLayerToGoogle, sendGtagConversion } =
+        useGoogleDataLayers();
 
       pushDataLayerToGoogle({
         event: "deposit",
         deposit: this.deposit,
       });
 
-      window.gtag("event", "conversion", {
-        send_to: "AW-16789345990/NgY6CPfc6pIaEMat5MU-",
-        transaction_id: timestamp,
-      });
+      sendGtagConversion(
+        "AW-16789345990/NgY6CPfc6pIaEMat5MU-",
+        new Date().toISOString(),
+      );
     },
 
     setBalanceBeforeDeposit(deposit) {

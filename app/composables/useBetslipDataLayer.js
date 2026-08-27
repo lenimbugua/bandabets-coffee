@@ -16,7 +16,7 @@ export function useBetslipDataLayer() {
   const { betslip, possibleWin, totalOdds, stake } = storeToRefs(
     useBetslipStore()
   );
-  const { pushDataLayerToGoogle } = useGoogleDataLayers();
+  const { pushDataLayerToGoogle, sendGtagConversion } = useGoogleDataLayers();
 
   function pushToItems(items, item, index) {
     items.push({
@@ -163,10 +163,7 @@ export function useBetslipDataLayer() {
       },
     };
     pushDataLayerToGoogle(purchaseData);
-    window.gtag("event", "conversion", {
-      send_to: "AW-16789345990/Y443CN7QgoIaEMat5MU-",
-      transaction_id: timestamp,
-    });
+    sendGtagConversion("AW-16789345990/Y443CN7QgoIaEMat5MU-", timestamp);
   }
 
   return {
