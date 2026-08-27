@@ -1,32 +1,21 @@
 <script setup>
 import { useBannerImage } from "@/composables/useBannerImage";
 import { useDefaultSport } from "@/composables/useDefaultSport";
-import "swiper/css";
-import { Autoplay } from "swiper/modules";
-import { Swiper, SwiperSlide } from "swiper/vue";
-import { ref } from "vue";
 import { useRouter } from "vue-router";
 
-// formCloudflareImage is no longer needed — the BANDA banners are local files.
-// Restore `import formatStuff from "@/utilities/format-stuff"` with it if the
-// Cloudflare-hosted slide set comes back.
+// Round 3 (Lighthouse): the banner used Swiper, which put a 26 KB gzip chunk
+// and ~1 s of main-thread work (init + forced reflow) on the home page's
+// critical path. The carousel is now native CSS scroll-snap: the browser
+// does the swiping, and the only JS is an 8 s autoplay tick and the
+// desktop prev/next buttons. Differences from the Swiper version: no
+// infinite loop (autoplay wraps to the first slide), and on mobile the
+// peeking next slide stops at the container edge rather than the screen edge.
 const { initDefaultSport } = useDefaultSport();
 const router = useRouter();
 const { bannerSources } = useBannerImage();
 
-const modules = [Autoplay];
-const autoplayDelay = 8000;
+const AUTOPLAY_DELAY_MS = 8000;
 
-// Default sizes assume DesktopSportsLayout.vue's flex row: the column
-// itself caps at 2xl:max-w-[1000px], and below that it's whatever's left of
-// the viewport after the fixed w-[16rem] sidebar (256px), the w-84 betslip
-// panel (336px), two gap-5 (20px) gaps and px-4 (32px) padding — 256 + 336 +
-// 40 + 32 = 664px. Pages that mount TheBanner in a different-width column
-// (e.g. casino-home.vue, which has no sidebar/betslip) should pass their own
-// `sizes` prop rather than relying on this default. Below lg
-// (MobileSportsLayout.vue), the banner's wrapper is only offset by mx-3
-// (24px) so it renders close to full viewport width — 100vw is used as a
-// safe fallback there.
 const props = defineProps({
   sizes: {
     type: String,
@@ -34,8 +23,6 @@ const props = defineProps({
   },
 });
 
-// BANDA campaign artwork, served from /public. 3:1, so the frame below uses
-// the same ratio and nothing gets cropped.
 const items = [
   { name: "Starter Free Bet", image: "/banners/banda/starter-free-bet.jpg" },
   { name: "Kick Off Bonus", image: "/banners/banda/kick-off-bonus.jpg" },
@@ -47,12 +34,6 @@ const items = [
   { name: "Wherever you are", image: "/banners/banda/wherever-you-are.jpg" },
 ];
 
-// TheBanner is the only carousel — DesktopSportsLayout.vue and
-// MobileSportsLayout.vue both mount it, but the layouts that mount those are
-// gated with v-if/v-else-if on useScreenSizes()'s breakpoints (see
-// TheSports.vue, TheLanding.vue, app/layouts/default.vue), so only ONE
-// TheBanner instance is ever mounted at a time. That makes this the single
-// place to preload the first slide for whichever viewport actually renders.
 const first = bannerSources(items[0].image);
 useHead({
   link: [
@@ -61,32 +42,14 @@ useHead({
       as: "image",
       href: items[0].image,
       fetchpriority: "high",
-      // Only advertise a srcset/sizes/type when a webp variant actually
-      // exists (see useBannerImage.js's .jpg guard) — otherwise the browser
-      // would preload a webp URL that 404s instead of falling back to the
-      // <img>'s plain jpg src.
-      ...(first.srcset ? { imagesrcset: first.srcset, imagesizes: props.sizes, type: "image/webp" } : {}),
+      ...(first.srcset
+        ? { imagesrcset: first.srcset, imagesizes: props.sizes, type: "image/webp" }
+        : {}),
     },
   ],
 });
 
-// The BANDA banners are brand artwork with no live offers behind them yet, so
-// every slide goes home. Flip this to false to restore per-banner routing —
-// the old slide set and its targets are kept below for that.
 const ROUTE_ALL_BANNERS_HOME = true;
-
-// Previous Cloudflare-hosted slides. Disabled, not deleted: these are the
-// image IDs and route targets to restore when the offers come back.
-// const sportsbook = { name: "sports", params: { sport: "soccer" } };
-// const legacyItems = [
-//   { name: "One Cut", image: "ba71caf8-45e3-4dba-8563-2fd769e98800", to: sportsbook },
-//   { name: "Welcome Bonus", image: "cdfc009d-fa81-4134-d165-3a1a0a463e00", to: sportsbook },
-//   { name: "Daily Deposit Bonus", image: "47fad6b1-0048-4f18-90cd-100c01eba300", to: { name: "deposit" } },
-//   { name: "Wagerless Rains", image: "c752f35f-37c3-42e8-03e1-11425ff4af00", to: { name: "playon" } },
-//   { name: "Cashout", image: "1949af94-a569-4c2a-032f-005a5c0e9900", to: sportsbook },
-//   { name: "Aviator Cashback", image: "3c60068d-b2cf-4ce2-0cab-4a65d691b700", to: { name: "aviator" } },
-// ];
-
 function openBanner(item) {
   if (ROUTE_ALL_BANNERS_HOME) {
     router.push({ name: "home" });
@@ -98,39 +61,74 @@ function openBanner(item) {
   router.push(item.to);
 }
 
-const swiperInstance = ref(null);
+const track = ref(null);
+let autoplayTimer = null;
 
-const onSwiperInit = (swiper) => {
-  swiperInstance.value = swiper;
-};
-
+// Index of the slide currently snapped at the start edge.
+function currentIndex() {
+  const el = track.value;
+  if (!el || !el.firstElementChild) return 0;
+  const stride = el.firstElementChild.offsetWidth + gapPx(el);
+  return stride > 0 ? Math.round(el.scrollLeft / stride) : 0;
+}
+function gapPx(el) {
+  return parseFloat(getComputedStyle(el).columnGap) || 0;
+}
+function goTo(index, behavior = "smooth") {
+  const el = track.value;
+  if (!el || !el.firstElementChild) return;
+  const count = items.length;
+  const target = ((index % count) + count) % count;
+  const stride = el.firstElementChild.offsetWidth + gapPx(el);
+  el.scrollTo({ left: target * stride, behavior });
+}
 function slidePrev() {
-  swiperInstance.value?.slidePrev();
+  goTo(currentIndex() - 1);
+}
+function slideNext() {
+  goTo(currentIndex() + 1);
 }
 
-function slideNext() {
-  swiperInstance.value?.slideNext();
+function startAutoplay() {
+  stopAutoplay();
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  autoplayTimer = setInterval(slideNext, AUTOPLAY_DELAY_MS);
 }
+function stopAutoplay() {
+  if (autoplayTimer) clearInterval(autoplayTimer);
+  autoplayTimer = null;
+}
+function onVisibility() {
+  document.hidden ? stopAutoplay() : startAutoplay();
+}
+
+onMounted(() => {
+  startAutoplay();
+  document.addEventListener("visibilitychange", onVisibility);
+});
+onBeforeUnmount(() => {
+  stopAutoplay();
+  document.removeEventListener("visibilitychange", onVisibility);
+});
 </script>
 
 <template>
   <div class="w-full">
     <div class="relative w-full">
-      <swiper
-        :slides-per-group="1"
-        :space-between="12"
-        :breakpoints="{
-          0: { slidesPerView: 1.1 },
-          1024: { slidesPerView: 1 },
-        }"
-        :loop="true"
-        :autoplay="{ delay: autoplayDelay, disableOnInteraction: false }"
-        :navigation="false"
-        :modules="modules"
-        class="max-lg:overflow-visible!"
-        @swiper="onSwiperInit"
+      <div
+        ref="track"
+        class="banner-track flex w-full gap-3 overflow-x-auto scroll-smooth snap-x snap-mandatory scrollbar-hide"
+        aria-roledescription="carousel"
+        aria-label="Promotions"
       >
-        <swiper-slide v-for="(item, index) in items" :key="item.image">
+        <div
+          v-for="(item, index) in items"
+          :key="item.image"
+          class="banner-slide shrink-0 snap-start"
+          role="group"
+          :aria-roledescription="'slide'"
+          :aria-label="`${index + 1} of ${items.length}`"
+        >
           <button
             type="button"
             class="relative block w-full aspect-[3/1] rounded-xl overflow-hidden group cursor-pointer ring-1 ring-gray-200/80 dark:ring-white/10"
@@ -157,10 +155,8 @@ function slideNext() {
               class="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"
             ></div>
           </button>
-        </swiper-slide>
-      </swiper>
-
-      <!-- Subtle scroll-suggesting arrows -->
+        </div>
+      </div>
       <button
         type="button"
         aria-label="Previous banner"
@@ -184,3 +180,21 @@ function slideNext() {
     </div>
   </div>
 </template>
+
+<style scoped>
+/* One slide plus a 10 % peek of the next on small screens (Swiper's old
+   slidesPerView: 1.1); exactly one slide from lg up. The gap-3 (12 px) on the
+   track is the old spaceBetween: 12. */
+.banner-slide {
+  width: calc((100% - 0.75rem) / 1.1);
+}
+@media (min-width: 1024px) {
+  .banner-slide {
+    width: 100%;
+  }
+}
+.banner-track {
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+}
+</style>
