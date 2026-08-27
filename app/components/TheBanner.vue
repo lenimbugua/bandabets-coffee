@@ -1,4 +1,5 @@
 <script setup>
+import { useBannerImage } from "@/composables/useBannerImage";
 import { useDefaultSport } from "@/composables/useDefaultSport";
 import "swiper/css";
 import { Autoplay } from "swiper/modules";
@@ -11,9 +12,19 @@ import { useRouter } from "vue-router";
 // Cloudflare-hosted slide set comes back.
 const { initDefaultSport } = useDefaultSport();
 const router = useRouter();
+const { bannerSources } = useBannerImage();
 
 const modules = [Autoplay];
 const autoplayDelay = 8000;
+
+// Measured from DesktopSportsLayout.vue's flex row at the lg breakpoint:
+// max-w-[1680px] container minus px-4 (32px) padding, minus the fixed
+// w-[16rem] sidebar (256px), the w-84 betslip panel (336px) and two gap-5
+// (20px) gaps — 1280px viewport - 32 - 256 - 336 - 40 = 616px, matching the
+// 616px Lighthouse observed. Below lg (MobileSportsLayout.vue), the banner's
+// wrapper is only offset by mx-3 (24px) so it renders close to full
+// viewport width — 100vw is used as a safe fallback there.
+const BANNER_SIZES = "(min-width: 1024px) 616px, 100vw";
 
 // BANDA campaign artwork, served from /public. 3:1, so the frame below uses
 // the same ratio and nothing gets cropped.
@@ -95,13 +106,16 @@ function slideNext() {
             :aria-label="`${item.name} — open`"
             @click="openBanner(item)"
           >
-            <img
-              :src="item.image"
-              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-              :alt="`${item.name} banner`"
-              loading="lazy"
-              decoding="async"
-            />
+            <picture>
+              <source type="image/webp" :srcset="bannerSources(item.image).srcset" :sizes="BANNER_SIZES" />
+              <img
+                :src="item.image"
+                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                :alt="`${item.name} banner`"
+                loading="lazy"
+                decoding="async"
+              />
+            </picture>
             <div
               class="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"
             ></div>
