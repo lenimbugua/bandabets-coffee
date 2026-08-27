@@ -1360,43 +1360,6 @@
   }
 }
 
-/* Datepicker — driven entirely by semantic tokens */
-.dp__theme_dark,
-.dp__theme_light {
-  --dp-background-color: var(--card);
-  --dp-text-color: var(--card-foreground);
-  --dp-hover-color: var(--surface-interactive);
-  --dp-hover-text-color: var(--foreground);
-  --dp-hover-icon-color: var(--muted-foreground);
-  --dp-primary-color: var(--primary);
-  --dp-primary-disabled-color: var(--brand-dark);
-  --dp-primary-text-color: var(--primary-foreground);
-  --dp-secondary-color: var(--muted-foreground);
-  --dp-border-color: var(--border);
-  --dp-menu-border-color: var(--border);
-  --dp-border-color-hover: var(--border-strong);
-  --dp-border-color-focus: var(--ring);
-  --dp-disabled-color: var(--surface-active);
-  --dp-disabled-color-text: var(--text-muted-alt);
-  --dp-scroll-bar-background: var(--surface-sunken);
-  --dp-scroll-bar-color: var(--border-strong);
-  --dp-success-color: var(--success);
-  --dp-success-color-disabled: var(--brand-dark);
-  --dp-icon-color: var(--muted-foreground);
-  --dp-danger-color: var(--destructive);
-  --dp-marker-color: var(--gold);
-  --dp-tooltip-color: var(--popover);
-  --dp-highlight-color: color-mix(in srgb, var(--primary) 20%, transparent);
-  --dp-range-between-dates-background-color: var(--surface-interactive);
-  --dp-range-between-dates-text-color: var(--foreground);
-  --dp-range-between-border-color: var(--border-strong);
-  --dp-border-radius: var(--radius);
-}
-
-.datepicker-fix-zindex {
-  z-index: 9999 !important;
-}
-
 .iframe-container {
   height: var(--viewport-height);
   overflow-y: scroll;
