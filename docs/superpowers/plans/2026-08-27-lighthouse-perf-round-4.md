@@ -79,3 +79,19 @@ Measure a real card/row/footer height on the mobile harness (`getBoundingClientR
 - [ ] **Step 5: Commit** — `perf: contain offscreen match cards, casino rows and footer` (+ `chore: add dev CORS proxy for real-data local Lighthouse runs` as part of the same commit is fine) with the Co-Authored-By trailer.
 
 ### Task 2 (controller): record results in this file, commit.
+
+## Results (2026-08-27)
+
+Task 1 was **rejected by its own accept rule** and reverted — no code change shipped from this round.
+
+| Variant (medians of 3, devtools throttling, live data via proxy) | Perf | LCP | TBT | Style & Layout | longest task |
+|---|---|---|---|---|---|
+| base (round-3 code) | 81 | 2.09 s | 610 ms | 554 ms | 483 ms |
+| `content-visibility: auto` on cards/rows/footer | 80 | 2.05 s | **676 ms** | 540 ms | 514 ms |
+
+Why it didn't help: the mobile home page is short (10 cards ≈ 90 px each) and scrolls inside an internal `.matches-scroll-container`, so almost every "offscreen" unit is within Chrome's containment margin anyway; the bookkeeping cost exceeded the skipped layout. The post-XHR ~500 ms task is dominated by rendering the *visible* cards, not offscreen ones.
+
+Lever candidates that remain, with the evidence from this harness:
+- The post-XHR render task itself: split the match-list mount into two frames (first 4 cards, then the rest on `requestAnimationFrame`) so no single task exceeds 50 ms attribution window — reduces TBT directly rather than total work.
+- The three casino strips + quick-access chips (≈380 nodes) render in the same task as the match list because their XHR resolves at the same time; deferring the casino strip mount to idle would move ~150 ms out of the blocking window.
+- The `matches` XHR itself is 31 KB and arrives ~1.0 s after request on slow 4G; a smaller first page (`pageSize=6`) would make the first render both earlier and cheaper.
