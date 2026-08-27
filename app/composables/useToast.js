@@ -1,4 +1,9 @@
-import Swal from "sweetalert2";
+// sweetalert2 (~27 KB gzip + injected CSS) is only needed once a toast
+// actually fires, so it is imported on first use instead of being bundled
+// into the login chunk that every page preloads.
+let swalPromise = null;
+const loadSwal = () =>
+  (swalPromise ??= import("sweetalert2").then((m) => m.default));
 
 const errorColor = "red";
 const successColor = "green";
@@ -10,26 +15,27 @@ const positionBottomRight = "bottom-right";
 const positionTopRight = "top-right";
 
 export function useToast() {
-  const Toast = (color, position = positionTop) =>
-    Swal.mixin({
-      toast: true,
-      position: position,
-      iconColor: color,
-      customClass: {
-        popup: "colored-toast",
-      },
-      showConfirmButton: false,
-      timer: 4000,
-      timerProgressBar: true,
-    });
+  // Returns an object whose fire() resolves once sweetalert2 has loaded and
+  // the toast has been shown — the same shape callers already await.
+  const Toast = (color, position = positionTop) => ({
+    async fire(options) {
+      const Swal = await loadSwal();
+      return Swal.mixin({
+        toast: true,
+        position: position,
+        iconColor: color,
+        customClass: {
+          popup: "colored-toast",
+        },
+        showConfirmButton: false,
+        timer: 4000,
+        timerProgressBar: true,
+      }).fire(options);
+    },
+  });
 
   function fireToast(color, icon, title, position = positionTop) {
-    (async () => {
-      await Toast(color, position).fire({
-        icon: icon,
-        title: title,
-      });
-    })();
+    Toast(color, position).fire({ icon: icon, title: title });
   }
 
   function fireSuccessToast(title, position = positionTop) {
