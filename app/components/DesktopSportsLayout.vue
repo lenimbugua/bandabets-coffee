@@ -19,7 +19,7 @@ defineProps({
       </div>
 
       <!-- Main content -->
-      <div class="flex-1 min-w-0 max-w-[800px] 2xl:max-w-[1000px]">
+      <main class="flex-1 min-w-0 max-w-[800px] 2xl:max-w-[1000px]">
         <!-- Main category nav now lives in the header (HeaderNavLinks) at lg+ -->
 
         <!-- Banner (always shown on sports desktop) -->
@@ -54,7 +54,7 @@ defineProps({
 
           <LazySEOMarkupContent hydrate-on-visible />
         </template>
-      </div>
+      </main>
 
       <!-- Betslip panel -->
       <div class="shrink-0">

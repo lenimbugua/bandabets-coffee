@@ -19,9 +19,9 @@ import TheSidebar from "@/components/TheSidebar.vue";
         <div class="shrink-0">
           <TheSidebar />
         </div>
-        <div class="flex-1 min-w-0 max-w-200 lg:max-w-250 py-3">
+        <main class="flex-1 min-w-0 max-w-200 lg:max-w-250 py-3">
           <slot />
-        </div>
+        </main>
         <div class="shrink-0">
           <SportsBetslipPanel />
         </div>
@@ -37,9 +37,9 @@ import TheSidebar from "@/components/TheSidebar.vue";
         <div class="shrink-0">
           <TheSidebar />
         </div>
-        <div class="flex-1 min-w-0 py-3">
+        <main class="flex-1 min-w-0 py-3">
           <slot />
-        </div>
+        </main>
       </div>
     </div>
     <LazyFooter hydrate-on-visible />
@@ -54,9 +54,9 @@ import TheSidebar from "@/components/TheSidebar.vue";
     >
       <HeaderLinks />
     </div>
-    <div class="w-full grow px-2 py-3">
+    <main class="w-full grow px-2 py-3">
       <slot />
-    </div>
+    </main>
     <LazyFooter hydrate-on-visible />
     <MobileFooterV2 />
   </div>

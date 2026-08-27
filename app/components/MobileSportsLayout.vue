@@ -59,7 +59,7 @@ onBeforeUnmount(() => {
     </div>
 
     <!-- Scrollable content -->
-    <div class="bg-gray-50 dark:bg-background">
+    <main class="bg-gray-50 dark:bg-background">
       <!-- Banner (always shown on mobile sports). Outer div clips the peeking
            next slide at the screen edge; slides carry their own rounding. -->
       <div class="overflow-hidden pt-3">
@@ -81,7 +81,7 @@ onBeforeUnmount(() => {
           <InfiniteScroll :flat="true" />
         </div>
       </template>
-    </div>
+    </main>
 
     <LazySEOMarkupContent hydrate-on-visible />
     <LazyFooter hydrate-on-visible />

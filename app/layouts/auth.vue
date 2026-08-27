@@ -15,7 +15,7 @@ import AuthTopBar from "@/components/AuthTopBar.vue";
     </div>
 
     <!-- Main content area -->
-    <div class="flex-1 w-full max-w-4xl mx-auto px-3">
+    <main class="flex-1 w-full max-w-4xl mx-auto px-3">
       <div class="flex min-h-[calc(100dvh-8rem)] lg:gap-8 lg:items-center lg:justify-center lg:py-6">
 
         <!-- Left: Branded hero panel (desktop only) -->
@@ -82,7 +82,7 @@ import AuthTopBar from "@/components/AuthTopBar.vue";
           </div>
         </div>
       </div>
-    </div>
+    </main>
 
     <Footer />
   </div>

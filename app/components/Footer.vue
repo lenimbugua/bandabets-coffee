@@ -52,9 +52,9 @@ const legalLinks = [
         <div class="col-span-2 sm:col-span-1">
           <div class="mb-4">
             <span class="text-base font-bold text-foreground tracking-tight">Bandabets</span>
-            <span class="block text-[10px] uppercase tracking-widest text-muted-foreground/50 font-semibold leading-none mt-0.5">Kenya</span>
+            <span class="block text-[10px] uppercase tracking-widest text-muted-foreground font-semibold leading-none mt-0.5">Kenya</span>
           </div>
-          <p class="text-xs leading-relaxed text-muted-foreground/70 max-w-xs">
+          <p class="text-xs leading-relaxed text-muted-foreground max-w-xs">
             Kenya's premier sports betting and casino platform. Bet smart, win big.
           </p>
 
@@ -66,7 +66,7 @@ const legalLinks = [
               :href="social.href"
               target="_blank"
               :aria-label="social.name"
-              class="group flex items-center justify-center w-8 h-8 rounded-full bg-foreground/5 text-muted-foreground/50 hover:bg-brand-bright/15 hover:text-brand-bright transition-all duration-200"
+              class="group flex items-center justify-center w-8 h-8 rounded-full bg-foreground/5 text-muted-foreground hover:bg-brand-bright/15 hover:text-brand-bright transition-all duration-200"
             >
               <svg xmlns="http://www.w3.org/2000/svg" :viewBox="social.viewBox" fill="currentColor" class="w-3.5 h-3.5">
                 <path :d="social.path" />
@@ -77,7 +77,7 @@ const legalLinks = [
 
         <!-- Quick Links -->
         <div>
-          <h4 class="text-xs font-semibold uppercase tracking-wider text-muted-foreground/60 mb-3">
+          <h4 class="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">
             Quick Links
           </h4>
           <nav class="space-y-2">
@@ -95,7 +95,7 @@ const legalLinks = [
         <!-- Support — disabled for now. Restore this column (and the
              useSupport wiring in the script block) to bring it back.
         <div>
-          <h4 class="text-xs font-semibold uppercase tracking-wider text-muted-foreground/60 mb-3">
+          <h4 class="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">
             Support
           </h4>
           <nav class="space-y-2">
@@ -119,7 +119,7 @@ const legalLinks = [
 
         <!-- Legal -->
         <div>
-          <h4 class="text-xs font-semibold uppercase tracking-wider text-muted-foreground/60 mb-3">
+          <h4 class="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">
             Legal
           </h4>
           <nav class="space-y-2">
@@ -142,7 +142,7 @@ const legalLinks = [
               </svg>
             </div>
             <div>
-              <p class="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground/50 leading-none">GRA Licensed</p>
+              <p class="text-[10px] uppercase tracking-wider font-semibold text-muted-foreground leading-none">GRA Licensed</p>
               <p class="text-xs font-bold text-muted-foreground tabular-nums mt-0.5">BK 0001255 · PG 0001254</p>
             </div>
           </div> -->
@@ -157,13 +157,13 @@ const legalLinks = [
         <div class="w-9 h-9 rounded-xl bg-red-500/10 border border-red-500/15 flex items-center justify-center">
           <span class="text-[10px] font-black text-red-400">18+</span>
         </div>
-        <p class="text-xs text-muted-foreground/70 max-w-md">
+        <p class="text-xs text-muted-foreground max-w-md">
           Gambling can be addictive. Play responsibly and only bet what you can afford to lose.
         </p>
         <a
           href="https://responsiblegambling.or.ke/"
           target="_blank"
-          class="inline-flex items-center gap-1 text-[11px] text-muted-foreground/50 hover:text-brand-bright transition-colors"
+          class="inline-flex items-center gap-1 text-[11px] text-muted-foreground hover:text-brand-bright transition-colors"
         >
           responsiblegambling.or.ke
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="w-2.5 h-2.5">
@@ -175,12 +175,12 @@ const legalLinks = [
 
       <!-- License text -->
       <div class="max-w-lg mx-auto mb-5 text-center">
-        <p class="text-[10px] leading-relaxed text-muted-foreground/40">
+        <p class="text-[10px] leading-relaxed text-muted-foreground">
           Bandabets Kenya is authorized and regulated by the GRA (Gambling Regulatory Authority) under the Gambling Control Act, 2025, Laws of Kenya.
         </p>
         <!-- Hidden until the Bandabets licence numbers are confirmed — the
              pair below are Bandabets's and must not ship under the new brand.
-        <p class="mt-1.5 text-[10px] font-semibold tabular-nums text-muted-foreground/60">
+        <p class="mt-1.5 text-[10px] font-semibold tabular-nums text-muted-foreground">
           License Numbers: BK 0001255 and PG 0001254
         </p>
         -->
@@ -189,7 +189,7 @@ const legalLinks = [
       <!-- Bottom bar -->
       <div class="h-px bg-border/50 mb-4"></div>
       <div class="flex items-center justify-center">
-        <p class="text-[11px] text-muted-foreground/40">
+        <p class="text-[11px] text-muted-foreground">
           &copy; {{ currentYear }} Bandabets Kenya. All rights reserved.
         </p>
       </div>

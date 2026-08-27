@@ -72,7 +72,7 @@ function isActive(tab) {
         :key="tab.key"
         :to="tab.to"
         class="flex flex-col items-center gap-0.5"
-        :class="isActive(tab) ? 'text-selected' : 'text-gray-500 dark:text-gray-500'"
+        :class="isActive(tab) ? 'text-selected' : 'text-muted-foreground'"
       >
         <!-- Home -->
         <svg v-if="tab.key === 'home'" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="h-[1.4rem] w-[1.4rem]" aria-hidden="true">
