@@ -308,6 +308,8 @@ export default defineNuxtConfig({
         provider: "google",
         weights: [400, 500, 600, 700, 800],
         styles: ["normal"],
+        subsets: ["latin"],
+        preload: true,
       },
     ],
     defaults: { weights: [400], styles: ["normal"] },
