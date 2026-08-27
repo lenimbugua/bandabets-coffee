@@ -10,6 +10,7 @@ import { storeToRefs } from "pinia";
 // home page that was the largest single JavaScript cost after hydration.
 // disableTransition:false skips that routine entirely; theme toggles simply
 // let elements with transition-colors animate, which is the nicer behaviour.
+// Never write isDark during SSR: this module-level ref is shared across requests on the server and must stay at its default there (writes happen only in client hooks).
 let shared = null;
 function themeRef() {
   if (!shared) {

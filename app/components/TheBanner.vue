@@ -16,6 +16,13 @@ const { bannerSources } = useBannerImage();
 
 const AUTOPLAY_DELAY_MS = 8000;
 
+// Same 1x1 transparent GIF used by NearViewportImage.vue — slides 2-8 render
+// this instead of their real image until the IntersectionObserver below
+// marks them loaded, so all 8 banners (≈235 KB) don't compete with the LCP
+// image at page load.
+const PLACEHOLDER =
+  "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==";
+
 const props = defineProps({
   sizes: {
     type: String,
@@ -102,12 +109,42 @@ function onVisibility() {
   document.hidden ? stopAutoplay() : startAutoplay();
 }
 
+// Slide 0 is always eager (SSR + preload). Slides 1-7 only get their real
+// srcset/src once they enter the track's 200px margin — autoplay's
+// slideNext() scrolls the track, so the observer fires on the *next* slide
+// about one slide ahead of when it's shown, which is the intended prefetch.
+const loaded = reactive(new Set([0]));
+let slideObserver = null;
+
+function observeSlides() {
+  const el = track.value;
+  if (!el) return;
+  if (!("IntersectionObserver" in window)) {
+    items.forEach((_, index) => loaded.add(index));
+    return;
+  }
+  slideObserver = new IntersectionObserver(
+    (entries) => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue;
+        loaded.add(Number(entry.target.dataset.index));
+        slideObserver.unobserve(entry.target);
+      }
+    },
+    { root: el, rootMargin: "0px 200px" }
+  );
+  el.querySelectorAll(".banner-slide").forEach((slide) => slideObserver.observe(slide));
+}
+
 onMounted(() => {
   startAutoplay();
+  observeSlides();
   document.addEventListener("visibilitychange", onVisibility);
 });
 onBeforeUnmount(() => {
   stopAutoplay();
+  slideObserver?.disconnect();
+  slideObserver = null;
   document.removeEventListener("visibilitychange", onVisibility);
 });
 </script>
@@ -127,6 +164,7 @@ onBeforeUnmount(() => {
           :key="item.image"
           class="banner-slide shrink-0 snap-start"
           role="group"
+          :data-index="index"
           :aria-roledescription="'slide'"
           :aria-label="`${index + 1} of ${items.length}`"
         >
@@ -138,13 +176,13 @@ onBeforeUnmount(() => {
           >
             <picture>
               <source
-                v-if="bannerSources(item.image).srcset"
+                v-if="loaded.has(index) && bannerSources(item.image).srcset"
                 type="image/webp"
                 :srcset="bannerSources(item.image).srcset"
                 :sizes="props.sizes"
               />
               <img
-                :src="item.image"
+                :src="loaded.has(index) ? item.image : PLACEHOLDER"
                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 :alt="`${item.name} banner`"
                 :loading="index === 0 ? 'eager' : 'lazy'"
