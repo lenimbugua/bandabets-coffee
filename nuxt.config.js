@@ -198,9 +198,20 @@ export default defineNuxtConfig({
     // hydration strategy / v-if fires. Without this, every SSR-rendered
     // component's chunk is preloaded before first paint even when its
     // hydration is deferred.
+    //
+    // Round 2 final review: pages/ and layouts/ chunks are dynamic imports
+    // too (Nuxt page/layout components), but the CURRENT route's page chunk
+    // and layout chunk are needed before hydration can even start — they are
+    // not "lazy" in the sense this hook targets. Stripping their preload
+    // hints forced the browser to discover them only after the entry chunk
+    // executed, adding one extra sequential round-trip before hydration.
+    // Leave those alone; only strip component-level dynamic entries (lazily
+    // mounted modals, lazily hydrated sections).
     "build:manifest": (manifest) => {
       for (const key in manifest) {
         const chunk = manifest[key];
+        const src = chunk.src ?? "";
+        if (/(^|\/)(pages|layouts)\//.test(src)) continue;
         if (chunk.isDynamicEntry && !chunk.isEntry) {
           chunk.preload = false;
           chunk.prefetch = false;

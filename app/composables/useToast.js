@@ -3,7 +3,12 @@
 // into the login chunk that every page preloads.
 let swalPromise = null;
 const loadSwal = () =>
-  (swalPromise ??= import("sweetalert2").then((m) => m.default));
+  (swalPromise ??= import("sweetalert2")
+    .then((m) => m.default)
+    .catch((err) => {
+      swalPromise = null; // let the next toast retry after a transient chunk-load failure
+      throw err;
+    }));
 
 const errorColor = "red";
 const successColor = "green";
