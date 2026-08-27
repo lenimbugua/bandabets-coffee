@@ -519,6 +519,38 @@ export default defineNuxtConfig({
 
   vite: {
     plugins: [tailwindcss()],
+    build: {
+      // Task 4 (Lighthouse perf): Nuxt's default `features.inlineStyles`
+      // already inlines every component's CSS as a `<style>` tag in the
+      // SSR HTML (verified against the installed @nuxt/schema resolver at
+      // node_modules/.pnpm/@nuxt+schema@4.5.1/node_modules/@nuxt/schema/dist/index.mjs:626-630 —
+      // default is `(id) => id.includes(".vue")`, active whenever
+      // dev:false and ssr!==false, which is this app's production build).
+      // But Vite's per-component CSS chunking still emits a matching
+      // `<link rel="stylesheet">` for each of those chunks too (kept for
+      // client-side navigation/hydration), so the baseline home page
+      // shipped both: 16 inlined `<style>` tags AND 13 render-blocking
+      // `<link>`s duplicating the same content (measured before this
+      // change). Explicitly setting `features.inlineStyles: true` was
+      // tried first and rejected — it additionally inlined the ~300 KB
+      // global entry.css (Tailwind) straight into the HTML, losing its
+      // browser cacheability, while still leaving 12 blocking links.
+      // `cssCodeSplit: false` instead collapses every chunk's CSS across
+      // the whole app (all components, all routes) into one file, so
+      // there is nothing left for Vite to split into per-component
+      // `<link>`s. Measured on `/` and `/sports/soccer`: 13 blocking
+      // `<link>`s -> 1; the default `inlineStyles` behaviour still fires
+      // (16 harmless, non-blocking `<style>` tags remain, same as
+      // baseline). The single merged file is larger (~464 KB raw / ~60 KB
+      // gzip) than the home page's previous 13-file total (~372 KB raw)
+      // because it now bundles CSS for every route in the app, not just
+      // what `/` needs — the accepted trade-off: one bigger, long-cached
+      // request beats 13 small render-blocking ones. `features.inlineStyles`
+      // is left at its default (unset): with cssCodeSplit:false there are
+      // no more per-component chunks for it to selectively inline, so an
+      // explicit override here would be dead configuration.
+      cssCodeSplit: false,
+    },
   },
 
   runtimeConfig: {
