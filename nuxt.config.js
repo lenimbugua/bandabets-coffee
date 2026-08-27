@@ -22,13 +22,19 @@ const clientCssDir = fileURLToPath(
 // features.inlineStyles already inlines that same CSS as a server-rendered
 // <style> whenever the owning component renders, so the chunk's
 // <link rel="stylesheet"> is redundant regardless of chunk name. Test the
-// actual CSS content: after stripping scoped-keyframes blocks and any
-// @media/@supports wrapper (by treating `@...{` prefixes as transparent),
-// every remaining rule's selector must contain `[data-v-`. An empty result
+// actual CSS content: after stripping comments and scoped-keyframes blocks
+// and any @media/@supports wrapper (by treating `@...{` prefixes as
+// transparent), every remaining rule's FULL, comma-separated selector list
+// must be entirely `[data-v-` selectors (a mixed list like `.a[data-v-x],
+// .b{...}` would otherwise leak `.b` as a global rule). An empty result
 // after stripping means there was no actual CSS to judge, so treat that as
-// NOT scoped-only (do not strip).
+// NOT scoped-only (do not strip). Round 6 fix round 1: dev mode's synthetic
+// client manifest only ever contains entry chunks (see writeManifest's
+// devClientManifest upstream), so this disk-read branch is never reached
+// during `nuxt dev` — it only runs for the real manifest built by `nuxt build`.
 function isScopedOnlyCss(css) {
-  const withoutKeyframes = css.replace(
+  const withoutComments = css.replace(/\/\*[\s\S]*?\*\//g, "");
+  const withoutKeyframes = withoutComments.replace(
     /@keyframes\s+[\w-]+-[0-9a-f]{8}\s*\{(?:[^{}]*\{[^{}]*\})*[^{}]*\}/g,
     "",
   );
@@ -38,7 +44,14 @@ function isScopedOnlyCss(css) {
     .map((rule) => rule.trim())
     .filter(Boolean);
   if (rules.length === 0) return false;
-  return rules.every((rule) => rule.split("{")[0].includes("[data-v-"));
+  return rules.every((rule) => {
+    const selectorList = rule.split("{")[0];
+    return selectorList
+      .split(",")
+      .map((selector) => selector.trim())
+      .filter(Boolean)
+      .every((selector) => selector.includes("[data-v-"));
+  });
 }
 
 // Lighthouse round 3: the build:manifest hook below needs to tell which CSS
