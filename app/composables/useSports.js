@@ -1,3 +1,4 @@
+import { SOCCER_SPORT_ID } from "@/utilities/sport-ids";
 import { useCompetionsStore } from "@/stores/competitions";
 import { useSportsQueryParamsStore } from "@/stores/sports-query-params";
 import formatStuff from "@/utilities/format-stuff";
@@ -38,7 +39,7 @@ const games = ref([
     name: "soccer",
     icon: soccer,
     iconColor: "text-primary",
-    id: 10,
+    id: SOCCER_SPORT_ID,
     link: "/",
   },
   {
@@ -232,7 +233,7 @@ export function useSports() {
       return;
     }
 
-    if (sportId !== 10) {
+    if (sportId !== SOCCER_SPORT_ID) {
       setResource("upcoming");
     }
     setSportIsPending(true);

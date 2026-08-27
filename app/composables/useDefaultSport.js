@@ -1,3 +1,4 @@
+import { SOCCER_SPORT_ID } from "@/utilities/sport-ids";
 import { useMatches2Store } from "../stores/matches2";
 import { useSportsStore } from "../stores/sports";
 import { useSportsQueryParamsStore } from "@/stores/sports-query-params";
@@ -13,7 +14,7 @@ export function useDefaultSport() {
     emptyMatches();
     resetSelectedMarket();
     resetToDefaults();
-    setSport(10);
+    setSport(SOCCER_SPORT_ID);
     resetSelectedSportId();
     setSelectedSport("soccer");
     if (shouldFetch) {

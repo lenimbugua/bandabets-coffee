@@ -1,3 +1,4 @@
+import { SOCCER_SPORT_ID } from "@/utilities/sport-ids";
 import { useMatches2Store } from "@/stores/matches2";
 import { useSportsQueryParamsStore } from "@/stores/sports-query-params";
 import API, { MATCHES_PATH } from "../services/API";
@@ -106,7 +107,7 @@ export const useLiveMatchesStore = defineStore("live-matches-store", {
       try {
         this.highlightPending = true;
         const response = await API().get(
-          `/sportsbook/api/v2/matches-grouped?sport=${sport || 10}&competition=&sortBy=&day=&resource=highlight`
+          `/sportsbook/api/v2/matches-grouped?sport=${sport || SOCCER_SPORT_ID}&competition=&sortBy=&day=&resource=highlight`
         );
         this.highlightMatches = response.data.data.competitions || [];
         this.highlightPending = false;

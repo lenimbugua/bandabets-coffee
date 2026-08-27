@@ -1,4 +1,4 @@
-
+import { SOCCER_SPORT_ID } from "@/utilities/sport-ids";
 const defaultPageSize = 10;
 
 export const useSportsQueryParamsStore = defineStore(
@@ -6,7 +6,7 @@ export const useSportsQueryParamsStore = defineStore(
   {
     state: () => ({
       /** !--- Start params for matches request ---! */
-      sport: 10,
+      sport: SOCCER_SPORT_ID,
       page: 0,
       pageSize: defaultPageSize,
       competition: "",
@@ -50,7 +50,7 @@ export const useSportsQueryParamsStore = defineStore(
     actions: {
       /** ---! Start set params section ---! */
       resetToDefaults() {
-        this.sport = 10;
+        this.sport = SOCCER_SPORT_ID;
         this.page = 0;
         this.pageSize = defaultPageSize;
         this.competition = "";
