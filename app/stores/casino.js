@@ -31,6 +31,13 @@ function normalizeGame(game) {
   };
 }
 
+// One shared request for the categories payload. Several home-page
+// components call fetchCategoriesWithGames() on mount (landing, sidebar,
+// top games, hot tabs); before this they raced three identical
+// /sg-categories requests on every load. Kept outside Pinia state so it is
+// never serialised or persisted.
+let categoriesRequest = null;
+
 export const useCasinoStore = defineStore("casino-store", {
   // state() is a factory invoked when the store is instantiated (inside a
   // component/plugin setup), which is a valid context for useRuntimeConfig()
@@ -134,29 +141,35 @@ export const useCasinoStore = defineStore("casino-store", {
       }
     },
 
-    async fetchCategoriesWithGames() {
-      try {
-        this.categoriesLoading = true;
-        const { headers } = getAuthHeaders();
-        // Soft-gaming tenant. Drives the sg-* casino endpoints.
-        const { public: config } = useRuntimeConfig();
-        const tenantCode = config.tenantCode;
-        const response = await API(casinoBaseURL).get(
-          `/api/v1/sg-categories/tenant/${tenantCode}`,
-          { headers }
-        );
-        const payload = Array.isArray(response.data)
-          ? response.data
-          : response.data?.data ?? [];
-        this.categoriesWithGames = payload.map((category) => ({
-          ...category,
-          games: filterHiddenGames(category.games).map(normalizeGame),
-        }));
-      } catch (err) {
-        console.log(err);
-      } finally {
-        this.categoriesLoading = false;
-      }
+    async fetchCategoriesWithGames({ force = false } = {}) {
+      if (!force && this.categoriesWithGames.length) return;
+      if (categoriesRequest) return categoriesRequest;
+      categoriesRequest = (async () => {
+        try {
+          this.categoriesLoading = true;
+          const { headers } = getAuthHeaders();
+          // Soft-gaming tenant. Drives the sg-* casino endpoints.
+          const { public: config } = useRuntimeConfig();
+          const tenantCode = config.tenantCode;
+          const response = await API(casinoBaseURL).get(
+            `/api/v1/sg-categories/tenant/${tenantCode}`,
+            { headers }
+          );
+          const payload = Array.isArray(response.data)
+            ? response.data
+            : response.data?.data ?? [];
+          this.categoriesWithGames = payload.map((category) => ({
+            ...category,
+            games: filterHiddenGames(category.games).map(normalizeGame),
+          }));
+        } catch (err) {
+          console.log(err);
+        } finally {
+          this.categoriesLoading = false;
+          categoriesRequest = null;
+        }
+      })();
+      return categoriesRequest;
     },
 
     async fetchProviders() {
