@@ -39,6 +39,25 @@ const items = [
   { name: "Wherever you are", image: "/banners/banda/wherever-you-are.jpg" },
 ];
 
+// TheBanner is the only carousel — DesktopSportsLayout.vue and
+// MobileSportsLayout.vue both mount it, but the layouts that mount those are
+// gated with v-if/v-else-if on useScreenSizes()'s breakpoints (see
+// TheSports.vue, TheLanding.vue, app/layouts/default.vue), so only ONE
+// TheBanner instance is ever mounted at a time. That makes this the single
+// place to preload the first slide for whichever viewport actually renders.
+useHead({
+  link: [
+    {
+      rel: "preload",
+      as: "image",
+      href: items[0].image,
+      imagesrcset: bannerSources(items[0].image).srcset,
+      imagesizes: BANNER_SIZES,
+      fetchpriority: "high",
+    },
+  ],
+});
+
 // The BANDA banners are brand artwork with no live offers behind them yet, so
 // every slide goes home. Flip this to false to restore per-banner routing —
 // the old slide set and its targets are kept below for that.
@@ -99,7 +118,7 @@ function slideNext() {
         class="max-lg:overflow-visible!"
         @swiper="onSwiperInit"
       >
-        <swiper-slide v-for="item in items" :key="item.image">
+        <swiper-slide v-for="(item, index) in items" :key="item.image">
           <button
             type="button"
             class="relative block w-full aspect-[3/1] rounded-xl overflow-hidden group cursor-pointer ring-1 ring-gray-200/80 dark:ring-white/10"
@@ -112,7 +131,8 @@ function slideNext() {
                 :src="item.image"
                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 :alt="`${item.name} banner`"
-                loading="lazy"
+                :loading="index === 0 ? 'eager' : 'lazy'"
+                :fetchpriority="index === 0 ? 'high' : undefined"
                 decoding="async"
               />
             </picture>
