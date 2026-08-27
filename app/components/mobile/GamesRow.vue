@@ -1,6 +1,7 @@
 <script setup>
 import { useRouter } from "vue-router";
 import { useCasino } from "@/composables/useCasino";
+import NearViewportImage from "@/components/casino/NearViewportImage.vue";
 
 const props = defineProps({
   title: { type: String, required: true },
@@ -64,11 +65,10 @@ function viewAll() {
           @click="play(game)"
         >
           <div class="relative aspect-square overflow-hidden">
-            <img
+            <NearViewportImage
               :src="game.imgFullUrl"
               :alt="game.gameName"
               class="w-full h-full object-cover"
-              loading="lazy"
             />
 
             <span

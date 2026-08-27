@@ -5,6 +5,7 @@ import { useRouter } from "vue-router";
 import { useCasinoStore } from "@/stores/casino";
 import { useCasino } from "@/composables/useCasino";
 import { casinoCategoryIconPath } from "@/composables/useCasinoCategoryIcons";
+import NearViewportImage from "@/components/casino/NearViewportImage.vue";
 
 const router = useRouter();
 const casinoStore = useCasinoStore();
@@ -133,11 +134,10 @@ function viewAll() {
           @click="play(game)"
         >
           <div class="relative aspect-square overflow-hidden">
-            <img
+            <NearViewportImage
               :src="game.imgFullUrl"
               :alt="game.gameName"
               class="w-full h-full object-cover"
-              loading="lazy"
             />
             <span class="absolute top-1 left-1 sm:top-1.5 sm:left-1.5 inline-flex items-center justify-center w-5 h-5 sm:w-6 sm:h-6 rounded-md bg-background/70 text-xs sm:text-sm" aria-hidden="true">🔥</span>
           </div>

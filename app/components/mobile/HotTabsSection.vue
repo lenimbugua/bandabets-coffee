@@ -10,6 +10,7 @@ import { useMatchDetails } from "@/composables/useMatchDetails";
 import { useLoadCode } from "@/composables/useLoadCode";
 import { useCasino } from "@/composables/useCasino";
 import { casinoCategoryIconPath } from "@/composables/useCasinoCategoryIcons";
+import NearViewportImage from "@/components/casino/NearViewportImage.vue";
 
 const router = useRouter();
 
@@ -443,11 +444,10 @@ onMounted(() => {
           @click="playGame(game)"
         >
           <div class="relative aspect-square overflow-hidden">
-            <img
+            <NearViewportImage
               :src="game.imgFullUrl"
               :alt="game.gameName"
               class="h-full w-full object-cover"
-              loading="lazy"
             />
           </div>
         </button>
