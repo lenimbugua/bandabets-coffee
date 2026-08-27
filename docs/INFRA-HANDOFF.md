@@ -145,3 +145,10 @@ begins.
 - Sticky sessions are not required; the session lives in a client cookie.
 - `GET /version.json` returns `{"version": "<NUXT_PUBLIC_APP_VERSION>"}` with
   `cache-control: no-store` — use it as the readiness/liveness probe.
+
+## Fonts (2026-08-27)
+
+`pnpm build` now needs outbound HTTPS to `fonts.googleapis.com` /
+`fonts.gstatic.com` on the **build** machine only (`@nuxt/fonts` downloads
+Hanken Grotesk `.woff2` files into `.output/public/_fonts/` at build time).
+The runtime container makes no font requests to Google.

@@ -198,7 +198,26 @@ export default defineNuxtConfig({
     "@vueuse/nuxt",
     "@nuxt/eslint",
     "@nuxt/icon",
+    "@nuxt/fonts",
   ],
+
+  // Self-hosts Hanken Grotesk (the app's only font family — see
+  // app/assets/css/style.css --font-sans/--font-display) instead of
+  // fetching it from Google at request time. Font files are downloaded at
+  // `pnpm build` time and emitted into `.output/public/_fonts/`; the
+  // runtime container makes no requests to Google. Explicit `families`
+  // avoids relying on the module's CSS-scanning guess.
+  fonts: {
+    families: [
+      {
+        name: "Hanken Grotesk",
+        provider: "google",
+        weights: [400, 500, 600, 700, 800],
+        styles: ["normal"],
+      },
+    ],
+    defaults: { weights: [400], styles: ["normal"] },
+  },
 
   icon: {
     serverBundle: { collections: ["tabler"] },
@@ -492,12 +511,6 @@ export default defineNuxtConfig({
         { rel: "icon", type: "image/png", sizes: "32x32", href: "/favicon-32x32.png" },
         { rel: "icon", type: "image/png", sizes: "16x16", href: "/favicon-16x16.png" },
         { rel: "manifest", href: "/site.webmanifest" },
-        { rel: "preconnect", href: "https://fonts.googleapis.com" },
-        { rel: "preconnect", href: "https://fonts.gstatic.com", crossorigin: "" },
-        {
-          rel: "stylesheet",
-          href: "https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap",
-        },
         { rel: "preconnect", href: "https://imagedelivery.net", crossorigin: "" },
         { rel: "preconnect", href: "https://storage.googleapis.com", crossorigin: "" },
       ],
