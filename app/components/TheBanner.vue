@@ -118,6 +118,7 @@ onBeforeUnmount(() => {
       <div
         ref="track"
         class="banner-track flex w-full gap-3 overflow-x-auto scroll-smooth snap-x snap-mandatory scrollbar-hide"
+        role="region"
         aria-roledescription="carousel"
         aria-label="Promotions"
       >

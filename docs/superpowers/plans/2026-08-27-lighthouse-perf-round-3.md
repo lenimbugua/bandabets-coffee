@@ -471,3 +471,40 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 - Coverage: chat design items 1→Task 1, 2→Task 2, 3→Task 3; verification→Task 4.
 - Placeholders: none; each code step is complete. Task 3 Step 4 names its abort condition.
 - Consistency: `build:manifest` hook text in Task 3 includes the round-2 guard verbatim; `fetchCategoriesWithGames` keeps its zero-arg call shape; `TheBanner.vue` keeps the `sizes` prop default that `casino-home.vue` overrides.
+
+## Results (2026-08-27, commits db86221..HEAD)
+
+Local build, `node .output/server/index.mjs` with the dev `.env` loaded correctly (loop, not `source`).
+
+### Critical-path bytes on `/` (`scripts/critical-bytes.mjs`)
+
+| Stage | modulepreload | JS gzip | stylesheets | CSS gzip |
+|---|---|---|---|---|
+| After round 2 | 81 | 260 KB | 1 | 54 KB |
+| T1 scroll-snap banner | 82 | 261 KB | 1 | 54 KB |
+| T2 categories dedupe | 82 | 261 KB | 1 | 54 KB |
+| **T3 split CSS + strip duplicate links** | 82 | 261 KB | 2 | **36 KB (−33 %)** |
+
+T1 does not move this metric because the Swiper chunk was only ever `prefetch`ed (the banner is `hydrate-on-idle`); its cost was main-thread time (~1 s incl. forced reflow), not preload bytes. The second stylesheet is `useFlyToBetslip.css` (1.1 KB, non-`.vue`, intentionally kept).
+
+### Lighthouse 13 (Moto G Power, slow 4G, mobile), local
+
+| Run | Perf | A11y | FCP | LCP | TBT | SI |
+|---|---|---|---|---|---|---|
+| Round 2 final, devtools throttling | 78 | 95 | 2.5 s | 2.5 s | 613 ms | 3.1 s |
+| Round 3 final, devtools throttling | 74 | 95 | 2.7 s | 2.7 s | 665 ms | 3.4 s |
+| Round 2 final, simulated | 62 | — | 4.8 s | 7.1 s | 180 ms | 4.8 s |
+| Round 3 final, simulated | 60 | — | 4.9 s | 7.1 s | 194 ms | 4.9 s |
+
+Local runs are within run-to-run noise of each other (the round-3 devtools run had an 878 ms TTFB vs 35 ms in round 2 — a cold local server, not a code change), so this round's effect must be read from the deterministic measurements: render-blocking CSS transfer 43 → 28 KB, Swiper's ~1 s of main-thread work removed, one `sg-categories` request instead of three. The deployed PSI number is the one that counts.
+
+### Verified headless
+- Banner: mobile autoplay advanced one stride (354 px on a 388 px track) in 9 s; desktop next → 714 px, prev → 0.
+- `sg-categories`: 1 request on `/` (was 3); `/casino-home` still refetches (`force: true`).
+- `/casino-home` (`ssr: false`, CSS arrives only via Vite's preload helper): banner track `overflow-x: auto`, slide 341.8 px on a 388 px track, 54 scoped rules present.
+- CSS: `/` → `/leagues` client-side keeps every scoped style (61 elements fingerprinted identical to a direct load); betslip/deposit/login modals opened client-side have their scoped rules; 12 component stylesheets are re-added post-hydration by Vite's preload helper.
+
+### Remaining measured candidates
+1. **Login-store chunk** (24 KB gz; 484 ms long task on every page) — `plugins/auth-ssr.js` instantiates `useLoginStore()` eagerly; audit its init (crypto-js PBKDF2 at 100 iterations runs on load?) and defer what is not needed for an anonymous first paint.
+2. **Style & Layout 713 ms** on load — the match list / odds grid renders ~26 sibling cards synchronously after the `matches` XHR; virtualise or render the first screen only.
+3. **Entry CSS 28 KB** — Tailwind utilities still dominate; per-route splitting of the utilities layer is not possible with Tailwind 4's single `@import`, so the next lever is component-level cleanup of unused legacy classes.
