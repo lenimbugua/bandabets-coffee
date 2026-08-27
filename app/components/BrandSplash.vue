@@ -1,102 +1,85 @@
 <script setup>
 import BandaLogo from "./logos/BandaLogo.vue";
 
+// The splash is SSR-rendered and dismissed by CSS animation alone (see the
+// style block): it fades out ~1 s after first paint whether or not the
+// JavaScript bundle has arrived. onMounted merely removes the node once the
+// animation is guaranteed to have finished, so it stops costing layout.
+const SPLASH_TOTAL_MS = 1100;
 const isVisible = ref(true);
-const hasEntered = ref(false);
-
-// Two beats, not one: the mark settles first, then the rule under it draws.
-// Sequencing reads as deliberate; everything arriving at once reads as a
-// page that simply appeared.
 onMounted(() => {
-  requestAnimationFrame(() => {
-    hasEntered.value = true;
-  });
   setTimeout(() => {
     isVisible.value = false;
-  }, 1800);
+  }, SPLASH_TOTAL_MS);
 });
 </script>
 
 <template>
-  <Transition name="splash">
-    <div
-      v-if="isVisible"
-      class="fixed inset-0 z-9999 flex flex-col items-center justify-center bg-background"
-      role="status"
-      aria-label="Bandabets is loading"
-    >
-      <BandaLogo
-        class="splash-mark h-9 w-auto md:h-11"
-        :class="{ 'is-in': hasEntered }"
-      />
-
-      <!-- A hairline that draws to full width, then holds. It reads as
-           progress without pretending to measure anything it cannot know. -->
-      <span
-        class="splash-rule mt-6 block h-px w-32 origin-left bg-primary md:w-40"
-        :class="{ 'is-in': hasEntered }"
-        aria-hidden="true"
-      />
-    </div>
-  </Transition>
+  <div
+    v-if="isVisible"
+    class="splash fixed inset-0 z-9999 flex flex-col items-center justify-center bg-background pointer-events-none"
+    role="status"
+    aria-label="Bandabets is loading"
+  >
+    <BandaLogo class="splash-mark h-9 w-auto md:h-11" />
+    <!-- A hairline that draws to full width, then holds. -->
+    <span
+      class="splash-rule mt-6 block h-px w-32 origin-left bg-primary md:w-40"
+      aria-hidden="true"
+    />
+  </div>
 </template>
 
 <style scoped>
-/* ease-out-expo. The mark decelerates hard into place and stops — no
-   overshoot, no settle wobble. The previous splash bounced each glyph on a
-   springy cubic-bezier, which read as a game, not a sportsbook. */
+/* Timeline (ms after first paint):
+     0–450   mark settles in (ease-out-expo, no overshoot)
+   120–570   rule draws left → right
+   700–1100  whole overlay lifts and fades; visibility flips to hidden at the end
+   The overlay never intercepts pointer events, so a fast tap on SSR content
+   still works during the hold. */
+.splash {
+  animation: splash-out 400ms cubic-bezier(0.16, 1, 0.3, 1) 700ms forwards;
+}
 .splash-mark {
   opacity: 0;
   transform: translateY(6px) scale(0.985);
-  transition:
-    opacity 620ms cubic-bezier(0.16, 1, 0.3, 1),
-    transform 620ms cubic-bezier(0.16, 1, 0.3, 1);
+  animation: splash-mark-in 450ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
-
-.splash-mark.is-in {
-  opacity: 1;
-  transform: translateY(0) scale(1);
-}
-
 .splash-rule {
   transform: scaleX(0);
   opacity: 0.9;
-  transition: transform 900ms cubic-bezier(0.16, 1, 0.3, 1) 180ms;
+  animation: splash-rule-in 450ms cubic-bezier(0.16, 1, 0.3, 1) 120ms forwards;
+}
+@keyframes splash-mark-in {
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+@keyframes splash-rule-in {
+  to {
+    transform: scaleX(1);
+  }
+}
+@keyframes splash-out {
+  to {
+    opacity: 0;
+    transform: scale(1.012);
+    visibility: hidden;
+  }
 }
 
-.splash-rule.is-in {
-  transform: scaleX(1);
-}
-
-/* Exit lifts very slightly as it fades, so the splash feels lifted away
-   rather than switched off. */
-.splash-leave-active {
-  transition:
-    opacity 420ms cubic-bezier(0.16, 1, 0.3, 1),
-    transform 420ms cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.splash-leave-to {
-  opacity: 0;
-  transform: scale(1.012);
-}
-
-/* Reduced motion: keep the brand, drop the movement. The mark is present
-   immediately and only the fade-out remains. */
+/* Reduced motion: keep the brand, drop the movement — mark and rule are
+   present immediately and only a short fade-out remains. */
 @media (prefers-reduced-motion: reduce) {
   .splash-mark,
   .splash-rule {
     opacity: 1;
     transform: none;
-    transition: none;
+    animation: none;
   }
-
-  .splash-leave-active {
-    transition: opacity 200ms linear;
-  }
-
-  .splash-leave-to {
-    transform: none;
+  .splash {
+    animation: splash-out 200ms linear 500ms forwards;
   }
 }
 </style>
