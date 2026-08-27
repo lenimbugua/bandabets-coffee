@@ -153,3 +153,26 @@ In `app/components/BrandSplash.vue`, remove `visibility: hidden;` from `@keyfram
 - Coverage: hotspot→T1, banner bytes/sizes→T2, splash warning→T1 Step 3. The `useFlyToBetslip.css` second blocking stylesheet (1.3 KB, parallel with entry.css) is deliberately left — its chunk is named after a composable but carries two components' scoped CSS; stripping it needs content inspection in the manifest hook (deferred, noted in Results).
 - Placeholders: none; accept rules numeric; each step names its verification.
 - Consistency: `useThemeSwitch()` return keys unchanged for `app.vue`, `ThemeSwitch.vue`, `stores/login.js`; `PLACEHOLDER` constant identical to `NearViewportImage.vue`.
+
+## Results (2026-08-27, commits d6fbdb9..04e516e)
+
+Real-data harness (`scripts/dev-cors-proxy.mjs`), devtools throttling, medians of 3.
+
+| Stage | Perf | LCP | TBT | SI | Style & Layout | longest task |
+|---|---|---|---|---|---|---|
+| Round-4 baseline (round-3 code) | 81 | 2.09 s | 610 ms | 2.87 s | 554 ms | 483 ms |
+| T1 shared theme instance (implementer's A/B) | 81 | 1.97 s | 635 ms | — | 423 ms | 532 ms |
+| **Round-5 final** (T1 + T2) | 80 | 2.07 s | 636 ms | 2.75 s | **389 ms (−30 %)** | 527 ms |
+
+- The forced-reflow routine is gone (`head style` count no longer grows after hydration); Style & Layout fell by ~165 ms. TBT did not follow — the remaining long task is the post-XHR render itself (script 615–690 ms), which is now the dominant cost.
+- Banner requests at load: 8 → 2 (+1 per autoplay step); total transfer on the mobile home page ≈ 1.26–1.29 MB.
+- Desktop `sizes`: measured slot 686 px at 1350 px viewport (chrome 664 px) — the existing default is correct; PSI's 598 px could not be reproduced locally, so `sizes` was left unchanged.
+- The splash `visibility` keyframe was removed (Lighthouse's non-composited-animation warning).
+
+Task 1's accept bar (TBT −100 ms) was set above this harness's noise (run-to-run TBT spread ≈ ±80 ms); the change was accepted on the strength of the profile and the consistent directional gains.
+
+### Remaining measured candidates
+1. Font in the critical chain (1.1 s on PSI): `@nuxt/fonts` supports `preload: true` per family.
+2. Second render-blocking stylesheet (`useFlyToBetslip.*.css`, 831 B: `AnimatePulse` + `OddChangeArrow` scoped CSS in a composable-named chunk): strip by content (all rules scoped) in the manifest hook.
+3. Entry stylesheet 28 KB gzip blocking ~1 s on slow 4G: measure used-CSS coverage on `/`; if the critical subset is small, inline it and load the rest async.
+4. Post-XHR render task (~500 ms): render the first screen of match cards, defer the rest to the next frame.
