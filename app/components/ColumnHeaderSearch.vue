@@ -8,8 +8,8 @@ const props = defineProps({
   outcomeLabels: { type: Array, default: () => ["1", "X", "2"] },
   isLive: { type: Boolean, default: false },
   variant: { type: String, default: "prematch" },
-  // "dark" sinks the bar below the panel surface instead of lifting it.
-  tone: { type: String, default: "default" },
+  // "dark" (default) sinks the bar below the panel surface; "default" lifts it.
+  tone: { type: String, default: "dark" },
 });
 
 const router = useRouter();

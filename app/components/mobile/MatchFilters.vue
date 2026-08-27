@@ -93,7 +93,6 @@ const outcomeLabels = computed(() => {
       v-if="layout !== 'grid' && matches?.length"
       :matches="matches"
       :outcome-labels="outcomeLabels"
-      tone="dark"
     />
     </template>
   </div>
