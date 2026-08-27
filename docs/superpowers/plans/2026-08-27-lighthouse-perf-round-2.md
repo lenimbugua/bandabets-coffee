@@ -1091,3 +1091,49 @@ Not delegated — the controller runs this after Tasks 0–8 are merged on `main
 - **Spec coverage:** assessment rows 1→Task 1, 2→Task 2, 3→Task 3, 4→Task 4, 5→Task 5, 6→Task 6, 7→Task 7, 8→Task 8; measurement/verification→Tasks 0 and 9. No gaps.
 - **Placeholders:** none — every code step carries the full file or exact replacement text; the only conditional step (Task 4 Step 6) states its decision rule and its time box.
 - **Consistency:** `scripts/critical-bytes.mjs` output format is identical in Task 0 and the recipe; `useModalTypes()` keys used in Task 3 match the file's declarations; `Toast(color, position).fire(opts)` shape in Task 6 matches `app/stores/deposit.js`; `NearViewportImage` props (`src`, `alt`, `rootMargin`) match its three call sites.
+
+## Results (2026-08-27, commits d820e1d..e71ec9c)
+
+Local build, same machine, `node .output/server/index.mjs` with the dev `.env`.
+
+### Critical-path bytes on `/` (`scripts/critical-bytes.mjs`)
+
+| Stage | modulepreload | JS gzip | CSS gzip | prefetch links |
+|---|---|---|---|---|
+| Baseline | 80 | 557 KB | 58 KB | 69 |
+| T1 datepicker removed | 80 | 497 KB | 54 KB | — |
+| T2 mixpanel deferred | 80 | 377 KB | 54 KB | — |
+| T3 lazy modals | 82 | 328 KB | 54 KB | — |
+| T4 lazy hydration + manifest hook | 79 | 297 KB | 54 KB | 35 |
+| T6 login chunk diet | 80 | 260 KB | 54 KB | — |
+| **Final** | **80** | **260 KB (−53 %)** | **54 KB** | **35** |
+
+The preload *count* barely moved because Vite re-split the modal/store graph into ~40 tiny (<1.5 KB) shared chunks; bytes are what the throttled simulation charges.
+
+### Lighthouse 13 (Moto G Power emulation, slow 4G, mobile)
+
+| Run | Perf | A11y | FCP | LCP | TBT | CLS | SI |
+|---|---|---|---|---|---|---|---|
+| Deployed Vercel preview, before (Google PSI, 2026-08-27 15:08) | 55 | 90 | 4.5 s | 6.1 s | 330 ms | 0.024 | 7.4 s |
+| Local baseline, simulated throttling (no API env) | 55 | — | 6.4 s | 8.1 s | 247 ms | — | 6.4 s |
+| Local final, simulated throttling (no API env) | 62 | 95 | 4.8 s | 7.1 s | 180 ms | 0.019 | 4.8 s |
+| Local final, **devtools throttling**, no API env | 86 | — | 2.5 s | 2.5 s | 349 ms | — | 3.1 s |
+| Local final, **devtools throttling**, real API env | **78** | **95** | 2.5 s | 2.5 s | 613 ms | — | 3.1 s |
+
+Notes on reading this:
+- Simulated ("Lantern") throttling is what PSI uses, and it is dominated by request count and the render-blocking stylesheet; devtools throttling measures the real timeline. Both point the same direction; the deployed PSI number after these commits ship is the one that counts.
+- With the real API env, TBT rises to ~600 ms because the home page's XHRs (`matches`, `matches-grouped`, `bets`, three parallel `sg-categories` calls) all resolve during the first idle window and each triggers a render.
+- The 4.8 s observed FCP in the simulated run is an artefact of the un-configured env (empty API URLs → error paths); the devtools run against the configured server is the trustworthy local figure.
+
+### Verified in headless Chrome (412×823, mobile)
+- Splash hidden 1.3 s after navigation start (CSS-timed; was ≥ hydration + 1.8 s).
+- Casino strips: 12 tiles rendered, 4 thumbnails fetched on load, 8 after scrolling the strip (was all 12 immediately).
+- Login modal opens through `useModalStore().openModal("login")` and closes on Escape (chunk loaded on demand).
+- Exactly one `<main>`; viewport meta allows zoom; footer renders with 11 links after scrolling; no page errors (only CORS errors from the API on `localhost`, expected).
+
+### Next candidates (measured, not yet done)
+1. **Swiper chunk** (`BPLZ7ch52`, 26 KB gz, 990 ms main-thread incl. forced reflow) — hydrate the banner `hydrate-on-visible`/on-interaction instead of idle, or replace the mobile banner Swiper with CSS scroll-snap.
+2. **Three parallel `sg-categories` fetches** on the home page (`TheLanding`, `MobileTest`, `TopGames`, `HotTabsSection`, `TheSidebar` all call `fetchCategoriesWithGames` on mount) — dedupe with an in-flight promise in `stores/casino.js`.
+3. **Render-blocking stylesheet** (54 KB gz, 872 ms on slow 4G): 254 KB raw of Tailwind utilities + 125 KB scoped CSS for every route in one file — per-route CSS (`cssCodeSplit: true` plus the manifest hook, now that the per-component `<link>` duplication is gone) or critical-CSS inlining via `features.inlineStyles` scoped to the home route.
+4. **Login-store chunk** (`B2pk-8sl`, 24 KB gz, 467 ms long task on load) — `app/stores/login.js` runs on every page via `plugins/auth-ssr.js`; audit what it does at init.
+5. Desktop/casino pages still use plain `<img loading="lazy">` for `imgFullUrl` tiles (9 components) — apply `NearViewportImage` there.
