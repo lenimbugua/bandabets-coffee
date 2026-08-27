@@ -37,7 +37,10 @@ const isSelected = (id) => {
       <div
         class="w-10 h-10 flex flex-col items-center justify-center rounded-lg bg-gray-100 dark:bg-white/[0.06] hover:bg-gray-200 dark:hover:bg-white/10 transition-colors"
       >
-        <SecondaryNavIcons :icon="link.icon" :icon-css="`h-6 w-6 sm:h-7 sm:w-7 ${link.iconColor || 'text-gray-600 dark:text-white/60'}`" />
+        <SecondaryNavIcons
+          :icon="link.icon"
+          :icon-css="`h-6 w-6 sm:h-7 sm:w-7 transition-colors ${isSelected(link.id) ? 'text-primary' : 'text-foreground/70'}`"
+        />
       </div>
       <div
         :class="[
