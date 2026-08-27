@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
-import { useDark } from "@vueuse/core";
+import { useThemeSwitch } from "@/composables/useThemeSwitch";
 
 import { useModalStore } from "@/stores/modal";
 import { useSports } from "@/composables/useSports";
@@ -34,7 +34,7 @@ function hasSvgIcon(sportIcon) {
 }
 
 const router = useRouter();
-const isDark = useDark();
+const { isDark } = useThemeSwitch();
 const { closeModal } = useModalStore();
 const { games, fetchMatches } = useSports();
 const { categories } = useCasino();

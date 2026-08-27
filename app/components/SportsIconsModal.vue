@@ -8,7 +8,7 @@ import {
 import { useModalTypes } from "@/composables/useModalTypes";
 import { useModalStore } from "@/stores/modal";
 import { useLoginStore } from "@/stores/login";
-import { useDark } from "@vueuse/core";
+import { useThemeSwitch } from "@/composables/useThemeSwitch";
 import { storeToRefs } from "pinia";
 import { computed, ref } from "vue";
 import { useRouter } from "vue-router";
@@ -16,7 +16,7 @@ import { useRouter } from "vue-router";
 import ExploreContent from "./ExploreContent.vue";
 
 const router = useRouter();
-const isDark = useDark();
+const { isDark } = useThemeSwitch();
 const { sportsIconsModal } = useModalTypes();
 const { showModal, modalType } = storeToRefs(useModalStore());
 const { closeModal } = useModalStore();

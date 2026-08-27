@@ -2,16 +2,32 @@ import { useDark, useToggle } from "@vueuse/core";
 import { useLoginStore } from "@/stores/login";
 import { storeToRefs } from "pinia";
 
+// One useDark instance for the whole app. Every call used to create its own
+// (app.vue, ThemeSwitch, TheSidebar, ExploreContent, …) and each instance's
+// immediate watcher ran VueUse's transition-suppression routine: inject a
+// <style>*{transition:none!important}</style>, read getComputedStyle().opacity
+// (a forced style recalculation over the entire document), remove it. On the
+// home page that was the largest single JavaScript cost after hydration.
+// disableTransition:false skips that routine entirely; theme toggles simply
+// let elements with transition-colors animate, which is the nicer behaviour.
+let shared = null;
+function themeRef() {
+  if (!shared) {
+    shared = useDark({
+      selector: "body",
+      attribute: "data-theme",
+      valueDark: "dark",
+      valueLight: "light",
+      disableTransition: false,
+    });
+  }
+  return shared;
+}
+
 export function useThemeSwitch() {
   const { isAuthenticated } = storeToRefs(useLoginStore());
   const { themeSwitch } = useLoginStore();
-
-  const isDark = useDark({
-    selector: "body",
-    attribute: "data-theme",
-    valueDark: "dark",
-    valueLight: "light",
-  });
+  const isDark = themeRef();
   const toggleDark = useToggle(isDark);
 
   function toggleToUserSavedTheme(userTheme) {
@@ -22,7 +38,6 @@ export function useThemeSwitch() {
       toggleDark();
     }
   }
-
   function changeTheme() {
     toggleDark();
     if (isAuthenticated.value) {
@@ -30,13 +45,11 @@ export function useThemeSwitch() {
       themeSwitch(theme);
     }
   }
-
   function switchToDark() {
     if (!isDark.value) {
       toggleDark();
     }
   }
-
   return {
     isDark,
     changeTheme,

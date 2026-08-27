@@ -1,5 +1,5 @@
 <script setup>
-import { useDark } from "@vueuse/core";
+import { useThemeSwitch } from "@/composables/useThemeSwitch";
 const props = defineProps({
   borderSize: {
     type: String,
@@ -7,7 +7,7 @@ const props = defineProps({
   },
 });
 
-const isDark = useDark();
+const { isDark } = useThemeSwitch();
 
 function borderCss() {
   const darkBorder = `border-bottom: ${props.borderSize} solid #09070d`;

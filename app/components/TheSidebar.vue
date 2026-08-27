@@ -7,12 +7,12 @@ import { useSecondaryNavGames } from "@/composables/useSecondaryNavGames";
 import { storeToRefs } from "pinia";
 import {  onMounted } from "vue";
 // import { useCasino } from "@/composables/useCasino";
-import { useDark } from "@vueuse/core";
+import { useThemeSwitch } from "@/composables/useThemeSwitch";
 import { useRouter } from "vue-router";
 import SidebarTabs from "./SidebarTabs.vue";
 import SecondaryNavIcons from "./SecondaryNavIcons.vue";
 
-const isDark = useDark();
+const { isDark } = useThemeSwitch();
 
 const router = useRouter();
 const casinoStore = useCasinoStore();
