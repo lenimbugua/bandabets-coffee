@@ -15,6 +15,11 @@ export const affiliateBaseURL = "affiliateUrl";
 export const cmsBaseURL = "cmsUrl";
 export const affiliateApiBaseURL = "affiliateApiUrl";
 
+// Backend path prefixes. Base hosts come from runtime config above; these
+// are the fixed path segments appended to them. Change here, not per call.
+export const MATCHES_PATH = "/sportsbook/api/v3/matches";
+export const BET_PATH = "/api/lsport/bet";
+
 export default (service = matchesBaseURL) => {
   const config = useRuntimeConfig();
   const baseURL = config.public[service];

@@ -1,6 +1,6 @@
 import { useMatches2Store } from "@/stores/matches2";
 import { useSportsQueryParamsStore } from "@/stores/sports-query-params";
-import API from "../services/API";
+import API, { MATCHES_PATH } from "../services/API";
 
 
 export const useLiveMatchesStore = defineStore("live-matches-store", {
@@ -24,7 +24,7 @@ export const useLiveMatchesStore = defineStore("live-matches-store", {
       try {
         this.responseOK = false;
         const response = await API().get(
-          "/sportsbook/api/v2/matches?sport=&page=0&pageSize=200&competition=&day=&sortBy=&hour=&country=&matchId=&subTypeId=&resource=live"
+          `${MATCHES_PATH}?sport=&page=0&pageSize=200&competition=&day=&sortBy=&hour=&country=&matchId=&subTypeId=&resource=live`
         );
 
         const sports = response.data.data.sports;
@@ -49,7 +49,7 @@ export const useLiveMatchesStore = defineStore("live-matches-store", {
         this.pending = true;
         this.responseOK = false;
         await this.getLiveSports();
-        const response = await API().get("/sportsbook/api/v2/matches", {
+        const response = await API().get(MATCHES_PATH, {
           params: getParams.value,
         });
         this.matches = response.data.data.matches;
@@ -74,7 +74,7 @@ export const useLiveMatchesStore = defineStore("live-matches-store", {
 
       try {
         await this.getLiveSports();
-        const response = await API().get("/sportsbook/api/v2/matches", {
+        const response = await API().get(MATCHES_PATH, {
           params: getParams.value,
         });
         this.matches = response.data.data.matches;

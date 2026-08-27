@@ -1,4 +1,4 @@
-import API from "../services/API";
+import API, { MATCHES_PATH } from "../services/API";
 // import { matchesBaseURL } from "../services/API";
 import { useSportsQueryParamsStore } from "@/stores/sports-query-params";
 import { useSortTypes } from "../composables/useSortTypes";
@@ -77,7 +77,7 @@ export const useMatchesStore = defineStore("matches-store", {
 
         this.landingIsPending = true;
 
-        const response = await API().get("/sportsbook/api/v2/matches", {
+        const response = await API().get(MATCHES_PATH, {
           params: getParams.value,
         });
         this.landingIsPending = false;
@@ -105,7 +105,7 @@ export const useMatchesStore = defineStore("matches-store", {
         setSport(sport);
         this.beforeAPICallState();
         this.sportIsPending = true;
-        const response = await API().get("/sportsbook/api/v2/matches", {
+        const response = await API().get(MATCHES_PATH, {
           params: getParams.value,
         });
         this.sportIsPending = false;
@@ -133,7 +133,7 @@ export const useMatchesStore = defineStore("matches-store", {
         // resetToDefaults();
         // setResource("live");
         // setDay("");
-        const response = await API().get("/sportsbook/api/v1/matches", {
+        const response = await API().get(MATCHES_PATH, {
           params: getParams.value,
         });
         this.setCompetitions(response?.data?.data?.competitions);
@@ -158,7 +158,7 @@ export const useMatchesStore = defineStore("matches-store", {
         this.beforeAPICallState();
         this.setCompetitions([]);
 
-        const response = await API().get("/sportsbook/api/v1/matches", {
+        const response = await API().get(MATCHES_PATH, {
           params: getParams.value,
         });
 
@@ -191,7 +191,7 @@ export const useMatchesStore = defineStore("matches-store", {
         this.beforeAPICallState();
         this.dayIsPending = true;
 
-        const response = await API().get("/sportsbook/api/v1/matches", {
+        const response = await API().get(MATCHES_PATH, {
           params: getParams.value,
         });
         this.dayIsPending = false;
@@ -211,7 +211,7 @@ export const useMatchesStore = defineStore("matches-store", {
       try {
         setHour(hour);
         this.beforeAPICallState();
-        const response = await API().get("/sportsbook/api/v1/matches", {
+        const response = await API().get(MATCHES_PATH, {
           params: getParams.value,
         });
 
@@ -234,7 +234,7 @@ export const useMatchesStore = defineStore("matches-store", {
         setCountry(country);
         setSortBy(sortByLeague);
         this.beforeAPICallState();
-        const response = await API().get("/sportsbook/api/v1/matches", {
+        const response = await API().get(MATCHES_PATH, {
           params: getParams.value,
         });
 
@@ -259,7 +259,7 @@ export const useMatchesStore = defineStore("matches-store", {
           field: "",
         };
         this.responseOK = false;
-        const response = await API().get("/sportsbook/api/v1/matches", {
+        const response = await API().get(MATCHES_PATH, {
           params: getParams.value,
         });
 
@@ -283,7 +283,7 @@ export const useMatchesStore = defineStore("matches-store", {
         resetToDefaults();
         setSortBy(sortBy);
         this.beforeAPICallState();
-        const response = await API().get("/sportsbook/api/v1/matches", {
+        const response = await API().get(MATCHES_PATH, {
           params: getParams.value,
         });
 
@@ -364,13 +364,13 @@ export const useMatchesStore = defineStore("matches-store", {
       const { resetToDefaults, setMatchId } = useSportsQueryParamsStore();
       //   const { getParams } = storeToRefs(useSportsQueryParamsStore());
 
-      const endPoint = `/sportsbook/api/v2/matches?sport=&page=0&pageSize=10&competition=&day=&sortBy=&hour=&country=&matchId=${id}&subTypeId=&resource=`;
+      const endPoint = `${MATCHES_PATH}?sport=&page=0&pageSize=10&competition=&day=&sortBy=&hour=&country=&matchId=${id}&subTypeId=&resource=`;
       try {
         resetToDefaults();
         setMatchId(id);
         this.beforeAPICallState();
 
-        // const response = await API().get("/sportsbook/api/v2/matches", {
+        // const response = await API().get(MATCHES_PATH, {
         //   params: getParams.value,
         // });
         const response = await API().get(endPoint);
@@ -405,7 +405,7 @@ export const useMatchesStore = defineStore("matches-store", {
         resetToDefaults();
         setMatchId(id);
 
-        const response = await API().get("/sportsbook/api/v2/matches", {
+        const response = await API().get(MATCHES_PATH, {
           params: getParams.value,
         });
 
@@ -430,7 +430,7 @@ export const useMatchesStore = defineStore("matches-store", {
         this.responseOK = false;
 
         setSubTypeId(subTypeId);
-        const response = await API().get("/sportsbook/api/v1/matches", {
+        const response = await API().get(MATCHES_PATH, {
           params: getParams.value,
         });
 
@@ -458,7 +458,7 @@ export const useMatchesStore = defineStore("matches-store", {
         this.responseOK = false;
 
         setSubTypeId(subTypeId);
-        const response = await API().get("/sportsbook/api/v1/matches", {
+        const response = await API().get(MATCHES_PATH, {
           params: getParams.value,
         });
 

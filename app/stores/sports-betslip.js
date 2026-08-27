@@ -4,7 +4,7 @@ import { useModalTypes } from "@/composables/useModalTypes";
 import { useToast } from "@/composables/useToast";
 import { useModalStore } from "@/stores/modal";
 import { useProfileStore } from "@/stores/profile";
-import API, { betBaseURL } from "../services/API";
+import API, { betBaseURL, BET_PATH } from "../services/API";
 import { useDepositStore } from "./deposit";
 import { useLoginStore } from "./login";
 
@@ -286,7 +286,7 @@ export const useBetslipStore = defineStore("sports-betslip", {
         const timestampString = new Date().toISOString();
         beginCheckoutDataLayer(timestampString);
         const response = await API(betBaseURL).post(
-          "/api/v3/bets/place-bet",
+          `${BET_PATH}/place-bet`,
           payload1,
           {
             headers: {
@@ -428,7 +428,7 @@ export const useBetslipStore = defineStore("sports-betslip", {
         const payload = this.convertSlipData();
         payload.multiBetSlip = this.extractMultiBetSlip();
         const response = await API(betBaseURL).post(
-          "/api/v3/bets/verify",
+          `${BET_PATH}/verify`,
           payload,
           {
             headers: {

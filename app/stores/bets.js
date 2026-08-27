@@ -1,6 +1,6 @@
 import { useToast } from "@/composables/useToast";
 import { useProfileStore } from "@/stores/profile";
-import API, { betBaseURL } from "../services/API";
+import API, { betBaseURL, BET_PATH } from "../services/API";
 import { useLoginStore } from "./login";
 const { fireErrorToast, fireSuccessToast, positionTopRight } = useToast();
 export const useBetsStore = defineStore("bets-store", {
@@ -21,7 +21,7 @@ export const useBetsStore = defineStore("bets-store", {
       const { profileSid, token } = storeToRefs(useLoginStore());
       try {
         const response = await API(betBaseURL).get(
-          `/api/v2/bets/profile?profileSid=${profileSid.value}&status=${status}`,
+          `${BET_PATH}/profile?profileSid=${profileSid.value}&status=${status}`,
           {
             headers: {
               Authorization: `Bearer ${token.value}`,
@@ -47,7 +47,7 @@ export const useBetsStore = defineStore("bets-store", {
       const { profileSid, token } = storeToRefs(useLoginStore());
       try {
         const response = await API(betBaseURL).get(
-          `/api/bets/slip?profileSid=${profileSid.value}&betId=${this.selectedId}`,
+          `${BET_PATH}/slip?profileSid=${profileSid.value}&betId=${this.selectedId}`,
           {
             headers: {
               Authorization: `Bearer ${token.value}`,

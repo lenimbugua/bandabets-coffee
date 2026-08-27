@@ -1,6 +1,6 @@
 import { useCompetionsStore } from "@/stores/competitions";
 import { useSportsQueryParamsStore } from "@/stores/sports-query-params";
-import API from "../services/API";
+import API, { MATCHES_PATH } from "../services/API";
 
 export const useMatches2Store = defineStore("matches2-store", {
   state: () => ({
@@ -55,7 +55,7 @@ export const useMatches2Store = defineStore("matches2-store", {
       try {
         this.pending = true;
         this.responseOK = false;
-        const response = await API().get("/sportsbook/api/v2/matches", {
+        const response = await API().get(MATCHES_PATH, {
           params: getParams.value,
         });
 
