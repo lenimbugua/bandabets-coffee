@@ -1,10 +1,45 @@
 import { fileURLToPath } from "node:url";
-import { readdirSync } from "node:fs";
+import { readdirSync, existsSync, readFileSync } from "node:fs";
 import tailwindcss from "@tailwindcss/vite";
 
 const phase2PlaceholderFile = fileURLToPath(
   new URL("./app/components/PhaseTwoPlaceholder.vue", import.meta.url),
 );
+
+// Lighthouse round 6: directory the client build writes its CSS chunks to,
+// used by the build:manifest hook's content-based scoped-CSS check below.
+// nuxt.options.buildDir isn't in scope inside the hook, so this is resolved
+// relative to this config file instead (same pattern as phase2PlaceholderFile).
+const clientCssDir = fileURLToPath(
+  new URL("./.nuxt/dist/client/_nuxt/", import.meta.url),
+);
+
+// Lighthouse round 6: a chunk's CSS can be 100% component-scoped rules
+// (Vue SFC `<style scoped>` output — `[data-v-xxxxxxxx]` selectors, plus
+// `@keyframes <name>-<8-hex>` for scoped keyframe animations) even when the
+// chunk itself is named after a composable (e.g. useFlyToBetslip.js) rather
+// than a .vue file, so it escapes the name-based check above. Nuxt's
+// features.inlineStyles already inlines that same CSS as a server-rendered
+// <style> whenever the owning component renders, so the chunk's
+// <link rel="stylesheet"> is redundant regardless of chunk name. Test the
+// actual CSS content: after stripping scoped-keyframes blocks and any
+// @media/@supports wrapper (by treating `@...{` prefixes as transparent),
+// every remaining rule's selector must contain `[data-v-`. An empty result
+// after stripping means there was no actual CSS to judge, so treat that as
+// NOT scoped-only (do not strip).
+function isScopedOnlyCss(css) {
+  const withoutKeyframes = css.replace(
+    /@keyframes\s+[\w-]+-[0-9a-f]{8}\s*\{(?:[^{}]*\{[^{}]*\})*[^{}]*\}/g,
+    "",
+  );
+  const withoutAtRuleWrappers = withoutKeyframes.replace(/@[^{]*\{/g, "");
+  const rules = withoutAtRuleWrappers
+    .split("}")
+    .map((rule) => rule.trim())
+    .filter(Boolean);
+  if (rules.length === 0) return false;
+  return rules.every((rule) => rule.split("{")[0].includes("[data-v-"));
+}
 
 // Lighthouse round 3: the build:manifest hook below needs to tell which CSS
 // chunks belong to a `.vue` SFC (already inlined as <style> by Nuxt's
@@ -279,8 +314,24 @@ export default defineNuxtConfig({
         const isVueModule = chunk.src
           ? chunk.src.endsWith(".vue")
           : appVueBasenames.has(chunk.name ?? "");
-        if (isVueModule && Array.isArray(chunk.css) && chunk.css.length) {
+        const hasCss = Array.isArray(chunk.css) && chunk.css.length;
+        if (isVueModule && hasCss) {
           chunk.css = [];
+          continue;
+        }
+        // Round 6: name-based match missed it (e.g. a composable chunk) —
+        // fall back to reading the chunk's actual CSS off disk and testing
+        // whether every rule in it is component-scoped (see isScopedOnlyCss
+        // above). Files that aren't on disk yet just fail the check below.
+        if (hasCss) {
+          const allScopedOnly = chunk.css.every((file) => {
+            const abs = `${clientCssDir}${file.split("/").pop()}`;
+            if (!existsSync(abs)) return false;
+            return isScopedOnlyCss(readFileSync(abs, "utf8"));
+          });
+          if (allScopedOnly) {
+            chunk.css = [];
+          }
         }
       }
     },
