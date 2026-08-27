@@ -1,5 +1,6 @@
 <script setup>
-import CasinoSidebar from "@/components/CasinoSidebar.vue";
+import { defineAsyncComponent } from "vue";
+const CasinoSidebar = defineAsyncComponent(() => import("@/components/CasinoSidebar.vue"));
 import CollectAllModals from "@/components/CollectAllModals.vue";
 import OddsBar from "@/components/mobile/OddsBar.vue";
 import BrandSplash from "@/components/BrandSplash.vue";
