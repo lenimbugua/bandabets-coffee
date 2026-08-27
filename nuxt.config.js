@@ -1,9 +1,42 @@
 import { fileURLToPath } from "node:url";
+import { readdirSync } from "node:fs";
 import tailwindcss from "@tailwindcss/vite";
 
 const phase2PlaceholderFile = fileURLToPath(
   new URL("./app/components/PhaseTwoPlaceholder.vue", import.meta.url),
 );
+
+// Lighthouse round 3: the build:manifest hook below needs to tell which CSS
+// chunks belong to a `.vue` SFC (already inlined as <style> by Nuxt's
+// features.inlineStyles default, so their <link rel="stylesheet"> is
+// redundant) versus a plain .js module (composable, vendor package) whose
+// CSS is NOT inlined and must keep its link. The obvious signal —
+// `chunk.src` — only exists on manifest entries Vite treats as an
+// entry/dynamic-import boundary (pages/layouts, confirmed via
+// `pages/index.vue`-style keys). Ordinary components split into their own
+// chunk via `cssCodeSplit` but reached only through STATIC imports get no
+// `src` at all in the manifest — just a bare `name` (the file's basename,
+// e.g. "SportsBetslip", "BandaLogo"), verified by dumping raw manifest
+// entries during this task. So `name` is matched against the real
+// `.vue` basenames on disk instead of trusting `src` for those chunks.
+const appVueBasenames = (() => {
+  const basenames = new Set();
+  const walk = (dir) => {
+    let entries;
+    try {
+      entries = readdirSync(dir, { withFileTypes: true });
+    } catch {
+      return;
+    }
+    for (const entry of entries) {
+      const full = `${dir}/${entry.name}`;
+      if (entry.isDirectory()) walk(full);
+      else if (entry.name.endsWith(".vue")) basenames.add(entry.name.slice(0, -4));
+    }
+  };
+  walk(fileURLToPath(new URL("./app", import.meta.url)));
+  return basenames;
+})();
 
 // Route names that carried `meta: { requiresAuth: true }` in the deleted
 // baseline router (`git show 81ae85f:src/router/index.js`), sourced by
@@ -215,6 +248,24 @@ export default defineNuxtConfig({
         if (chunk.isDynamicEntry && !chunk.isEntry) {
           chunk.preload = false;
           chunk.prefetch = false;
+        }
+      }
+      // Round 3: a .vue module's CSS is inlined as <style> by
+      // features.inlineStyles, so its <link rel="stylesheet"> is redundant.
+      // Pages and layouts are .vue modules too and get the same treatment.
+      // Pages/layouts carry `chunk.src` ending in ".vue" (they're reached
+      // via Nuxt's own dynamic-import boundary); ordinary components split
+      // into their own chunk via cssCodeSplit but reached only through
+      // static imports have no `src` at all — just `name`, the file's
+      // basename — so those are matched against appVueBasenames instead
+      // (see the comment on its declaration above).
+      for (const key in manifest) {
+        const chunk = manifest[key];
+        if (chunk.isEntry) continue;
+        const isVueModule =
+          (chunk.src ?? "").endsWith(".vue") || appVueBasenames.has(chunk.name ?? "");
+        if (isVueModule && Array.isArray(chunk.css) && chunk.css.length) {
+          chunk.css = [];
         }
       }
     },
@@ -555,44 +606,26 @@ export default defineNuxtConfig({
   vite: {
     plugins: [tailwindcss()],
     build: {
-      // Task 4 (Lighthouse perf): Nuxt's default `features.inlineStyles`
-      // already inlines every component's CSS as a `<style>` tag in the
-      // SSR HTML (verified against the installed @nuxt/schema resolver at
-      // node_modules/.pnpm/@nuxt+schema@4.5.1/node_modules/@nuxt/schema/dist/index.mjs:626-630 —
-      // default is `(id) => id.includes(".vue")`, active whenever
-      // dev:false and ssr!==false, which is this app's production build).
-      // But Vite's per-component CSS chunking still emits a matching
-      // `<link rel="stylesheet">` for each of those chunks too (kept for
-      // client-side navigation/hydration), so the baseline home page
-      // shipped both: 16 inlined `<style>` tags AND 13 render-blocking
-      // `<link>`s duplicating the same content (measured before this
-      // change). Explicitly setting `features.inlineStyles: true` was
-      // tried first and rejected — it additionally inlined the ~300 KB
-      // global entry.css (Tailwind) straight into the HTML, losing its
-      // browser cacheability, while still leaving 12 blocking links.
-      // `cssCodeSplit: false` instead collapses every chunk's CSS across
-      // the whole app (all components, all routes) into one file, so
-      // there is nothing left for Vite to split into per-component
-      // `<link>`s. Measured on `/` and `/sports/soccer`: 13 blocking
-      // `<link>`s -> 1; the default `inlineStyles` behaviour still fires
-      // (16 harmless, non-blocking `<style>` tags remain, same as
-      // baseline). The single merged file is larger (~464 KB raw / ~60 KB
-      // gzip) than the home page's previous 13-file total (~372 KB raw)
-      // because it now bundles CSS for every route in the app, not just
-      // what `/` needs — the accepted trade-off: one bigger, long-cached
-      // request beats 13 small render-blocking ones. `features.inlineStyles`
-      // is left at its default (unset): with cssCodeSplit:false there are
-      // no more per-component chunks for it to selectively inline, so an
-      // explicit override here would be dead configuration.
-      cssCodeSplit: false,
+      // Lighthouse round 3: CSS is split per chunk again so the render-
+      // blocking entry stylesheet only carries what the entry needs
+      // (~36 KB gzip instead of ~54 KB for every route's CSS merged). Nuxt's
+      // default `features.inlineStyles` already inlines each .vue module's
+      // CSS as a <style> tag in the SSR HTML, so the matching per-component
+      // <link rel="stylesheet"> would be pure duplication on first load —
+      // the build:manifest hook (hooks section) strips those links for .vue
+      // chunks. Client-side navigation is unaffected: Vite's preload helper
+      // embedded in the JS loads a chunk's CSS itself. Non-.vue CSS
+      // (swiper-vue, useFlyToBetslip) is not inlined and keeps its link.
+      cssCodeSplit: true,
     },
   },
 
   nitro: {
     // Emit .gz/.br next to every public asset and serve them with the right
-    // Content-Encoding. The merged stylesheet (vite.build.cssCodeSplit:false)
-    // is ~464 KB raw / ~61 KB gzip / ~47 KB brotli — without compression it
-    // would be a net loss versus the old 13 chunks. Works with any front proxy.
+    // Content-Encoding. Round 3 (vite.build.cssCodeSplit:true) went back to
+    // per-chunk CSS files (entry + a handful of non-.vue chunks per route),
+    // so this still matters for the entry stylesheet and JS chunks alike.
+    // Works with any front proxy.
     compressPublicAssets: { gzip: true, brotli: true },
   },
 
