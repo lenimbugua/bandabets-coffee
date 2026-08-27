@@ -1,6 +1,5 @@
 <script setup>
 import SecondaryNav from "./SecondaryNav.vue";
-import TheBanner from "./TheBanner.vue";
 import MatchFilters from "./mobile/MatchFilters.vue";
 
 defineProps({
@@ -25,7 +24,7 @@ defineProps({
 
         <!-- Banner (always shown on sports desktop) -->
         <div class="my-3 rounded-xl overflow-hidden">
-          <TheBanner />
+          <LazyTheBanner hydrate-on-idle />
         </div>
 
         <!-- Secondary nav — game links below the banner -->
@@ -53,7 +52,7 @@ defineProps({
             <InfiniteScroll />
           </div>
 
-          <SEOMarkupContent />
+          <LazySEOMarkupContent hydrate-on-visible />
         </template>
       </div>
 
@@ -64,7 +63,7 @@ defineProps({
     </div>
   </div>
   <slot name="after-content" />
-  <Footer />
+  <LazyFooter hydrate-on-visible />
 </template>
 
 <style scoped>

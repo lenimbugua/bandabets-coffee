@@ -191,6 +191,22 @@ export default defineNuxtConfig({
         });
       }
     },
+
+    // Lighthouse round 2, Task 4: chunks that are only ever reached via a
+    // dynamic import (lazy-hydrated sections, lazily-mounted modals) must not
+    // be modulepreload'ed in the SSR HTML — the browser fetches them when the
+    // hydration strategy / v-if fires. Without this, every SSR-rendered
+    // component's chunk is preloaded before first paint even when its
+    // hydration is deferred.
+    "build:manifest": (manifest) => {
+      for (const key in manifest) {
+        const chunk = manifest[key];
+        if (chunk.isDynamicEntry && !chunk.isEntry) {
+          chunk.preload = false;
+          chunk.prefetch = false;
+        }
+      }
+    },
   },
 
   modules: [

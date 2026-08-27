@@ -6,7 +6,6 @@ import LazyInfinityScroll from "./LazyInfinityScroll.vue";
 import CategoryPills from "./mobile/CategoryPills.vue";
 import MobileFooterV2 from "./mobile/MobileFooterV2.vue";
 import MatchFilters from "./mobile/MatchFilters.vue";
-import TheBanner from "./TheBanner.vue";
 // DEPOSIT BAR DISABLED — restore later
 // import TheDepositBar from "./TheDepositBar.vue";
 
@@ -65,7 +64,7 @@ onBeforeUnmount(() => {
            next slide at the screen edge; slides carry their own rounding. -->
       <div class="overflow-hidden pt-3">
         <div class="mx-3">
-          <TheBanner />
+          <LazyTheBanner hydrate-on-idle />
         </div>
       </div>
 
@@ -84,8 +83,8 @@ onBeforeUnmount(() => {
       </template>
     </div>
 
-    <SEOMarkupContent />
-    <Footer />
+    <LazySEOMarkupContent hydrate-on-visible />
+    <LazyFooter hydrate-on-visible />
     <MobileFooterV2 />
   </LazyInfinityScroll>
 </template>

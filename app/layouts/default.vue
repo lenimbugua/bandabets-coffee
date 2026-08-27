@@ -27,7 +27,7 @@ import TheSidebar from "@/components/TheSidebar.vue";
         </div>
       </div>
     </div>
-    <Footer />
+    <LazyFooter hydrate-on-visible />
     <MobileFooterV2 />
   </div>
   <div v-else-if="isMediumScreen" class="min-h-dvh bg-gray-50 dark:bg-background">
@@ -42,7 +42,7 @@ import TheSidebar from "@/components/TheSidebar.vue";
         </div>
       </div>
     </div>
-    <Footer />
+    <LazyFooter hydrate-on-visible />
     <MobileFooterV2 />
   </div>
   <div
@@ -57,7 +57,7 @@ import TheSidebar from "@/components/TheSidebar.vue";
     <div class="w-full grow px-2 py-3">
       <slot />
     </div>
-    <Footer />
+    <LazyFooter hydrate-on-visible />
     <MobileFooterV2 />
   </div>
 </template>
