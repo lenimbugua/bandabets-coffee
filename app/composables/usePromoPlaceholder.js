@@ -1,9 +1,9 @@
 // TEMPORARY — placeholder standing in for the PROMO PAGE images while the real
 // promo artwork is produced.
 //
-// Scope is the promo pages only. The homepage banner carousels
-// (TheBanner.vue, mobile/HeroBanner.vue) use the real BANDA campaign artwork
-// from /public/banners/banda/ and are deliberately NOT covered here.
+// Scope is the promo pages only. The homepage banner carousel (TheBanner.vue)
+// uses the real BANDA campaign artwork from /public/banners/banda/ and is
+// deliberately NOT covered here.
 //
 // Call sites, all under app/components/promos/:
 //   PromoIndex.vue          — replaces the Cloudflare image lookup

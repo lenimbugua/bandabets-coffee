@@ -10,8 +10,10 @@ import { basename, extname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import sharp from "sharp";
 
-const bannersDir = fileURLToPath(new URL("../public/banners/banda/", import.meta.url));
-const widths = [640, 960, 1280];
+const bannersDir = fileURLToPath(
+  new URL("../public/banners/banda/", import.meta.url),
+);
+const widths = [640, 960, 1280, 1600];
 
 const jpgFiles = readdirSync(bannersDir).filter((file) => {
   if (extname(file).toLowerCase() !== ".jpg") return false;

@@ -152,3 +152,12 @@ begins.
 `fonts.gstatic.com` on the **build** machine only (`@nuxt/fonts` downloads
 Hanken Grotesk `.woff2` files into `.output/public/_fonts/` at build time).
 The runtime container makes no font requests to Google.
+
+- The build now also emits pre-compressed `.gz`/`.br` copies of every
+  `.output/public` asset, and the Node server serves them itself with the
+  right `Content-Encoding` — a front proxy does not need to compress
+  `/_nuxt/*` (it may, harmlessly).
+- `sharp` is a devDependency, used only for the one-off `pnpm
+  banners:optimize` script — a plain `pnpm install` in the build stage pulls
+  down a prebuilt `libvips` binary for it, but nothing at runtime needs
+  `sharp` or `libvips`.

@@ -17,14 +17,22 @@ const { bannerSources } = useBannerImage();
 const modules = [Autoplay];
 const autoplayDelay = 8000;
 
-// Measured from DesktopSportsLayout.vue's flex row at the lg breakpoint:
-// max-w-[1680px] container minus px-4 (32px) padding, minus the fixed
-// w-[16rem] sidebar (256px), the w-84 betslip panel (336px) and two gap-5
-// (20px) gaps — 1280px viewport - 32 - 256 - 336 - 40 = 616px, matching the
-// 616px Lighthouse observed. Below lg (MobileSportsLayout.vue), the banner's
-// wrapper is only offset by mx-3 (24px) so it renders close to full
-// viewport width — 100vw is used as a safe fallback there.
-const BANNER_SIZES = "(min-width: 1024px) 616px, 100vw";
+// Default sizes assume DesktopSportsLayout.vue's flex row: the column
+// itself caps at 2xl:max-w-[1000px], and below that it's whatever's left of
+// the viewport after the fixed w-[16rem] sidebar (256px), the w-84 betslip
+// panel (336px), two gap-5 (20px) gaps and px-4 (32px) padding — 256 + 336 +
+// 40 + 32 = 664px. Pages that mount TheBanner in a different-width column
+// (e.g. casino-home.vue, which has no sidebar/betslip) should pass their own
+// `sizes` prop rather than relying on this default. Below lg
+// (MobileSportsLayout.vue), the banner's wrapper is only offset by mx-3
+// (24px) so it renders close to full viewport width — 100vw is used as a
+// safe fallback there.
+const props = defineProps({
+  sizes: {
+    type: String,
+    default: "(min-width: 1024px) min(1000px, calc(100vw - 664px)), 100vw",
+  },
+});
 
 // BANDA campaign artwork, served from /public. 3:1, so the frame below uses
 // the same ratio and nothing gets cropped.
@@ -45,15 +53,19 @@ const items = [
 // TheSports.vue, TheLanding.vue, app/layouts/default.vue), so only ONE
 // TheBanner instance is ever mounted at a time. That makes this the single
 // place to preload the first slide for whichever viewport actually renders.
+const first = bannerSources(items[0].image);
 useHead({
   link: [
     {
       rel: "preload",
       as: "image",
       href: items[0].image,
-      imagesrcset: bannerSources(items[0].image).srcset,
-      imagesizes: BANNER_SIZES,
       fetchpriority: "high",
+      // Only advertise a srcset/sizes/type when a webp variant actually
+      // exists (see useBannerImage.js's .jpg guard) — otherwise the browser
+      // would preload a webp URL that 404s instead of falling back to the
+      // <img>'s plain jpg src.
+      ...(first.srcset ? { imagesrcset: first.srcset, imagesizes: props.sizes, type: "image/webp" } : {}),
     },
   ],
 });
@@ -126,7 +138,12 @@ function slideNext() {
             @click="openBanner(item)"
           >
             <picture>
-              <source type="image/webp" :srcset="bannerSources(item.image).srcset" :sizes="BANNER_SIZES" />
+              <source
+                v-if="bannerSources(item.image).srcset"
+                type="image/webp"
+                :srcset="bannerSources(item.image).srcset"
+                :sizes="props.sizes"
+              />
               <img
                 :src="item.image"
                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"

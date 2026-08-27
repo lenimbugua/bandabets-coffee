@@ -234,7 +234,10 @@ function clearSearch() {
       <div class="max-w-[1280px] mx-auto px-3 md:px-5 pb-20">
         <!-- 2. Hero Banner (overflow-hidden clips the mobile peek slide) -->
         <div class="mt-3 overflow-hidden">
-          <TheBanner />
+          <!-- This page has no sidebar/betslip: the column is capped by the
+          max-w-[1280px] mx-auto px-3 md:px-5 wrapper above (1280px - 40px
+          padding = 1240px). -->
+          <TheBanner sizes="(min-width: 1024px) min(1240px, calc(100vw - 40px)), 100vw" />
         </div>
         <!-- Search Input -->
         <div class="relative z-30 mt-3">

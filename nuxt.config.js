@@ -58,8 +58,9 @@ const phase2RequiresAuthNames = new Set([]);
 // into app/ only if live code imports the file directly, delete
 // otherwise):
 //   - leaderboard (src/views/LeaderBoard.vue): one live call site
-//     (app/components/mobile/HeroBanner.vue:80, `router.push({name:
-//     "leaderboard"})`) — a route-NAME push, not a component import.
+//     (a `router.push({name: "leaderboard"})`, a route-NAME push, not a
+//     component import, in a mobile component that was itself dead —
+//     unmounted anywhere — and has since been deleted).
 //     Nothing in app/ imports LeaderBoard.vue itself, so it was deleted.
 //     The placeholder below keeps that push from throwing.
 //   - share-happiness (src/views/festive/ShareZaKrisii.vue): four live
@@ -559,6 +560,14 @@ export default defineNuxtConfig({
       // explicit override here would be dead configuration.
       cssCodeSplit: false,
     },
+  },
+
+  nitro: {
+    // Emit .gz/.br next to every public asset and serve them with the right
+    // Content-Encoding. The merged stylesheet (vite.build.cssCodeSplit:false)
+    // is ~464 KB raw / ~61 KB gzip / ~47 KB brotli — without compression it
+    // would be a net loss versus the old 13 chunks. Works with any front proxy.
+    compressPublicAssets: { gzip: true, brotli: true },
   },
 
   runtimeConfig: {

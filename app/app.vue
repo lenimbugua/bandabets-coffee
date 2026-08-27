@@ -20,6 +20,8 @@ const { currentMode } = useAppMode();
 // Task 5 (Lighthouse perf): preconnect to the matches API origin at runtime,
 // since the host is env-driven (NUXT_PUBLIC_MATCHES_URL) and not known at
 // build time. Guarded so an unset or malformed URL never throws during SSR.
+// This only reaches routes that actually render on the server — casino-home.vue
+// sets `ssr: false`, so this useHead call is inert there.
 const { public: config } = useRuntimeConfig();
 const apiOrigin = (() => {
   try {
