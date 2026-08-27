@@ -35,7 +35,9 @@ function normalizeGame(game) {
 // components call fetchCategoriesWithGames() on mount (landing, sidebar,
 // top games, hot tabs); before this they raced three identical
 // /sg-categories requests on every load. Kept outside Pinia state so it is
-// never serialised or persisted.
+// never serialised or persisted. Safe as a module-level holder only because
+// every caller invokes this action from onMounted / click handlers
+// (client-only), so it never spans SSR requests.
 let categoriesRequest = null;
 
 export const useCasinoStore = defineStore("casino-store", {

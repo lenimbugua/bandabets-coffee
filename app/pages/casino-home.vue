@@ -45,7 +45,8 @@ const casinoStore = useCasinoStore();
 const { categoriesWithGames, categoriesLoading } = storeToRefs(casinoStore);
 
 onMounted(() => {
-  casinoStore.fetchCategoriesWithGames();
+  // Always refresh on the casino page: the payload is auth-scoped (Authorization / X-PROFILE-SID) and may differ after login.
+  casinoStore.fetchCategoriesWithGames({ force: true });
 });
 
 const route = useRoute();
