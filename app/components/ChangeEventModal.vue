@@ -59,12 +59,7 @@ const showBetslip = computed(() => {
               <div class="modal-header">
                 <div class="header-left">
                   <div class="icon-wrap">
-                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <polyline points="17 1 21 5 17 9" />
-                      <path d="M3 11V9a4 4 0 0 1 4-4h14" />
-                      <polyline points="7 23 3 19 7 15" />
-                      <path d="M21 13v2a4 4 0 0 1-4 4H3" />
-                    </svg>
+                    <Icon name="tabler:refresh" class="w-3.5 h-3.5" aria-hidden="true" />
                   </div>
                   <div>
                     <DialogTitle class="modal-title">Change Event</DialogTitle>
@@ -77,10 +72,7 @@ const showBetslip = computed(() => {
                   aria-label="Close"
                   @click="closeModal"
                 >
-                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="18" y1="6" x2="6" y2="18" />
-                    <line x1="6" y1="6" x2="18" y2="18" />
-                  </svg>
+                  <Icon name="tabler:x" class="w-4 h-4" aria-hidden="true" />
                 </button>
               </div>
 

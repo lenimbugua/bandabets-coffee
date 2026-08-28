@@ -116,9 +116,7 @@ getCashoutValue(props.bet.betId, false);
       >
         <TheButtonSpin v-if="autoCashoutPending" />
         <template v-else>
-          <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
-          </svg>
+          <Icon name="tabler:clock" class="w-3 h-3" aria-hidden="true" />
           <span>Auto</span>
           <span v-if="cashoutData?.autoCashOutEnabled" class="auto-amount">{{ cashoutData?.autoCashOutAmount }}</span>
         </template>

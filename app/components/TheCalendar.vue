@@ -170,41 +170,13 @@ function selectDate(day) {
               class="focus:text-gray-400 hover:text-gray-400 text-gray-800 dark:text-gray-100"
               @click="reduceCurrentIndex()"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="icon icon-tabler icon-tabler-chevron-left"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="currentColor"
-                fill="none"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                <polyline points="15 6 9 12 15 18"></polyline>
-              </svg></button
+              <Icon name="tabler:chevron-left" aria-hidden="true" /></button
             ><button
               aria-label="calendar forward"
               class="focus:text-gray-400 hover:text-gray-400 ml-3 text-gray-800 dark:text-gray-100"
               @click="increaseCurrentIndex()"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="icon icon-tabler icon-tabler-chevron-right"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="currentColor"
-                fill="none"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
-                <polyline points="9 6 15 12 9 18"></polyline>
-              </svg>
+              <Icon name="tabler:chevron-right" aria-hidden="true" />
             </button>
           </div>
         </div>

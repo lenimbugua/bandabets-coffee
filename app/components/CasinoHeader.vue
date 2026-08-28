@@ -75,9 +75,7 @@ function goToCasinoHome() {
           class="inline-flex items-center justify-center w-9 h-9 rounded-lg bg-surface-interactive text-foreground hover:bg-surface-active transition-colors"
           @click="goBack"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4">
-            <polyline points="15 18 9 12 15 6" />
-          </svg>
+          <Icon name="tabler:chevron-left" class="w-4 h-4" aria-hidden="true" />
         </button>
 
         <button
@@ -86,10 +84,7 @@ function goToCasinoHome() {
           class="hidden sm:inline-flex items-center gap-1.5 px-3 h-9 rounded-lg bg-surface-interactive text-foreground hover:bg-surface-active transition-colors text-xs font-semibold"
           @click="goToCasinoHome"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4">
-            <path d="M3 12l9-9 9 9" />
-            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
-          </svg>
+          <Icon name="tabler:home" class="w-4 h-4" aria-hidden="true" />
           <span>Lobby</span>
         </button>
 
@@ -99,10 +94,7 @@ function goToCasinoHome() {
           class="inline-flex sm:hidden items-center justify-center w-9 h-9 rounded-lg bg-surface-interactive text-foreground hover:bg-surface-active transition-colors"
           @click="goToCasinoHome"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4">
-            <path d="M3 12l9-9 9 9" />
-            <path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10" />
-          </svg>
+          <Icon name="tabler:home" class="w-4 h-4" aria-hidden="true" />
         </button>
       </div>
 
@@ -125,10 +117,7 @@ function goToCasinoHome() {
         class="shrink-0 inline-flex items-center gap-1.5 px-3 h-9 rounded-lg bg-primary text-primary-foreground hover:opacity-90 active:scale-95 transition-all text-xs font-bold"
         @click="handleDeposit"
       >
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4">
-          <line x1="12" y1="5" x2="12" y2="19" />
-          <line x1="5" y1="12" x2="19" y2="12" />
-        </svg>
+        <Icon name="tabler:plus" class="w-4 h-4" aria-hidden="true" />
         <span>Deposit</span>
       </button>
     </div>

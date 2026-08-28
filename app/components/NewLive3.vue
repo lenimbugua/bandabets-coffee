@@ -200,19 +200,12 @@ const getSportById = computed(() => {
                   >
                     {{ getSportById(selectedSportId)?.matchCount || totalLiveCount }}
                   </span>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2.5"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
+                  <Icon
+                    name="tabler:chevron-down"
                     class="w-3 h-3 transition-transform"
                     :class="sportsPopoverOpen ? 'rotate-180' : ''"
-                  >
-                    <polyline points="6 9 12 15 18 9" />
-                  </svg>
+                    aria-hidden="true"
+                  />
                 </button>
 
                 <div
@@ -320,20 +313,12 @@ const getSportById = computed(() => {
             >
               {{ competition.matchCount }}
             </span>
-            <svg
-              viewBox="0 0 15 15"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
+            <Icon
+              name="tabler:chevron-down"
               :class="{ 'rotate-180': competition.isOpened }"
               class="h-3.5 w-3.5 text-gray-400 dark:text-white/25 transition-transform duration-200"
-            >
-              <path
-                fill-rule="evenodd"
-                clip-rule="evenodd"
-                d="M3.13523 6.15803C3.3241 5.95657 3.64052 5.94637 3.84197 6.13523L7.5 9.56464L11.158 6.13523C11.3595 5.94637 11.6759 5.95657 11.8648 6.15803C12.0536 6.35949 12.0434 6.67591 11.842 6.86477L7.84197 10.6148C7.64964 10.7951 7.35036 10.7951 7.15803 10.6148L3.15803 6.86477C2.95657 6.67591 2.94637 6.35949 3.13523 6.15803Z"
-                fill="currentColor"
-              />
-            </svg>
+              aria-hidden="true"
+            />
           </div>
         </div>
 
@@ -393,18 +378,7 @@ const getSportById = computed(() => {
                   class="text-[0.6rem] text-red-500 font-medium flex items-center gap-0.5"
                 >
                   +{{ match.marketCount }}
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 16 16"
-                    fill="currentColor"
-                    class="w-3 h-3"
-                  >
-                    <path
-                      fill-rule="evenodd"
-                      d="M6.22 4.22a.75.75 0 0 1 1.06 0l3.25 3.25a.75.75 0 0 1 0 1.06l-3.25 3.25a.75.75 0 0 1-1.06-1.06L8.94 8 6.22 5.28a.75.75 0 0 1 0-1.06Z"
-                      clip-rule="evenodd"
-                    />
-                  </svg>
+                  <Icon name="tabler:chevron-right" class="w-3 h-3" aria-hidden="true" />
                 </span>
               </div>
             </div>
@@ -471,18 +445,7 @@ const getSportById = computed(() => {
                       class="text-[0.6rem] leading-none mb-0.5 text-gray-400 dark:text-white/25"
                       >—</span
                     >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 20 20"
-                      fill="currentColor"
-                      class="w-3.5 h-3.5 text-gray-400 dark:text-white/30"
-                    >
-                      <path
-                        fill-rule="evenodd"
-                        d="M10 1a4.5 4.5 0 0 0-4.5 4.5V9H5a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2h-.5V5.5A4.5 4.5 0 0 0 10 1Zm3 8V5.5a3 3 0 1 0-6 0V9h6Z"
-                        clip-rule="evenodd"
-                      />
-                    </svg>
+                    <Icon name="tabler:lock" class="w-3.5 h-3.5 text-gray-400 dark:text-white/30" aria-hidden="true" />
                   </button>
                 </div>
                 <div

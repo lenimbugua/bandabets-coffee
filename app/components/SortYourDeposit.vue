@@ -40,9 +40,7 @@ async function sortDeposit() {
     <!-- Header -->
     <div class="px-5 pt-4 pb-3 flex items-center gap-3">
       <div class="w-7 h-7 rounded-lg bg-amber-50 dark:bg-amber-500/10 flex items-center justify-center">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-3.5 h-3.5 text-amber-500">
-          <path fill-rule="evenodd" d="M15.312 11.424a5.5 5.5 0 0 1-9.201 2.466l-.312-.311h2.433a.75.75 0 0 0 0-1.5H4.065a.75.75 0 0 0-.75.75v4.166a.75.75 0 0 0 1.5 0v-2.433l.311.312a7 7 0 0 0 11.712-3.138.75.75 0 0 0-1.449-.39Zm1.23-3.723a.75.75 0 0 0 .219-.53V2.929a.75.75 0 0 0-1.5 0V5.36l-.31-.31A7 7 0 0 0 3.239 8.188a.75.75 0 1 0 1.448.389A5.5 5.5 0 0 1 13.89 6.11l.311.31h-2.432a.75.75 0 0 0 0 1.5h4.165a.75.75 0 0 0 .53-.219Z" clip-rule="evenodd" />
-        </svg>
+        <Icon name="tabler:refresh" class="w-3.5 h-3.5 text-amber-500" aria-hidden="true" />
       </div>
       <h3 class="text-[0.6rem] font-bold text-gray-400 dark:text-white/25 uppercase tracking-widest">Sort Your Deposit</h3>
     </div>
@@ -91,9 +89,7 @@ async function sortDeposit() {
     <div class="px-5 pb-4">
       <div class="rounded-xl bg-amber-50/50 dark:bg-amber-500/5 border border-amber-200/50 dark:border-amber-500/10 px-4 py-3">
         <div class="flex gap-2.5">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4 shrink-0 text-amber-500 mt-0.5">
-            <path fill-rule="evenodd" d="M18 10a8 8 0 1 1-16 0 8 8 0 0 1 16 0Zm-7-4a1 1 0 1 1-2 0 1 1 0 0 1 2 0ZM9 9a.75.75 0 0 0 0 1.5h.253a.25.25 0 0 1 .244.304l-.459 2.066A1.75 1.75 0 0 0 10.747 15H11a.75.75 0 0 0 0-1.5h-.253a.25.25 0 0 1-.244-.304l.459-2.066A1.75 1.75 0 0 0 9.253 9H9Z" clip-rule="evenodd" />
-          </svg>
+          <Icon name="tabler:info-circle" class="w-4 h-4 shrink-0 text-amber-500 mt-0.5" aria-hidden="true" />
           <p class="text-[0.7rem] text-amber-700 dark:text-amber-400/70 leading-relaxed">
             Use this to fix any deposit where money was deducted but not reflected in your account. You should have an M-Pesa confirmation SMS.
           </p>

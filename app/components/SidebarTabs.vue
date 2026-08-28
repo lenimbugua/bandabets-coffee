@@ -47,14 +47,7 @@ function fetchGame(competition) {
   <div class="h-full flex flex-col rounded-xl bg-white dark:bg-white/2 border border-gray-200/80 dark:border-white/6 shadow-sm dark:shadow-none overflow-hidden">
     <!-- Header -->
     <div class="shrink-0 flex items-center gap-2 px-3.5 py-2.5">
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 16 16"
-        fill="currentColor"
-        class="w-3.5 h-3.5 text-brand-bright"
-      >
-        <path d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14Zm.75-10.25v2.5h2.5a.75.75 0 0 1 0 1.5h-2.5v2.5a.75.75 0 0 1-1.5 0v-2.5h-2.5a.75.75 0 0 1 0-1.5h2.5v-2.5a.75.75 0 0 1 1.5 0Z" />
-      </svg>
+      <Icon name="tabler:circle-plus" class="w-3.5 h-3.5 text-brand-bright" aria-hidden="true" />
       <h3 class="text-[0.65rem] font-bold uppercase tracking-widest text-gray-400 dark:text-white/30">
         Top Leagues
       </h3>
@@ -72,18 +65,14 @@ function fetchGame(competition) {
         <span class="text-[0.75rem] font-medium text-gray-700 dark:text-white/50 group-hover:text-gray-900 dark:group-hover:text-white/70 truncate transition-colors">
           {{ league.competitionName }}
         </span>
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="w-3.5 h-3.5 text-gray-300 dark:text-white/15 group-hover:text-brand-bright transition-colors shrink-0 ml-2">
-          <path fill-rule="evenodd" d="M6.22 4.22a.75.75 0 0 1 1.06 0l3.25 3.25a.75.75 0 0 1 0 1.06l-3.25 3.25a.75.75 0 0 1-1.06-1.06L8.94 8 6.22 5.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
-        </svg>
+        <Icon name="tabler:chevron-right" class="w-3.5 h-3.5 text-gray-300 dark:text-white/15 group-hover:text-brand-bright transition-colors shrink-0 ml-2" aria-hidden="true" />
       </button>
     </div>
 
     <!-- Empty state -->
     <div v-else class="flex-1 flex flex-col items-center justify-center px-4 py-6">
       <div class="w-10 h-10 rounded-full bg-gray-100 dark:bg-white/5 flex items-center justify-center mb-2">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="w-5 h-5 text-gray-300 dark:text-white/20">
-          <path d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14Zm.75-10.25v2.5h2.5a.75.75 0 0 1 0 1.5h-2.5v2.5a.75.75 0 0 1-1.5 0v-2.5h-2.5a.75.75 0 0 1 0-1.5h2.5v-2.5a.75.75 0 0 1 1.5 0Z" />
-        </svg>
+        <Icon name="tabler:circle-plus" class="w-5 h-5 text-gray-300 dark:text-white/20" aria-hidden="true" />
       </div>
       <p class="text-[0.7rem] text-gray-400 dark:text-white/25">Loading leagues...</p>
     </div>

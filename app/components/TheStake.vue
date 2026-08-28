@@ -49,10 +49,7 @@ function formatStakeLabel(amount) {
         v-if="balance && isAuthenticated"
         class="flex items-center gap-1.5 text-[0.7rem] text-gray-500 dark:text-white/40"
       >
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="w-3.5 h-3.5">
-          <path d="M2 4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v1H2V4Z" />
-          <path fill-rule="evenodd" d="M1 6a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v6a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V6Zm11 3.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z" clip-rule="evenodd" />
-        </svg>
+        <Icon name="tabler:wallet" class="w-3.5 h-3.5" aria-hidden="true" />
         <span class="font-bold text-gray-700 dark:text-white/60 font-odds tabular-nums">
           {{ parseFloat(balance).toFixed("2") }}
         </span>
@@ -90,9 +87,7 @@ function formatStakeLabel(amount) {
           class="shrink-0 w-8 h-8 flex items-center justify-center rounded-lg bg-gray-100 dark:bg-white/5 border border-gray-200/80 dark:border-white/8 text-gray-500 dark:text-white/40 hover:bg-gray-200 dark:hover:bg-white/10 hover:text-gray-700 dark:hover:text-white/60 transition-colors cursor-pointer"
           @click="updateStake(Math.max(0, Number(selectedStakeAmount) - 10))"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="w-3.5 h-3.5">
-            <path d="M3.75 7.25a.75.75 0 0 0 0 1.5h8.5a.75.75 0 0 0 0-1.5h-8.5Z" />
-          </svg>
+          <Icon name="tabler:minus" class="w-3.5 h-3.5" aria-hidden="true" />
         </button>
         <div class="relative flex-1">
           <span class="absolute inset-y-0 left-0 flex items-center pl-2.5 text-[0.65rem] font-medium text-gray-400 dark:text-white/25 pointer-events-none">
@@ -113,9 +108,7 @@ function formatStakeLabel(amount) {
           class="shrink-0 w-8 h-8 flex items-center justify-center rounded-lg bg-gray-100 dark:bg-white/5 border border-gray-200/80 dark:border-white/8 text-gray-500 dark:text-white/40 hover:bg-gray-200 dark:hover:bg-white/10 hover:text-gray-700 dark:hover:text-white/60 transition-colors cursor-pointer"
           @click="updateStake(Number(selectedStakeAmount) + 10)"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="w-3.5 h-3.5">
-            <path d="M8.75 3.75a.75.75 0 0 0-1.5 0v3.5h-3.5a.75.75 0 0 0 0 1.5h3.5v3.5a.75.75 0 0 0 1.5 0v-3.5h3.5a.75.75 0 0 0 0-1.5h-3.5v-3.5Z" />
-          </svg>
+          <Icon name="tabler:plus" class="w-3.5 h-3.5" aria-hidden="true" />
         </button>
       </div>
     </div>

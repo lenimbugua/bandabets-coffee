@@ -20,21 +20,11 @@
       >
       <!-- the chevron is the affordance: this chip navigates away rather than
            toggling something in place -->
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
+      <Icon
+        name="tabler:chevron-right"
         class="ml-0.5 h-3 w-3 sm:h-3.5 sm:w-3.5 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5"
-        viewBox="0 0 24 24"
         aria-hidden="true"
-      >
-        <path
-          fill="none"
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="m9 18l6-6l-6-6"
-        />
-      </svg>
+      />
     </div>
   </RouterLink>
 </template>

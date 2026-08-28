@@ -62,9 +62,7 @@ function updateCharacterCount() {
         <div class="absolute top-0 right-0 w-32 h-32 bg-brand-bright/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl"></div>
         <div class="relative">
           <div class="inline-flex items-center gap-2 rounded-full bg-brand-bright/10 dark:bg-brand-bright/15 px-3 py-1 mb-3">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-3.5 h-3.5 text-brand-bright">
-              <path d="M3.105 2.288a.75.75 0 0 0-.826.95l1.414 4.926A1.5 1.5 0 0 0 5.135 9.25h6.115a.75.75 0 0 1 0 1.5H5.135a1.5 1.5 0 0 0-1.442 1.086l-1.414 4.926a.75.75 0 0 0 .826.95 28.897 28.897 0 0 0 15.293-7.154.75.75 0 0 0 0-1.114A28.897 28.897 0 0 0 3.105 2.288Z" />
-            </svg>
+            <Icon name="tabler:send" class="w-3.5 h-3.5 text-brand-bright" aria-hidden="true" />
             <span class="text-[11px] font-semibold text-brand-bright uppercase tracking-wider">Share Your Voice</span>
           </div>
           <h1 class="text-xl font-bold text-foreground leading-tight">
@@ -78,9 +76,7 @@ function updateCharacterCount() {
 
       <!-- Incentive strip -->
       <div class="flex items-center gap-2.5 px-5 py-3 bg-gold-bright/5 dark:bg-gold-bright/8 border-y border-gold-bright/10">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4 text-gold-bright shrink-0">
-          <path fill-rule="evenodd" d="M10.868 2.884c-.321-.772-1.415-.772-1.736 0l-1.83 4.401-4.753.381c-.833.067-1.171 1.107-.536 1.651l3.62 3.102-1.106 4.637c-.194.813.691 1.456 1.405 1.02L10 15.591l4.069 2.485c.713.436 1.598-.207 1.404-1.02l-1.106-4.637 3.62-3.102c.635-.544.297-1.584-.536-1.65l-4.752-.382-1.831-4.401Z" clip-rule="evenodd" />
-        </svg>
+        <Icon name="tabler:star" class="w-4 h-4 text-gold-bright shrink-0" aria-hidden="true" />
         <p class="text-xs text-foreground">
           Share your idea & enter the daily <span class="font-bold text-gold-bright">Shinda Freebet</span> draw!
         </p>
@@ -165,9 +161,7 @@ function updateCharacterCount() {
         >
           <TheButtonSpin v-if="pending" />
           <template v-else>
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4">
-              <path d="M3.105 2.288a.75.75 0 0 0-.826.95l1.414 4.926A1.5 1.5 0 0 0 5.135 9.25h6.115a.75.75 0 0 1 0 1.5H5.135a1.5 1.5 0 0 0-1.442 1.086l-1.414 4.926a.75.75 0 0 0 .826.95 28.897 28.897 0 0 0 15.293-7.154.75.75 0 0 0 0-1.114A28.897 28.897 0 0 0 3.105 2.288Z" />
-            </svg>
+            <Icon name="tabler:send" class="w-4 h-4" aria-hidden="true" />
             Submit Feedback
           </template>
         </button>

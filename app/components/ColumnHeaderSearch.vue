@@ -71,9 +71,7 @@ const isSearching = computed(() => searchQuery.value.trim().length > 0);
           aria-label="Search matches"
           @click="openSearch"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-3.5 h-3.5 shrink-0">
-            <path fill-rule="evenodd" d="M9 3.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11ZM2 9a7 7 0 1 1 12.452 4.391l3.328 3.329a.75.75 0 1 1-1.06 1.06l-3.329-3.328A7 7 0 0 1 2 9Z" clip-rule="evenodd" />
-          </svg>
+          <Icon name="tabler:search" class="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
           <span class="text-[0.6rem] font-semibold">Search</span>
         </button>
 
@@ -82,9 +80,7 @@ const isSearching = computed(() => searchQuery.value.trim().length > 0);
           v-else
           class="flex items-center flex-1 search-input-wrapper rounded-full px-3 py-0.5"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-3.5 h-3.5 text-gray-400 dark:text-white/30 shrink-0">
-            <path fill-rule="evenodd" d="M9 3.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11ZM2 9a7 7 0 1 1 12.452 4.391l3.328 3.329a.75.75 0 1 1-1.06 1.06l-3.329-3.328A7 7 0 0 1 2 9Z" clip-rule="evenodd" />
-          </svg>
+          <Icon name="tabler:search" class="w-3.5 h-3.5 text-gray-400 dark:text-white/30 shrink-0" aria-hidden="true" />
           <input
             ref="searchInputRef"
             v-model="searchQuery"
@@ -97,9 +93,7 @@ const isSearching = computed(() => searchQuery.value.trim().length > 0);
             aria-label="Close search"
             @click="closeSearch"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-3.5 h-3.5">
-              <path d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z" />
-            </svg>
+            <Icon name="tabler:x" class="w-3.5 h-3.5" aria-hidden="true" />
           </button>
         </div>
       </div>
@@ -174,9 +168,7 @@ const isSearching = computed(() => searchQuery.value.trim().length > 0);
         </div>
       </div>
       <div v-else class="flex flex-col items-center py-6">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-6 h-6 text-gray-300 dark:text-white/15 mb-1.5">
-          <path fill-rule="evenodd" d="M9 3.5a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11ZM2 9a7 7 0 1 1 12.452 4.391l3.328 3.329a.75.75 0 1 1-1.06 1.06l-3.329-3.328A7 7 0 0 1 2 9Z" clip-rule="evenodd" />
-        </svg>
+        <Icon name="tabler:search" class="w-6 h-6 text-gray-300 dark:text-white/15 mb-1.5" aria-hidden="true" />
         <span class="text-[0.7rem] text-gray-400 dark:text-white/30">No matches found</span>
       </div>
     </div>

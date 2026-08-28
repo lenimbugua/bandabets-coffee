@@ -69,18 +69,11 @@ onMounted(() => {
         class="relative z-1 hidden sm:flex items-center gap-1 rounded-lg bg-white/12 px-3 py-1.5 text-xs font-bold text-white transition-colors group-hover:bg-white/20"
       >
         Claim
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 16 16"
-          fill="currentColor"
+        <Icon
+          name="tabler:chevron-right"
           class="h-3.5 w-3.5 transition-transform duration-200 group-hover:translate-x-0.5"
-        >
-          <path
-            fill-rule="evenodd"
-            d="M6.22 4.22a.75.75 0 0 1 1.06 0l3.25 3.25a.75.75 0 0 1 0 1.06l-3.25 3.25a.75.75 0 0 1-1.06-1.06L8.94 8 6.22 5.28a.75.75 0 0 1 0-1.06Z"
-            clip-rule="evenodd"
-          />
-        </svg>
+          aria-hidden="true"
+        />
       </span>
 
       <!-- dismiss -->
@@ -90,16 +83,7 @@ onMounted(() => {
         class="relative z-1 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg text-white/45 transition-colors hover:bg-white/10 hover:text-white/80"
         @click.prevent.stop="dismiss"
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 20 20"
-          fill="currentColor"
-          class="h-4 w-4"
-        >
-          <path
-            d="M6.28 5.22a.75.75 0 0 0-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 1 0 1.06 1.06L10 11.06l3.72 3.72a.75.75 0 1 0 1.06-1.06L11.06 10l3.72-3.72a.75.75 0 0 0-1.06-1.06L10 8.94 6.28 5.22Z"
-          />
-        </svg>
+        <Icon name="tabler:x" class="h-4 w-4" aria-hidden="true" />
       </button>
     </RouterLink>
   </Transition>

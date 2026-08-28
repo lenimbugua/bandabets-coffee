@@ -27,9 +27,7 @@ const showMultibetBoost = ref(false);
         :aria-label="showMultibetBoost ? 'Hide details' : 'Show details'"
         @click="showMultibetBoost = !showMultibetBoost"
       >
-        <svg class="toggle-icon" :class="{ 'toggle-open': showMultibetBoost }" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <polyline points="6 9 12 15 18 9" />
-        </svg>
+        <Icon name="tabler:chevron-down" class="toggle-icon" :class="{ 'toggle-open': showMultibetBoost }" aria-hidden="true" />
       </button>
     </div>
     <div class="level-track">

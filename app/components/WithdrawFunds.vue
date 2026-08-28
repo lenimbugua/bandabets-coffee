@@ -62,9 +62,7 @@ onUnmounted(() => {
     <div class="withdraw-card">
       <div class="balance-header">
         <div class="balance-icon-wrap">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4">
-            <path fill-rule="evenodd" d="M1 4a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V4Zm12 4a3 3 0 1 1-6 0 3 3 0 0 1 6 0ZM4 9a1 1 0 1 0 0-2 1 1 0 0 0 0 2Zm13-1a1 1 0 1 1-2 0 1 1 0 0 1 2 0ZM1.75 14.5a.75.75 0 0 0 0 1.5c4.417 0 8.693.603 12.749 1.73 1.111.309 2.251-.512 2.251-1.696v-.784a.75.75 0 0 0-1.5 0v.784a.272.272 0 0 1-.35.25A49.043 49.043 0 0 0 1.75 14.5Z" clip-rule="evenodd" />
-          </svg>
+          <Icon name="tabler:credit-card" class="w-4 h-4" aria-hidden="true" />
         </div>
         <div class="flex-1">
           <p class="balance-label">Available Balance</p>
@@ -102,9 +100,7 @@ onUnmounted(() => {
       <div class="form-header">
         <div class="flex items-center gap-2">
           <div class="form-icon-wrap">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-3.5 h-3.5">
-              <path fill-rule="evenodd" d="M10 18a8 8 0 1 0 0-16 8 8 0 0 0 0 16ZM6.75 9.25a.75.75 0 0 0 0 1.5h4.59l-2.1 1.95a.75.75 0 0 0 1.02 1.1l3.5-3.25a.75.75 0 0 0 0-1.1l-3.5-3.25a.75.75 0 1 0-1.02 1.1l2.1 1.95H6.75Z" clip-rule="evenodd" />
-            </svg>
+            <Icon name="tabler:circle-arrow-right-filled" class="w-3.5 h-3.5" aria-hidden="true" />
           </div>
           <h3 class="form-title">Withdraw to M-Pesa</h3>
         </div>
@@ -113,9 +109,7 @@ onUnmounted(() => {
       <form class="form-body" @submit.prevent="makeWithdrawal">
         <!-- Low balance warning -->
         <div v-if="balanceBelowMin" class="low-balance-alert">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4 shrink-0">
-            <path fill-rule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495ZM10 5a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0v-3.5A.75.75 0 0 1 10 5Zm0 9a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z" clip-rule="evenodd" />
-          </svg>
+          <Icon name="tabler:alert-triangle" class="w-4 h-4 shrink-0" aria-hidden="true" />
           <p>Your balance (KES {{ formattedNumber(balance) }}) is below the minimum withdrawal of KES {{ formattedNumber(MIN_WITHDRAWAL) }}.</p>
         </div>
 

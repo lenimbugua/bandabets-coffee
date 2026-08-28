@@ -78,9 +78,7 @@ async function bet() {
           class="w-full flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-lg bg-bet text-bet-foreground text-xs font-bold transition-all duration-150 hover:bg-bet-hover active:scale-[0.98] cursor-pointer"
           @click="openLogin"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="w-3.5 h-3.5">
-            <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM12.735 14c.618 0 1.093-.561.872-1.139a6.002 6.002 0 0 0-11.215 0c-.22.578.254 1.139.872 1.139h9.47Z" />
-          </svg>
+          <Icon name="tabler:user" class="w-3.5 h-3.5" aria-hidden="true" />
           Login to Place Bet
         </button>
         <button
@@ -90,9 +88,7 @@ async function bet() {
         >
           <TheButtonSpin v-if="pending" />
           <template v-else>
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="w-3.5 h-3.5">
-              <path fill-rule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14Zm3.844-8.791a.75.75 0 0 0-1.188-.918l-3.7 4.79-1.649-1.833a.75.75 0 1 0-1.114 1.004l2.25 2.5a.75.75 0 0 0 1.15-.043l4.25-5.5Z" clip-rule="evenodd" />
-            </svg>
+            <Icon name="tabler:circle-check" class="w-3.5 h-3.5" aria-hidden="true" />
             Place Bet
           </template>
         </button>

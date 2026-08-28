@@ -73,9 +73,7 @@ function showRebet(status) {
       <!-- View details hint -->
       <div class="bet-details-hint">
         <span>View details</span>
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="w-3 h-3">
-          <path fill-rule="evenodd" d="M6.22 4.22a.75.75 0 0 1 1.06 0l3.25 3.25a.75.75 0 0 1 0 1.06l-3.25 3.25a.75.75 0 0 1-1.06-1.06L8.94 8 6.22 5.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
-        </svg>
+        <Icon name="tabler:chevron-right" class="w-3 h-3" aria-hidden="true" />
       </div>
     </RouterLink>
 
@@ -97,9 +95,7 @@ function showRebet(status) {
           <button class="bet-action-btn">
             <TheButtonSpin v-if="sharePending && selectedId === bet.betId" />
             <template v-else>
-              <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="22" y1="2" x2="11" y2="13" /><polygon points="22 2 15 22 11 13 2 9 22 2" />
-              </svg>
+              <Icon name="tabler:send" class="w-3.5 h-3.5" aria-hidden="true" />
               <span>Share</span>
             </template>
           </button>

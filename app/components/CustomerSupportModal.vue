@@ -136,18 +136,7 @@ const showDialog = computed(() => {
                   <div
                     class="w-11 h-11 rounded-xl bg-brand-bright flex items-center justify-center shrink-0 shadow-sm"
                   >
-                    <svg
-                      class="w-6 h-6 text-white"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    >
-                      <rect x="2" y="4" width="20" height="16" rx="2" />
-                      <path d="m2 7 10 6 10-6" />
-                    </svg>
+                    <Icon name="tabler:mail" class="w-6 h-6 text-white" aria-hidden="true" />
                   </div>
                   <div class="flex-1 min-w-0">
                     <p class="text-sm font-semibold text-foreground">Email Us</p>
@@ -155,18 +144,7 @@ const showDialog = computed(() => {
                       {{ supportEmail }}
                     </p>
                   </div>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                    class="w-5 h-5 text-muted-foreground/50 group-hover:text-foreground/50 transition-colors shrink-0"
-                  >
-                    <path
-                      fill-rule="evenodd"
-                      d="M3 10a.75.75 0 0 1 .75-.75h10.638L10.23 5.29a.75.75 0 1 1 1.04-1.08l5.5 5.25a.75.75 0 0 1 0 1.08l-5.5 5.25a.75.75 0 1 1-1.04-1.08l4.158-3.96H3.75A.75.75 0 0 1 3 10Z"
-                      clip-rule="evenodd"
-                    />
-                  </svg>
+                  <Icon name="tabler:chevron-right" class="w-5 h-5 text-muted-foreground/50 group-hover:text-foreground/50 transition-colors shrink-0" aria-hidden="true" />
                 </a>
 
                 <!-- Phone -->
@@ -177,19 +155,7 @@ const showDialog = computed(() => {
                   <div
                     class="w-11 h-11 rounded-xl bg-brand-bright flex items-center justify-center shrink-0 shadow-sm"
                   >
-                    <svg
-                      class="w-6 h-6 text-white"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    >
-                      <path
-                        d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92Z"
-                      />
-                    </svg>
+                    <Icon name="tabler:phone" class="w-6 h-6 text-white" aria-hidden="true" />
                   </div>
                   <div class="flex-1 min-w-0">
                     <p class="text-sm font-semibold text-foreground">Call Us</p>
@@ -197,18 +163,7 @@ const showDialog = computed(() => {
                       {{ supportPhone }}
                     </p>
                   </div>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                    class="w-5 h-5 text-muted-foreground/50 group-hover:text-foreground/50 transition-colors shrink-0"
-                  >
-                    <path
-                      fill-rule="evenodd"
-                      d="M3 10a.75.75 0 0 1 .75-.75h10.638L10.23 5.29a.75.75 0 1 1 1.04-1.08l5.5 5.25a.75.75 0 0 1 0 1.08l-5.5 5.25a.75.75 0 1 1-1.04-1.08l4.158-3.96H3.75A.75.75 0 0 1 3 10Z"
-                      clip-rule="evenodd"
-                    />
-                  </svg>
+                  <Icon name="tabler:chevron-right" class="w-5 h-5 text-muted-foreground/50 group-hover:text-foreground/50 transition-colors shrink-0" aria-hidden="true" />
                 </a>
               </div>
 

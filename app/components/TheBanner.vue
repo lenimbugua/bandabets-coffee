@@ -202,9 +202,7 @@ onBeforeUnmount(() => {
         class="absolute left-2 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full hidden lg:flex items-center justify-center bg-card/60 text-muted-foreground opacity-40 hover:opacity-100 hover:text-foreground hover:bg-card transition-all duration-200 backdrop-blur-sm"
         @click="slidePrev"
       >
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4" aria-hidden="true">
-          <path fill-rule="evenodd" d="M14.78 5.22a.75.75 0 0 1 0 1.06L9.06 12l5.72 5.72a.75.75 0 1 1-1.06 1.06l-6.25-6.25a.75.75 0 0 1 0-1.06l6.25-6.25a.75.75 0 0 1 1.06 0Z" clip-rule="evenodd" />
-        </svg>
+        <Icon name="tabler:chevron-left" class="w-4 h-4" aria-hidden="true" />
       </button>
       <button
         type="button"
@@ -212,9 +210,7 @@ onBeforeUnmount(() => {
         class="absolute right-2 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full hidden lg:flex items-center justify-center bg-card/60 text-muted-foreground opacity-40 hover:opacity-100 hover:text-foreground hover:bg-card transition-all duration-200 backdrop-blur-sm"
         @click="slideNext"
       >
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4" aria-hidden="true">
-          <path fill-rule="evenodd" d="M9.22 5.22a.75.75 0 0 1 1.06 0l6.25 6.25a.75.75 0 0 1 0 1.06l-6.25 6.25a.75.75 0 1 1-1.06-1.06L14.94 12 9.22 6.28a.75.75 0 0 1 0-1.06Z" clip-rule="evenodd" />
-        </svg>
+        <Icon name="tabler:chevron-right" class="w-4 h-4" aria-hidden="true" />
       </button>
     </div>
   </div>

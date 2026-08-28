@@ -47,9 +47,7 @@ const toggle = async () => {
       :class="!isRealPlay && 'toggle-label--active'"
       @click="isRealPlay && toggle()"
     >
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="toggle-icon">
-        <path d="M3 3.732a1.5 1.5 0 0 1 2.305-1.265l6.706 4.267a1.5 1.5 0 0 1 0 2.531l-6.706 4.268A1.5 1.5 0 0 1 3 12.267V3.732Z" />
-      </svg>
+      <Icon name="tabler:player-play-filled" class="toggle-icon" aria-hidden="true" />
       Free
     </button>
 
@@ -69,9 +67,7 @@ const toggle = async () => {
       :class="isRealPlay && 'toggle-label--active toggle-label--real'"
       @click="!isRealPlay && toggle()"
     >
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="toggle-icon">
-        <path d="M1 4a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v1H1V4ZM1 7h14v5a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V7Zm5 2a.75.75 0 0 0 0 1.5h4a.75.75 0 0 0 0-1.5H6Z" />
-      </svg>
+      <Icon name="tabler:credit-card" class="toggle-icon" aria-hidden="true" />
       Real
     </button>
   </div>
