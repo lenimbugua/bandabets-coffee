@@ -96,7 +96,7 @@ function copyBookingCode() {
         :bet-id="parseInt(afterBetDetails?.betId)"
       >
         <button class="w-full flex items-center justify-center gap-2 h-10 rounded-xl border border-gray-300 dark:border-white/10 bg-white dark:bg-white/5 text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-white/10 transition-colors">
-          <Icon name="tabler:share" class="w-4 h-4" aria-hidden="true" />
+          <Icon name="tabler:send" class="w-4 h-4" aria-hidden="true" />
           Share
         </button>
       </ShareBet>

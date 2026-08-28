@@ -1,3 +1,3 @@
 <template>
-  <Icon name="tabler:caret-right-filled" class="h-[1em] w-[1em]" aria-hidden="true" />
+  <Icon name="tabler:caret-right-filled" aria-hidden="true" />
 </template>

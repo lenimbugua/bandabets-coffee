@@ -86,7 +86,7 @@ function showScores(isLive, status) {
           <button class="share-btn">
             <TheButtonSpin v-if="sharePending" />
             <template v-else>
-              <Icon name="tabler:share" class="w-3.5 h-3.5" aria-hidden="true" />
+              <Icon name="tabler:send" class="w-3.5 h-3.5" aria-hidden="true" />
               <span>Share</span>
             </template>
           </button>
