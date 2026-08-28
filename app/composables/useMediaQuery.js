@@ -1,4 +1,4 @@
-import { getCurrentInstance, onMounted, onScopeDispose, ref } from "vue";
+import { getCurrentInstance, getCurrentScope, onMounted, onScopeDispose, ref } from "vue";
 
 // Native replacement for VueUse's useMediaQuery + provideSSRWidth.
 //
@@ -27,6 +27,29 @@ export function useMediaQuery(query) {
   const matches = ref(evaluateForWidth(query, SSR_WIDTH));
 
   if (import.meta.client) {
+    let cleanup = null;
+
+    // Register cleanup against whatever scope is ACTIVE AT THIS CALL — not
+    // whatever scope happens to be active later, when subscribe() actually
+    // runs. That distinction matters because subscribe() itself may run
+    // deferred, inside onMounted (see below), and Vue reactivates the
+    // *mounting component's own* scope around lifecycle-hook callbacks —
+    // which is not necessarily the scope this function was called from.
+    // useScreenSizes.js is the case that bites: its first call happens
+    // inside default.vue's setup, synchronously inside a detached
+    // effectScope(true).run(...). getCurrentScope() here, evaluated
+    // synchronously at call time, correctly captures that detached scope
+    // (never disposed for the app's lifetime — its refs are cached on
+    // nuxtApp and reused). If onScopeDispose() were instead called from
+    // inside the deferred onMounted callback, it would bind to
+    // default.vue's own scope, so navigating from a default-layout page to
+    // any layout:false page would tear down the shared matchMedia
+    // listeners on unmount — freezing responsive switching for the rest of
+    // the session, since useScreenSizes never re-subscribes.
+    if (getCurrentScope()) {
+      onScopeDispose(() => cleanup?.());
+    }
+
     const subscribe = () => {
       const mql = window.matchMedia(query);
       const update = () => {
@@ -34,12 +57,7 @@ export function useMediaQuery(query) {
       };
       update();
       mql.addEventListener("change", update);
-      // Works in both call shapes: inside onMounted the active scope is the
-      // component's own (Vue re-activates it for lifecycle-hook callbacks),
-      // and for the no-instance path below this runs synchronously inside
-      // useScreenSizes.js's detached effectScope.run(), which is likewise
-      // the active scope at this point.
-      onScopeDispose(() => mql.removeEventListener("change", update));
+      cleanup = () => mql.removeEventListener("change", update);
     };
 
     // useScreenSizes.js runs this inside a detached effectScope with no
