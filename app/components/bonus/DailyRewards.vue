@@ -1,6 +1,4 @@
 <script setup>
-import { cn } from "@/lib/utils"
-
 import coinsReward from "@/assets/bonus/coins-reward.png"
 import aviatorReward from "@/assets/bonus/aviator-reward.png"
 import diamondReward from "@/assets/bonus/diamond-reward.png"
@@ -41,26 +39,26 @@ const todayReward = weeklyRewards.find((r) => r.current)
       <div
         v-for="day in weeklyRewards"
         :key="day.day"
-        :class="cn(
+        :class="[
           'flex-1 flex flex-col items-center p-1 rounded-lg border transition-all hover:scale-[1.04] cursor-pointer',
           day.claimed && 'bg-primary/5 dark:bg-primary/10 border-primary/20 dark:border-primary/30',
           day.current && 'bg-accent/10 dark:bg-accent/20 border-accent shadow-glow-gold',
           day.locked && 'bg-gray-50 dark:bg-secondary/30 border-gray-200 dark:border-border opacity-60'
-        )"
+        ]"
       >
         <!-- Day Label -->
-        <span :class="cn(
+        <span :class="[
           'text-[8px] font-semibold mb-0.5',
           day.current ? 'text-accent' : 'text-muted-foreground'
-        )">
+        ]">
           D{{ day.day }}
         </span>
 
         <!-- Day Image -->
-        <div :class="cn(
+        <div :class="[
           'w-7 h-7 md:w-10 md:h-10 rounded-md overflow-hidden mb-0.5',
           day.locked && 'grayscale opacity-50'
-        )">
+        ]">
           <div v-if="day.claimed" class="w-full h-full bg-primary/10 dark:bg-primary/20 flex items-center justify-center">
             <Icon name="tabler:check" class="w-3.5 h-3.5 text-primary" />
           </div>
@@ -72,18 +70,18 @@ const todayReward = weeklyRewards.find((r) => r.current)
             v-else
             :src="day.image"
             :alt="`Day ${day.day} reward`"
-            :class="cn(
+            :class="[
               'w-full h-full object-cover',
               day.current && 'ring-2 ring-accent/50'
-            )"
+            ]"
           />
         </div>
 
         <!-- Reward -->
-        <span :class="cn(
+        <span :class="[
           'text-[9px] font-bold leading-tight text-center',
           day.current ? 'text-accent' : 'text-foreground/80'
-        )">
+        ]">
           {{ day.reward }}
         </span>
       </div>

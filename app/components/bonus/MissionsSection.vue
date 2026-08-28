@@ -1,6 +1,4 @@
 <script setup>
-import { cn } from "@/lib/utils"
-
 const missions = [
   {
     id: 1,
@@ -69,10 +67,10 @@ const gameIconMap = {
       <div
         v-for="mission in missions"
         :key="mission.id"
-        :class="cn(
+        :class="[
           'relative shrink-0 w-[150px] md:w-auto bg-card rounded-xl border p-2.5 card-hover-lift snap-start shadow-md dark:shadow-none',
           mission.hot ? 'border-accent/40 dark:border-accent/50' : 'border-gray-200 dark:border-border'
-        )"
+        ]"
       >
         <!-- Hot Badge -->
         <div
@@ -84,7 +82,7 @@ const gameIconMap = {
 
         <!-- Header: Icon + Title -->
         <div class="flex items-center gap-2 mb-2">
-          <div :class="cn('w-8 h-8 rounded-lg flex items-center justify-center border', gameIconMap[mission.gameIcon].color)">
+          <div :class="['w-8 h-8 rounded-lg flex items-center justify-center border', gameIconMap[mission.gameIcon].color]">
             <Icon :name="gameIconMap[mission.gameIcon].icon" class="w-4 h-4" />
           </div>
           <div class="flex-1 min-w-0">

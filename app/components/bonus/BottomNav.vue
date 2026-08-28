@@ -1,6 +1,4 @@
 <script setup>
-import { cn } from "@/lib/utils"
-
 defineProps({
   activeTab: { type: String, required: true },
 })
@@ -21,18 +19,18 @@ const navItems = [
       <button
         v-for="item in navItems"
         :key="item.id"
-        :class="cn(
+        :class="[
           'flex flex-col items-center gap-0.5 py-1.5 px-4 rounded-xl transition-all relative',
           item.highlight
             ? 'bg-bet text-bet-foreground shadow-glow-gold -mt-4 px-5 py-2'
             : activeTab === item.id
             ? 'text-primary'
             : 'text-muted-foreground hover:text-foreground'
-        )"
+        ]"
         @click="emit('update:activeTab', item.id)"
       >
         <div class="relative">
-          <Icon :name="item.icon" :class="cn('w-5 h-5', item.highlight && 'w-6 h-6')" />
+          <Icon :name="item.icon" :class="['w-5 h-5', item.highlight && 'w-6 h-6']" />
           <span
             v-if="item.badge"
             class="absolute -top-1.5 -right-2 bg-destructive text-destructive-foreground text-[8px] font-bold w-4 h-4 rounded-full flex items-center justify-center"
@@ -40,7 +38,7 @@ const navItems = [
             {{ item.badge }}
           </span>
         </div>
-        <span :class="cn('text-[10px] font-medium', item.highlight && 'text-xs font-bold')">
+        <span :class="['text-[10px] font-medium', item.highlight && 'text-xs font-bold']">
           {{ item.label }}
         </span>
         <div

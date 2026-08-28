@@ -1,5 +1,4 @@
 <script setup>
-import { cn } from "@/lib/utils";
 import { computed } from "vue";
 
 const props = defineProps({
@@ -69,10 +68,10 @@ const gameIconComponents = {
             </h3>
             <span
               :class="
-                cn(
+                [
                   'text-[9px] font-bold px-2 py-0.5 rounded-full border shrink-0',
                   statusColors[status]
-                )
+                ]
               "
             >
               {{ status.toUpperCase() }}
@@ -122,12 +121,12 @@ const gameIconComponents = {
               <!-- Step Dot -->
               <div
                 :class="
-                  cn(
+                  [
                     'absolute -left-4 w-3.5 h-3.5 rounded-full flex items-center justify-center text-[8px] font-bold border-2 z-10',
                     index === redemptionSteps.length - 1
                       ? 'bg-primary border-primary text-primary-foreground'
                       : 'bg-primary border-primary/50 text-primary-foreground'
-                  )
+                  ]
                 "
               >
                 {{ step.step }}
@@ -136,12 +135,12 @@ const gameIconComponents = {
               <!-- Step Text -->
               <p
                 :class="
-                  cn(
+                  [
                     'text-[11px] leading-snug pt-0.5',
                     index === redemptionSteps.length - 1
                       ? 'text-primary font-semibold'
                       : 'text-foreground/70'
-                  )
+                  ]
                 "
               >
                 {{ step.description }}
