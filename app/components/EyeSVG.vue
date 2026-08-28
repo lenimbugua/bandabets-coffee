@@ -10,7 +10,7 @@ defineProps({
   <Icon
     v-if="show"
     name="tabler:eye"
-    class="fill-current text-gray-950 dark:text-white"
+    class="w-[17px] h-4 text-gray-950 dark:text-white"
     style="color: var(--light-black)"
     aria-hidden="true"
   />
@@ -18,7 +18,7 @@ defineProps({
   <Icon
     v-else
     name="tabler:eye-off"
-    class="fill-current text-gray-950 dark:text-white"
+    class="w-[17px] h-4 text-gray-950 dark:text-white"
     style="color: var(--light-black)"
     aria-hidden="true"
   />

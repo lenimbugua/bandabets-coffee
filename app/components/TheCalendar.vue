@@ -170,13 +170,13 @@ function selectDate(day) {
               class="focus:text-gray-400 hover:text-gray-400 text-gray-800 dark:text-gray-100"
               @click="reduceCurrentIndex()"
             >
-              <Icon name="tabler:chevron-left" aria-hidden="true" /></button
+              <Icon name="tabler:chevron-left" class="w-6 h-6" aria-hidden="true" /></button
             ><button
               aria-label="calendar forward"
               class="focus:text-gray-400 hover:text-gray-400 ml-3 text-gray-800 dark:text-gray-100"
               @click="increaseCurrentIndex()"
             >
-              <Icon name="tabler:chevron-right" aria-hidden="true" />
+              <Icon name="tabler:chevron-right" class="w-6 h-6" aria-hidden="true" />
             </button>
           </div>
         </div>
