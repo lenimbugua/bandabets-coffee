@@ -37,9 +37,7 @@ fetchBetslip();
     <div class="bet-details-wrapper">
       <div class="page-header">
         <button aria-label="Go back" class="back-btn" @click="$router.go(-1)">
-          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="15 18 9 12 15 6" />
-          </svg>
+          <Icon name="tabler:chevron-left" class="w-4 h-4" aria-hidden="true" />
         </button>
         <h1 class="page-title">Bet Details</h1>
       </div>

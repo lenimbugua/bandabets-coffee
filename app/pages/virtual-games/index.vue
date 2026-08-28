@@ -49,19 +49,7 @@ const { pending } = storeToRefs(useCasinoStore());
             class="w-full flex items-center justify-between h-full cursor-pointer pb-5"
           >
             <button aria-label="Go back" class="cursor-pointer" @click="$router.go(-1)">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                class="size-6 stroke-2 text-gray-900 dark:text-white"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18"
-                />
-              </svg>
+              <Icon name="tabler:arrow-left" class="size-6 stroke-2 text-gray-900 dark:text-white" aria-hidden="true" />
             </button>
             <h1 class="font-black text-3xl text-gray-900 dark:text-gray-50 leading-none">
               VIRTUAL GAMES

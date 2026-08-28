@@ -37,18 +37,14 @@ function scrollRight() {
           class="hidden md:flex items-center justify-center w-7 h-7 rounded-full bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 text-gray-500 dark:text-gray-400 transition-colors"
           @click="scrollLeft"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3.5 h-3.5">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
-          </svg>
+          <Icon name="tabler:chevron-left" class="w-3.5 h-3.5" aria-hidden="true" />
         </button>
         <button
           aria-label="Scroll right"
           class="hidden md:flex items-center justify-center w-7 h-7 rounded-full bg-gray-100 dark:bg-white/5 hover:bg-gray-200 dark:hover:bg-white/10 text-gray-500 dark:text-gray-400 transition-colors"
           @click="scrollRight"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-3.5 h-3.5">
-            <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
-          </svg>
+          <Icon name="tabler:chevron-right" class="w-3.5 h-3.5" aria-hidden="true" />
         </button>
         <!-- More > link -->
         <button

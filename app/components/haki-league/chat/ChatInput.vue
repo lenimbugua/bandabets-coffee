@@ -60,19 +60,7 @@
         <span class="text-stone-500">160</span>
       </div>
       <button class="text-brand-mid" aria-label="Send message">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="24"
-          height="24"
-          fill="none"
-          viewBox="0 0 24 24"
-          aria-hidden="true"
-        >
-          <path
-            fill="#8F8F8F"
-            d="M16.386 2.42 6.82 5.598c-6.43 2.15-6.43 5.657 0 7.797l2.839.943.942 2.84c2.14 6.43 5.658 6.43 7.797 0l3.19-9.556c1.419-4.29-.912-6.632-5.202-5.202Zm.339 5.7-4.026 4.046a.786.786 0 0 1-.561.233.786.786 0 0 1-.562-.233.8.8 0 0 1 0-1.123l4.026-4.046a.8.8 0 0 1 1.123 0 .8.8 0 0 1 0 1.123Z"
-          ></path>
-        </svg>
+        <Icon name="tabler:send" class="w-[24px] h-[24px]" style="color: #8F8F8F" aria-hidden="true" />
       </button>
     </div>
   </div>

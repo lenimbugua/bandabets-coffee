@@ -40,9 +40,7 @@ const tabs = [
           aria-label="Go back"
           @click="$router.go(-1)"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 text-gray-600 dark:text-gray-300">
-            <path fill-rule="evenodd" d="M11.78 5.22a.75.75 0 0 1 0 1.06L8.06 10l3.72 3.72a.75.75 0 1 1-1.06 1.06l-4.25-4.25a.75.75 0 0 1 0-1.06l4.25-4.25a.75.75 0 0 1 1.06 0Z" clip-rule="evenodd" />
-          </svg>
+          <Icon name="tabler:chevron-left" class="w-5 h-5 text-gray-600 dark:text-gray-300" aria-hidden="true" />
         </button>
         <h1 class="text-lg font-bold text-gray-900 dark:text-white tracking-tight">Deposit Funds</h1>
       </div>

@@ -34,9 +34,7 @@ onBeforeUnmount(() => {
     <div class="cashout-header">
       <div class="flex items-center gap-2">
         <div class="cashout-icon-wrap">
-          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="7 10 12 5 17 10" /><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="21" x2="19" y2="21" />
-          </svg>
+          <Icon name="tabler:upload" class="w-4 h-4" aria-hidden="true" />
         </div>
         <div>
           <h2 class="cashout-title">Cashout</h2>
@@ -44,9 +42,7 @@ onBeforeUnmount(() => {
         </div>
       </div>
       <button class="cashout-close-btn" @click="closeModal">
-        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
-        </svg>
+        <Icon name="tabler:x" class="w-4 h-4" aria-hidden="true" />
       </button>
     </div>
 
@@ -65,9 +61,7 @@ onBeforeUnmount(() => {
         :class="['cashout-tab', selectedCashout === 'auto' && 'cashout-tab-active']"
         @click="setSelectedCashout('auto')"
       >
-        <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
-        </svg>
+        <Icon name="tabler:clock" class="w-3.5 h-3.5" aria-hidden="true" />
         <span>Auto</span>
       </button>
     </div>

@@ -407,20 +407,7 @@ function clearSearch() {
                 class="flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 dark:bg-surface-sunken hover:bg-gray-200 dark:hover:bg-surface-elevated text-gray-700 dark:text-muted-foreground hover:text-gray-900 dark:hover:text-white transition-colors"
                 @click="onCategorySelect('all')"
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke-width="2"
-                  stroke="currentColor"
-                  class="w-4 h-4"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M15.75 19.5 8.25 12l7.5-7.5"
-                  />
-                </svg>
+                <Icon name="tabler:chevron-left" class="w-4 h-4" aria-hidden="true" />
               </button>
               <h2 class="text-gray-900 dark:text-white text-lg font-bold">
                 {{ activeGridLabel }}

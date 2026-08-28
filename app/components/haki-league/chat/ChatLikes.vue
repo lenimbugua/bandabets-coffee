@@ -1,18 +1,7 @@
 <template>
   <div class="flex flex-col items-center space-x-1">
     <button class="btn chat-message-like-btn">
-      <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="fill-current text-slate-500"
-          width="24"
-          height="25"
-          fill="none"
-          aria-hidden="true"
-        >
-          <path
-            d="M16.44 3.5c-1.81 0-3.43.88-4.44 2.23C10.99 4.38 9.37 3.5 7.56 3.5 4.49 3.5 2 6 2 9.09c0 1.19.19 2.29.52 3.31 1.58 5 6.45 7.99 8.86 8.81.34.12.9.12 1.24 0 2.41-.82 7.28-3.81 8.86-8.81.33-1.02.52-2.12.52-3.31C22 6 19.51 3.5 16.44 3.5Z"
-          ></path></svg
-      >
+      <Icon name="tabler:heart" class="fill-current text-slate-500 w-[24px] h-[25px]" aria-hidden="true" />
     </button>
     <span class="text-sm dark:text-slate-500">1</span>
   </div>

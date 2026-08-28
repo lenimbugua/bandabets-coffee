@@ -10,17 +10,7 @@ const partialCashoutValue = ref(0);
       <Icon name="tabler:info-circle" class="h-6 w-6 text-red-600" />
       <Span class="">Partial Cashout</Span>
       <span>
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="h-7 w-7 text-red-500"
-          viewBox="0 0 24 24"
-        >
-          <!-- Icon from Material Symbols by Google - https://github.com/google/material-design-icons/blob/master/LICENSE -->
-          <path
-            fill="currentColor"
-            d="M11.475 14.475L7.85 10.85q-.075-.075-.112-.162T7.7 10.5q0-.2.138-.35T8.2 10h7.6q.225 0 .363.15t.137.35q0 .05-.15.35l-3.625 3.625q-.125.125-.25.175T12 14.7t-.275-.05t-.25-.175"
-          />
-        </svg>
+        <Icon name="tabler:caret-down-filled" class="h-7 w-7 text-red-500" aria-hidden="true" />
       </span>
       <span class="font-bold text-xl text-gray-700 dark:text-slate-300"
         >427 Ksh</span

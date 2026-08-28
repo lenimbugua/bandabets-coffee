@@ -182,20 +182,7 @@
         class="inline-flex items-center px-8 py-3 rounded-full bg-brand-bright hover:bg-brand-bright text-primary-foreground font-semibold shadow-lg shadow-brand-bright/40 transition-transform transform hover:-translate-y-1"
       >
         Try Jenga Bet Now
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="w-5 h-5 ml-2"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M17 8l4 4m0 0l-4 4m4-4H3"
-          />
-        </svg>
+        <Icon name="tabler:arrow-right" class="w-5 h-5 ml-2" aria-hidden="true" />
       </RouterLink>
     </div>
   </div>

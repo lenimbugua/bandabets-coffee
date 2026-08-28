@@ -23,9 +23,7 @@ const greeting = computed(() => {
           <img :src="userIcon" alt="Profile" class="w-10 h-10 object-contain" />
         </div>
         <div class="absolute -bottom-0.5 -right-0.5 h-4 w-4 rounded-full bg-success ring-[2.5px] ring-white dark:ring-background flex items-center justify-center">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="w-2.5 h-2.5 text-white">
-            <path fill-rule="evenodd" d="M12.416 3.376a.75.75 0 0 1 .208 1.04l-5 7.5a.75.75 0 0 1-1.154.114l-3-3a.75.75 0 0 1 1.06-1.06l2.353 2.353 4.493-6.74a.75.75 0 0 1 1.04-.207Z" clip-rule="evenodd" />
-          </svg>
+          <Icon name="tabler:check" class="w-2.5 h-2.5 text-white" aria-hidden="true" />
         </div>
       </div>
 

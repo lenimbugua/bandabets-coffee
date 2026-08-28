@@ -35,16 +35,14 @@ useSeoHead({
           aria-label="Go back"
           @click="$router.go(-1)"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 text-gray-600 dark:text-gray-300">
-            <path fill-rule="evenodd" d="M11.78 5.22a.75.75 0 0 1 0 1.06L8.06 10l3.72 3.72a.75.75 0 1 1-1.06 1.06l-4.25-4.25a.75.75 0 0 1 0-1.06l4.25-4.25a.75.75 0 0 1 1.06 0Z" clip-rule="evenodd" />
-          </svg>
+          <Icon name="tabler:chevron-left" class="w-5 h-5 text-gray-600 dark:text-gray-300" aria-hidden="true" />
         </button>
         <h1 class="text-lg font-bold text-gray-900 dark:text-white tracking-tight">Withdraw Funds</h1>
       </div>
 
       <!-- Free banner -->
       <div class="flex items-center gap-2 px-3 py-2 rounded-lg bg-brand-bright/8 dark:bg-brand-bright/10 border border-brand-bright/15">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="w-3.5 h-3.5 text-brand-bright shrink-0"><path fill-rule="evenodd" d="M12.416 3.376a.75.75 0 0 1 .208 1.04l-5 7.5a.75.75 0 0 1-1.154.114l-3-3a.75.75 0 0 1 1.06-1.06l2.353 2.353 4.493-6.74a.75.75 0 0 1 1.04-.207Z" clip-rule="evenodd" /></svg>
+        <Icon name="tabler:check" class="w-3.5 h-3.5 text-brand-bright shrink-0" aria-hidden="true" />
         <span class="text-[0.7rem] font-semibold text-brand-bright">Withdrawals are 100% free — no charges, no fees</span>
       </div>
 

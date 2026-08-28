@@ -44,9 +44,7 @@ import AuthTopBar from "@/components/AuthTopBar.vue";
             <div class="relative z-1 mt-auto pt-6">
               <div class="flex items-center gap-4">
                 <div class="flex items-center gap-1.5">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="w-3.5 h-3.5 text-white/30">
-                    <path fill-rule="evenodd" d="M8 1a3.5 3.5 0 0 0-3.5 3.5V7A1.5 1.5 0 0 0 3 8.5V12A1.5 1.5 0 0 0 4.5 13.5h7A1.5 1.5 0 0 0 13 12V8.5A1.5 1.5 0 0 0 11.5 7V4.5A3.5 3.5 0 0 0 8 1Zm2 6V4.5a2 2 0 1 0-4 0V7h4Z" clip-rule="evenodd" />
-                  </svg>
+                  <Icon name="tabler:lock" class="w-3.5 h-3.5 text-white/30" aria-hidden="true" />
                   <span class="text-[0.65rem] text-white/30">Secure</span>
                 </div>
                 <div class="w-px h-3 bg-white/10"></div>
@@ -58,9 +56,7 @@ import AuthTopBar from "@/components/AuthTopBar.vue";
                 </div>
                 <div class="w-px h-3 bg-white/10"></div>
                 <div class="flex items-center gap-1.5">
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" class="w-3.5 h-3.5 text-white/30">
-                    <path fill-rule="evenodd" d="M1 8a7 7 0 1 1 14 0A7 7 0 0 1 1 8Zm10.25-1.75a.75.75 0 0 0-1.5 0v2a.75.75 0 0 0 .75.75h1.5a.75.75 0 0 0 0-1.5h-.75v-1.25Z" clip-rule="evenodd" />
-                  </svg>
+                  <Icon name="tabler:clock" class="w-3.5 h-3.5 text-white/30" aria-hidden="true" />
                   <span class="text-[0.65rem] text-white/30">Instant M-Pesa</span>
                 </div>
               </div>

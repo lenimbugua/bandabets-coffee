@@ -46,9 +46,7 @@ function viewAll() {
           @click="viewAll"
         >
           ALL
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5">
-            <polyline points="9 18 15 12 9 6" />
-          </svg>
+          <Icon name="tabler:chevron-right" class="w-3.5 h-3.5" aria-hidden="true" />
         </button>
       </header>
 

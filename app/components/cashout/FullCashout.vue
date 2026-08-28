@@ -11,9 +11,7 @@ const cashoutData = computed(() => useCashoutStore().cashoutData(betId.value));
     <!-- Auto cashout active warning -->
     <div v-if="cashoutData?.autoCashOutEnabled" class="cashout-section">
       <div class="cashout-notice">
-        <svg class="w-3.5 h-3.5 shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" />
-        </svg>
+        <Icon name="tabler:alert-circle" class="w-3.5 h-3.5 shrink-0 mt-0.5" aria-hidden="true" />
         <p>Auto cashout is active. Cancel it first to use instant cashout.</p>
       </div>
       <button class="cashout-action-btn cashout-btn-cancel" :disabled="pending" @click="cancelAutoCashout(cashoutData.betId)">

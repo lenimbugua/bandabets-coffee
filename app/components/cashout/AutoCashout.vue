@@ -29,9 +29,7 @@ const handleCashout = (betId) => {
     <!-- Auto cashout already enabled -->
     <div v-if="cashoutData?.autoCashOutEnabled" class="cashout-section">
       <div class="cashout-notice">
-        <svg class="w-3.5 h-3.5 shrink-0 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
-        </svg>
+        <Icon name="tabler:clock" class="w-3.5 h-3.5 shrink-0 mt-0.5" aria-hidden="true" />
         <p>Auto cashout is active. Cancel it before setting a new amount.</p>
       </div>
       <button
@@ -87,9 +85,7 @@ const handleCashout = (betId) => {
       <button class="cashout-action-btn cashout-btn-primary" :disabled="pending">
         <TheButtonSpin v-if="pending" />
         <template v-else>
-          <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
-          </svg>
+          <Icon name="tabler:clock" class="w-3.5 h-3.5" aria-hidden="true" />
           <span>Set Auto Cashout</span>
         </template>
       </button>
