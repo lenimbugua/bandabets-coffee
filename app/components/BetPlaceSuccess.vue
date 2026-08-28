@@ -16,9 +16,7 @@ const { closeModal } = useModalStore();
     <div class="flex justify-center -mt-12 mb-3">
       <div class="rounded-full bg-white dark:bg-card p-1.5 shadow-lg">
         <div class="w-16 h-16 rounded-full bg-primary flex items-center justify-center shadow-[0_0_20px_oklch(55%_0.2_145/0.4)]">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-9 h-9 text-white">
-            <path fill-rule="evenodd" d="M19.916 4.626a.75.75 0 0 1 .208 1.04l-9 13.5a.75.75 0 0 1-1.154.114l-6-6a.75.75 0 0 1 1.06-1.06l5.353 5.353 8.493-12.74a.75.75 0 0 1 1.04-.207Z" clip-rule="evenodd" />
-          </svg>
+          <Icon name="tabler:check" class="w-9 h-9 text-white" aria-hidden="true" />
         </div>
       </div>
     </div>

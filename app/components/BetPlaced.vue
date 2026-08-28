@@ -96,9 +96,7 @@ function copyBookingCode() {
         :bet-id="parseInt(afterBetDetails?.betId)"
       >
         <button class="w-full flex items-center justify-center gap-2 h-10 rounded-xl border border-gray-300 dark:border-white/10 bg-white dark:bg-white/5 text-sm font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-white/10 transition-colors">
-          <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="22" y1="2" x2="11" y2="13" /><polygon points="22 2 15 22 11 13 2 9 22 2" />
-          </svg>
+          <Icon name="tabler:share" class="w-4 h-4" aria-hidden="true" />
           Share
         </button>
       </ShareBet>

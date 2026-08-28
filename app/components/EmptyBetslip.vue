@@ -10,9 +10,7 @@ import BetslipLoadCode from "./BetslipLoadCode.vue";
         <div class="relative w-14 h-14 mb-4">
           <div class="absolute inset-0 rounded-full border-2 border-dashed border-border/50 animate-[spin_20s_linear_infinite]"></div>
           <div class="absolute inset-2 rounded-full bg-muted/50 flex items-center justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="w-5 h-5 text-muted-foreground/30">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-            </svg>
+            <Icon name="tabler:plus" class="w-5 h-5 text-muted-foreground/30" aria-hidden="true" />
           </div>
         </div>
 

@@ -1,10 +1,3 @@
 <template>
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width="1em"
-    height="1em"
-    viewBox="0 0 24 24"
-  >
-    <path fill="currentColor" d="M10 17V7l5 5z"></path>
-  </svg>
+  <Icon name="tabler:caret-right-filled" class="h-[1em] w-[1em]" aria-hidden="true" />
 </template>

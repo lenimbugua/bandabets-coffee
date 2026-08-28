@@ -52,10 +52,7 @@ function oneCutReady() {
     <div class="boost-payout">
       <span class="payout-label">Payout</span>
       <span class="payout-current">{{ formattedNumber(calculatePossibleWin(betslip, stake)) }}</span>
-      <svg class="payout-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <line x1="5" y1="12" x2="19" y2="12" />
-        <polyline points="12 5 19 12 12 19" />
-      </svg>
+      <Icon name="tabler:arrow-right" class="payout-arrow" aria-hidden="true" />
       <span class="payout-boosted">{{ possibleWin }}</span>
       <span class="payout-currency">KES</span>
     </div>

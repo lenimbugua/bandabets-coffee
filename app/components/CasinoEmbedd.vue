@@ -50,9 +50,7 @@ function addStyleToLaunchData(data) {
           <div class="game-loading-emblem" aria-hidden="true">
             <div class="emblem-glow"></div>
             <div class="emblem-ring"></div>
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="emblem-icon">
-              <path d="M8 5v14l11-7z" />
-            </svg>
+            <Icon name="tabler:player-play-filled" class="emblem-icon" aria-hidden="true" />
           </div>
 
           <div class="game-loading-meta">

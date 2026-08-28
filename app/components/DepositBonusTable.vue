@@ -15,9 +15,7 @@ const bonusRanges = [
     <!-- Header -->
     <div class="px-5 pt-4 pb-3 flex items-center gap-3">
       <div class="w-7 h-7 rounded-lg bg-amber-50 dark:bg-gold-650/10 flex items-center justify-center">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-3.5 h-3.5 text-gold-650">
-          <path fill-rule="evenodd" d="M10 2a.75.75 0 0 1 .75.75v.258a33.186 33.186 0 0 1 6.668.83.75.75 0 0 1-.336 1.461 31.28 31.28 0 0 0-1.103-.232l1.702 7.545a.75.75 0 0 1-.387.832A4.981 4.981 0 0 1 15 14c-.825 0-1.606-.2-2.294-.556a.75.75 0 0 1-.387-.832l1.77-7.849a31.743 31.743 0 0 0-3.339-.364v11.851H13a.75.75 0 0 1 0 1.5H7a.75.75 0 0 1 0-1.5h2.25V4.399a31.712 31.712 0 0 0-3.339.364l1.77 7.849a.75.75 0 0 1-.387.832A4.981 4.981 0 0 1 5 14c-.825 0-1.606-.2-2.294-.556a.75.75 0 0 1-.387-.832l1.702-7.545c-.372.06-.742.126-1.103.232a.75.75 0 0 1-.336-1.461 33.186 33.186 0 0 1 6.668-.83V2.75A.75.75 0 0 1 10 2ZM5 12.662l-1.395-6.178A31.8 31.8 0 0 1 5 6.282c.484.04.964.092 1.395.202L5 12.662Zm10 0 1.395-6.178A31.8 31.8 0 0 0 15 6.282a31.67 31.67 0 0 0-1.395.202L15 12.662Z" clip-rule="evenodd" />
-        </svg>
+        <Icon name="tabler:currency-dollar" class="w-3.5 h-3.5 text-gold-650" aria-hidden="true" />
       </div>
       <h3 class="text-[0.6rem] font-bold text-gray-400 dark:text-white/25 uppercase tracking-widest">Deposit Bonus Tiers</h3>
     </div>

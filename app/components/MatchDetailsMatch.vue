@@ -50,11 +50,7 @@ function teamAbbr(name) {
         class="change-event-btn flex items-center gap-1 px-3 py-1.5 rounded-lg text-[0.6rem] font-semibold text-brand-bright cursor-pointer shrink-0 transition-all duration-150 active:scale-95"
         @click="changeEvent"
       >
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M8 3H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3" />
-          <path d="M17 3l-8 8" />
-          <path d="M12 3h5v5" />
-        </svg>
+        <Icon name="tabler:external-link" class="h-3 w-3" aria-hidden="true" />
         <span>Change Event</span>
       </button>
     </div>

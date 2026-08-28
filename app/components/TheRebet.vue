@@ -39,18 +39,12 @@ const doRebet = async () => {
     class="flex space-x-1 items-center font-bold cursor-pointer p-1 rounded-md"
     @click="doRebet"
   >
-    <svg
+    <Icon
+      name="tabler:refresh"
       class="w-4 h-4"
       :class="{ 'animate-spin': rebetPending && selectedId === props.betId }"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      stroke-width="2.5"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-    >
-      <polyline points="17 1 21 5 17 9" /><path d="M3 11V9a4 4 0 0 1 4-4h14" /><polyline points="7 23 3 19 7 15" /><path d="M21 13v2a4 4 0 0 1-4 4H3" />
-    </svg>
+      aria-hidden="true"
+    />
     <span>Rebet</span>
   </div>
 </template>
