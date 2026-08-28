@@ -20,7 +20,7 @@
  *   cycle inside the panel; on close focus returns to the remembered element.
  * - Body scroll is locked while any AppDialog is open (module-level counter).
  */
-import { nextTick, onBeforeUnmount, ref, useId, watch } from "vue";
+import { nextTick, onBeforeUnmount, onMounted, ref, useId, watch } from "vue";
 
 const props = defineProps({
   open: { type: Boolean, default: false },
@@ -71,7 +71,14 @@ function resolveEl(target) {
   return null;
 }
 
-function focusInitial() {
+// Called after the panel exists. On the mount-already-open path (lazy modals)
+// the teleported panel can lag one frame behind nextTick, so retry on rAF.
+function focusInitial(attempt = 0) {
+  if (!active) return;
+  if (!panel.value) {
+    if (attempt < 10) requestAnimationFrame(() => focusInitial(attempt + 1));
+    return;
+  }
   const initial = resolveEl(props.initialFocus);
   if (initial && panel.value && panel.value.contains(initial)) {
     initial.focus({ preventScroll: true });
@@ -89,7 +96,7 @@ function activate() {
   previouslyFocused = document.activeElement;
   lockScroll();
   pushDialog(instance);
-  nextTick(focusInitial);
+  nextTick(() => focusInitial());
 }
 
 function deactivate() {
@@ -147,15 +154,19 @@ function onOutsideClick() {
 }
 
 if (import.meta.client) {
+  // Same path whether `open` is already true at mount or flips later;
+  // `activate()`/`deactivate()` are idempotent via the `active` flag.
+  onMounted(() => {
+    if (props.open) activate();
+  });
   watch(
     () => props.open,
-    (isOpen) => (isOpen ? activate() : deactivate()),
-    { immediate: true }
+    (isOpen) => (isOpen ? activate() : deactivate())
   );
   onBeforeUnmount(deactivate);
 }
 
-defineExpose({ titleId, panel });
+defineExpose({ titleId, panel, getOpenCount });
 </script>
 
 <script>
@@ -188,6 +199,10 @@ function popDialog(inst) {
     document.removeEventListener("keydown", documentKeydown, true);
     document.removeEventListener("focusin", documentFocusin, true);
   }
+}
+
+function getOpenCount() {
+  return openCount;
 }
 
 function lockScroll() {
