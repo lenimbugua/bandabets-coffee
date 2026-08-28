@@ -225,3 +225,26 @@ Update the three call sites' imports (they call `copy(x)` explicitly and read `c
 - Coverage: assessment items 1–4 → Tasks 1–4; measurement → baseline in T1 + T5.
 - Placeholders: none; each task has code or exact rules and a concrete verification.
 - Consistency: `API()` return shape `{data,status,headers}` matches the 245 `response.data` and 1 `response.status` reads; error `response.{data,status}` matches the ~45 `err.response.*` reads; `useMediaQuery` keeps the 390 px SSR rule that `provideSSRWidth` provided; `useClipboard` keeps `{copy, copied}`; `useThemeSwitch` keys unchanged.
+
+## Results (2026-08-28, commits a261865..1d28a75)
+
+| Stage | modulepreload | JS gzip | Notes |
+|---|---|---|---|
+| Before | 83 | 261 KB | |
+| T1 axios → `$fetch` adapter | 83 | 246 KB | axios chunk (44.7 KB raw) gone; both login error shapes verified live |
+| T2 VueUse → native | 83 | 241 KB | 22 files; no hydration warnings mobile/desktop; scope-cleanup bug found in review and fixed (`e049604`) |
+| T3 crypto-js → Web Crypto | 83 | **235 KB** | ciphertexts byte-identical (PBKDF2-**SHA-256** — crypto-js 4.2 default; the plan's SHA-1 assumption was wrong) |
+| T4 `@neoconfetti/vue` removed | 83 | 235 KB | unused |
+
+Lighthouse, live data via proxy, devtools throttling, same machine as the round-6 A/B (that session's head medians: perf 73, LCP 2638, TBT 776, longest 597):
+
+| Run | Perf | LCP | TBT | SI | script eval | longest task |
+|---|---|---|---|---|---|---|
+| 1 | 84 | 2268 | 428 | 2955 | 512 | 317 |
+| 2 | 85 | 2250 | 407 | 2937 | 500 | 283 |
+| 3 | 95 | 2298 | 0 | 2967 | 29 | 273 |
+| **median** | **85** | 2268 | **407** | 2955 | 500 | **283** |
+
+Run 3 is an outlier (script evaluation 29 ms — the XHRs answered before hydration so the render fell outside the TBT window); the two consistent runs still show TBT −45 % and the longest task −50 % against the round-6 session. Removing three libraries that every page evaluated at startup (axios, VueUse, crypto-js) is what moved the post-hydration long task, which no rendering experiment in rounds 4–6 could.
+
+Remaining runtime dependencies and why they stay: `@headlessui/vue` (63 files, a11y-critical, lazy-loaded with the modals), `pinia` + persistedstate (the native Nuxt state layer), `@nuxt/fonts`/`@nuxt/icon` (native modules), `clsx` + `tailwind-merge` (`cn()` has 15 callers), `dompurify` (sanitising CMS HTML), `mixpanel-browser` (deferred to idle), `sweetalert2` (loaded on first toast), `swiper` (community-bets/affiliate pages only).
