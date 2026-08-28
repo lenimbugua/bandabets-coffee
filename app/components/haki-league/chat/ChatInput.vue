@@ -60,7 +60,7 @@
         <span class="text-stone-500">160</span>
       </div>
       <button class="text-brand-mid" aria-label="Send message">
-        <Icon name="tabler:send" class="w-[24px] h-[24px]" style="color: #8F8F8F" aria-hidden="true" />
+        <Icon name="tabler:send" class="w-[24px] h-[24px] text-muted-foreground" aria-hidden="true" />
       </button>
     </div>
   </div>

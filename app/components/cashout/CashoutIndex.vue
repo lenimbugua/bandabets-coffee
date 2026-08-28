@@ -34,7 +34,7 @@ onBeforeUnmount(() => {
     <div class="cashout-header">
       <div class="flex items-center gap-2">
         <div class="cashout-icon-wrap">
-          <Icon name="tabler:upload" class="w-4 h-4" aria-hidden="true" />
+          <Icon name="tabler:arrow-up" class="w-4 h-4" aria-hidden="true" />
         </div>
         <div>
           <h2 class="cashout-title">Cashout</h2>
