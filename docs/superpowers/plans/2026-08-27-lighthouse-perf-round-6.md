@@ -76,3 +76,19 @@ The round-3 loop strips `css` links for chunks *named* after a `.vue` file. `use
 - Coverage: font chain → T1; second stylesheet → T2; render task → T3 (experiment with explicit revert path).
 - Placeholders: none; every accept rule numeric; every step names its verification.
 - Consistency: T2 extends the existing hook without touching the round-2 page/layout guard or the round-3 name rule; T3 keeps `MatchTwo` keys and the sentinel-based loader untouched.
+
+## Results (2026-08-28)
+
+Net code change from this round: **one commit pair** (`9e1195f` + `b19e23e`) — the manifest hook now also strips stylesheet links whose CSS is entirely component-scoped, so the home page has **one** render-blocking stylesheet instead of two. Two experiments were rejected by measurement and reverted:
+
+| Task | Outcome | Evidence (medians of 3, live data, devtools throttling) |
+|---|---|---|
+| T1 font preload (`preload: true` + `subsets: ["latin"]`) | **rejected**, reverted (`8f8faae`) | font finished 860 ms earlier, but FCP +92 ms / LCP +109 ms in every run, perf 78→78; and the latin-only subset drops latin-ext/cyrillic glyphs site-wide. `@nuxt/fonts` 0.14 preloads one "top priority" file per family (a build-time pick that ignored the page's actual subset) and ignores a second family entry with the same name. |
+| T2 content-based stylesheet strip | **kept** | `blockingCss` 2 → 1 on `/`, `/leagues`, `/sports/soccer`; client navigation still injects styles; shimmer keyframe present. Same-session A/B (2026-08-28, noisy machine): head perf 73 / LCP 2638 / TBT 776 vs base 76 / 2239 / 798 — per-run LCP spread was 1.1 s in both arms, so the delta is not resolvable; the change removes a request from the critical path and cannot structurally raise LCP. |
+| T3 two-frame match-list render | **rejected**, reverted (no commit) | TBT +352 ms, LCP +409 ms, SI +366 ms, longest task +174 ms. Splitting the render adds a second layout/paint pass that costs more than the first-frame saving on this list size. Side finding: `watch(matches, …)` never fires in `InfiniteScroll.vue` because `matches2.js` mutates the array in place — watch `matches.length` if that watcher is ever needed. |
+
+### Where this leaves the page
+The remaining costs are structural rather than incidental: the post-XHR render of the visible match cards (~500 ms task), the entry stylesheet round-trip on slow 4G, and third-party API latency. Further gains would need product-level changes (fewer/lighter odds cards in the first screen, or server-rendering the first page of matches so the client does not render them at all) — worth deciding with the deployed PSI number in hand rather than more local rounds.
+
+### Measurement note
+Local numbers on 2026-08-28 were ~5 points lower and far noisier than on 2026-08-27 for identical code (machine load); compare only within a session.
