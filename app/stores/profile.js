@@ -1,5 +1,4 @@
 import { useGoogleDataLayers } from "@/composables/useGoogleDataLayers";
-import { timestamp } from "@vueuse/core";
 import API, { authBaseURL } from "../services/API";
 import { useLoginStore } from "./login";
 

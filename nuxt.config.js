@@ -353,7 +353,6 @@ export default defineNuxtConfig({
   modules: [
     "@pinia/nuxt",
     "pinia-plugin-persistedstate/nuxt",
-    "@vueuse/nuxt",
     "@nuxt/eslint",
     "@nuxt/icon",
     "@nuxt/fonts",

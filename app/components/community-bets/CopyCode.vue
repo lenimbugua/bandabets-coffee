@@ -1,6 +1,6 @@
 <script setup>
 import { useShareBetStore } from "@/stores/sharebet.js";
-import { useClipboard } from "@vueuse/core";
+import { useClipboard } from "@/composables/useClipboard";
 import { storeToRefs } from "pinia";
 
 const { bookingCode } = storeToRefs(useShareBetStore());

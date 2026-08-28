@@ -1,6 +1,5 @@
 <script setup>
 import { useToast } from "@/composables/useToast";
-import { timestamp } from "@vueuse/core";
 import { computed, toRefs } from "vue";
 import { useBetBuilderStore } from "../stores/betbuilder";
 import OddChangeArrow from "./OddChangeArrow.vue";
@@ -123,7 +122,7 @@ async function handleSelect() {
     sportName: props.sportName,
     multiBetOutcomeName: outcome.multiBetOutcomeName,
     multiBetMarketName: props.multiBetMarketName,
-    timestamp: timestamp().toString(),
+    timestamp: Date.now().toString(),
     clickIsToSelectOutcome,
   };
 

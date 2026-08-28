@@ -1,5 +1,5 @@
 import { effectScope } from "vue";
-import { useMediaQuery } from "@vueuse/core";
+import { useMediaQuery } from "./useMediaQuery";
 
 // Cache key for the refs stashed on the current Nuxt app instance (see
 // below). A Symbol avoids any chance of colliding with a real NuxtApp
@@ -15,22 +15,19 @@ export function useScreenSizes() {
   //     request-isolation bug. useNuxtApp() also throws "nuxt instance
   //     unavailable" if called at module scope, so a bare module-scope call
   //     isn't even viable here.
-  //  2. Fresh-per-call is also out: useMediaQuery() registers a watchEffect
-  //     plus a matchMedia listener. Callers outside component setup (e.g.
-  //     the Pinia actions below) have no owning effect scope to clean those
-  //     up, so calling this on every invocation leaks listeners on every
-  //     click. Memoising on nuxtApp bounds it to one set of refs per
-  //     request (SSR) / per app instance (client) — the closest in-Nuxt
-  //     equivalent of the old module singleton, without sharing state
-  //     across concurrent requests.
-  //  3. The SSR width (see app/plugins/ssr-width.js) is provided via
-  //     `app.provide()` on the per-request Vue app instance. VueUse reads it
-  //     through Vue's injection context (`useSSRWidth()` -> `injectLocal`),
-  //     which only exists during component setup. Because creation is still
-  //     lazy, the first real call — always app/layouts/default.vue's setup,
-  //     since the layout renders before any page/action can run — happens
-  //     inside that injection context and sees the provided width. Later
-  //     calls (including from actions) just reuse the cached refs.
+  //  2. Fresh-per-call is also out: on the client useMediaQuery() registers
+  //     a matchMedia listener cleaned up via onScopeDispose(). Callers
+  //     outside component setup (e.g. the Pinia actions below) have no
+  //     owning effect scope to clean those up, so calling this on every
+  //     invocation leaks listeners on every click. Memoising on nuxtApp
+  //     bounds it to one set of refs per request (SSR) / per app instance
+  //     (client) — the closest in-Nuxt equivalent of the old module
+  //     singleton, without sharing state across concurrent requests.
+  //  3. useMediaQuery()'s SSR fallback (see its own file) is a module
+  //     constant, not something injected from component context, so unlike
+  //     the old VueUse-based version this no longer needs to run inside
+  //     default.vue's setup specifically to see the right width — it's
+  //     correct from any caller, including the effectScope.run() below.
   const nuxtApp = useNuxtApp();
 
   if (!nuxtApp[SCREEN_SIZES_KEY]) {

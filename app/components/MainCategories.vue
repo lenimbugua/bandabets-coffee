@@ -1,19 +1,16 @@
 <script setup>
 import { useDefaultSport } from "@/composables/useDefaultSport";
 import { useSportsQueryParamsStore } from "@/stores/sports-query-params";
-import { computed, onMounted, ref, toRefs } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import { useMainCategories } from "../composables/useMainCategories";
 import { useLiveMatchesStore } from "../stores/live-matches";
 import MainCategoryIcons from "./MainCategoryIcons.vue";
 
-import { useScroll } from "@vueuse/core";
 const scrollContainer = ref(null);
 
 const smooth = ref(true);
 const behavior = computed(() => (smooth.value ? "smooth" : "auto"));
-const { x, arrivedState } = useScroll(scrollContainer, { behavior });
-const { right } = toRefs(arrivedState);
 
 const router = useRouter();
 
@@ -25,9 +22,16 @@ const scrollAmount = 300;
 const canScrollLeft = ref(false);
 const canScrollRight = ref(true);
 
+// Native replacement for the two bits used from VueUse's useScroll(): `x`
+// (drives the scroll position) and `arrivedState.right` (gates further
+// scrolling once the rightmost edge is reached) — computed from the DOM
+// directly at click time instead of a reactively-tracked pair of refs.
 function scroll() {
-  if (right.value) return;
-  x.value += scrollAmount;
+  const el = scrollContainer.value;
+  if (!el) return;
+  const atRight = el.scrollLeft >= el.scrollWidth - el.clientWidth - 1;
+  if (atRight) return;
+  el.scrollTo({ left: el.scrollLeft + scrollAmount, behavior: behavior.value });
 }
 
 // const scrollRight = () => {

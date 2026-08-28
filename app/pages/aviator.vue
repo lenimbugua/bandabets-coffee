@@ -9,7 +9,7 @@
 import ShareToSocials from "@/components/community-bets/ShareToSocials.vue";
 import { useAviatorReferralStore } from "@/stores/aviator-referral";
 // import { useLoginStore } from "@/stores/login"; // invite friend feature disabled
-import { useClipboard } from "@vueuse/core";
+import { useClipboard } from "@/composables/useClipboard";
 import { storeToRefs } from "pinia";
 import { computed, onMounted, ref } from "vue";
 // import { useRoute } from "vue-router"; // invite friend feature disabled

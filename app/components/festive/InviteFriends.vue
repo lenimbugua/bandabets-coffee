@@ -1,7 +1,7 @@
 <script setup>
 import ShareToSocials from "@/components/community-bets/ShareToSocials.vue";
 import { useShareToSocials } from "@/composables/useShareToSocials";
-import { useClipboard } from "@vueuse/core";
+import { useClipboard } from "@/composables/useClipboard";
 import { ref, toRefs } from "vue";
 import { useAffiliateV2Store } from "@/stores/affiliate-v2";
 

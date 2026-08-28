@@ -13,7 +13,7 @@ import { storeToRefs } from "pinia";
 import { computed, ref } from "vue";
 
 import { useShareToSocials } from "@/composables/useShareToSocials";
-import { useClipboard } from "@vueuse/core";
+import { useClipboard } from "@/composables/useClipboard";
 import { useAffiliateStore } from "@/stores/affiliate";
 
 const { affiliateText } = useShareToSocials();

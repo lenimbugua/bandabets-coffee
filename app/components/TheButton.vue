@@ -1,5 +1,4 @@
 <script setup>
-import { timestamp } from "@vueuse/core";
 import { storeToRefs } from "pinia";
 import { computed } from "vue";
 import { useBetslipStore } from "../stores/sports-betslip.js";
@@ -121,7 +120,7 @@ function handleSelect(event) {
     competitionName: props.competitionName,
     countryName: props.countryName,
     sportName: props.sportName,
-    timestamp: timestamp().toString(),
+    timestamp: Date.now().toString(),
     clickIsToSelectOutcome,
   };
 

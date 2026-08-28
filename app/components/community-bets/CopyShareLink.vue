@@ -1,6 +1,6 @@
 <script setup>
 import { useShareToSocials } from "@/composables/useShareToSocials";
-import { useClipboard } from "@vueuse/core";
+import { useClipboard } from "@/composables/useClipboard";
 import SocialsIcons from "./SocialsIcons.vue";
 
 const props = defineProps({

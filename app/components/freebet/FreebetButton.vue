@@ -1,5 +1,4 @@
 <script setup>
-import { timestamp } from "@vueuse/core";
 import { useFreebetStore } from "@/stores/freebet";
 import ThePadlock from "@/components/ThePadlock.vue";
 import OddChangeArrow from "@/components/OddChangeArrow.vue";
@@ -97,7 +96,7 @@ function handleSelect() {
     competitionName: props.competitionName,
     countryName: props.countryName,
     sportName: props.sportName,
-    timestamp: timestamp().toString(),
+    timestamp: Date.now().toString(),
     clickIsToSelectOutcome,
   };
   addAnItemToBetslip(payload);

@@ -1,6 +1,6 @@
 <script setup>
 import { useAffiliateStore } from "../../stores/affiliate";
-import { useClipboard } from "@vueuse/core";
+import { useClipboard } from "../../composables/useClipboard";
 import { storeToRefs } from "pinia";
 
 const { affiliateUrl } = storeToRefs(useAffiliateStore());

@@ -11,7 +11,7 @@ import {
   TransitionChild,
   TransitionRoot,
 } from "@headlessui/vue";
-import { useClipboard } from "@vueuse/core";
+import { useClipboard } from "@/composables/useClipboard";
 import { storeToRefs } from "pinia";
 import { computed, ref } from "vue";
 
