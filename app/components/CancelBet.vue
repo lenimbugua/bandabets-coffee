@@ -1,6 +1,5 @@
 <script setup>
 import { useModalStore } from "@/stores/modal";
-import { DialogTitle } from "@headlessui/vue";
 import { storeToRefs } from "pinia";
 import { useBetsStore } from "../stores/bets";
 import TheButtonSpin from "./TheButtonSpin.vue";
@@ -33,12 +32,9 @@ async function cancelTheBet() {
     >
       <Icon name="tabler:x" class="text-gray-900 dark:text-white w-5 h-5" />
     </div>
-    <DialogTitle
-      as="h3"
-      class="w-full flex justify-center text-lg font-medium leading-6 text-red-500"
-    >
+    <h3 class="w-full flex justify-center text-lg font-medium leading-6 text-red-500">
       Are you sure?
-    </DialogTitle>
+    </h3>
     <div
       class="mt-2 px-2 rounded-md text-gray-600 dark:text-slate-300 text-center"
     >

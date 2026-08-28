@@ -1,11 +1,5 @@
 <script setup>
-import {
-  Dialog,
-  DialogPanel,
-  DialogTitle,
-  TransitionChild,
-  TransitionRoot,
-} from "@headlessui/vue";
+import AppDialog from "@/components/ui/AppDialog.vue";
 
 import { useModalTypes } from "@/composables/useModalTypes";
 import { useModalStore } from "@/stores/modal";
@@ -25,78 +19,54 @@ const showBetslip = computed(() => {
 </script>
 
 <template>
-  <TransitionRoot appear :show="showBetslip" as="template">
-    <Dialog
-      as="div"
-      class="relative z-100"
-      :initial-focus="closeButtonRef"
-      @close="closeModal"
-    >
-      <TransitionChild
-        as="template"
-        enter="duration-300 ease-out"
-        enter-from="opacity-0"
-        enter-to="opacity-100"
-        leave="duration-200 ease-in"
-        leave-from="opacity-100"
-        leave-to="opacity-0"
-      >
-        <div class="modal-backdrop" />
-      </TransitionChild>
-      <div class="fixed z-50 inset-x-0 bottom-0">
-        <div class="flex justify-center">
-          <TransitionChild
-            as="template"
-            enter="duration-300 ease-out"
-            enter-from="opacity-0 translate-y-full"
-            enter-to="opacity-100 translate-y-0"
-            leave="duration-200 ease-in"
-            leave-from="opacity-100 translate-y-0"
-            leave-to="opacity-0 translate-y-full"
-          >
-            <DialogPanel class="modal-card">
-              <!-- Header -->
-              <div class="modal-header">
-                <div class="header-left">
-                  <div class="icon-wrap">
-                    <Icon name="tabler:refresh" class="w-3.5 h-3.5" aria-hidden="true" />
-                  </div>
-                  <div>
-                    <DialogTitle class="modal-title">Change Event</DialogTitle>
-                    <p class="modal-subtitle">Select a different match</p>
-                  </div>
-                </div>
-                <button
-                  ref="closeButtonRef"
-                  class="close-btn"
-                  aria-label="Close"
-                  @click="closeModal"
-                >
-                  <Icon name="tabler:x" class="w-4 h-4" aria-hidden="true" />
-                </button>
-              </div>
-
-              <!-- Body -->
-              <div class="modal-body">
-                <ChangeEvent />
-              </div>
-            </DialogPanel>
-          </TransitionChild>
+  <AppDialog
+    :open="showBetslip"
+    :initial-focus="closeButtonRef"
+    z-class="z-100"
+    overlay-class="modal-backdrop"
+    container-class="flex min-h-full items-end justify-center"
+    panel-class="modal-card"
+    @close="closeModal"
+  >
+    <template #default="{ titleId }">
+      <!-- Header -->
+      <div class="modal-header">
+        <div class="header-left">
+          <div class="icon-wrap">
+            <Icon name="tabler:refresh" class="w-3.5 h-3.5" aria-hidden="true" />
+          </div>
+          <div>
+            <h2 :id="titleId" class="modal-title">Change Event</h2>
+            <p class="modal-subtitle">Select a different match</p>
+          </div>
         </div>
+        <button
+          ref="closeButtonRef"
+          class="close-btn"
+          aria-label="Close"
+          @click="closeModal"
+        >
+          <Icon name="tabler:x" class="w-4 h-4" aria-hidden="true" />
+        </button>
       </div>
-    </Dialog>
-  </TransitionRoot>
+
+      <!-- Body -->
+      <div class="modal-body">
+        <ChangeEvent />
+      </div>
+    </template>
+  </AppDialog>
 </template>
 
 <style scoped>
-.modal-backdrop {
+:global(.modal-backdrop) {
   position: fixed;
   inset: 0;
   background: oklch(0% 0 0 / 0.5);
   backdrop-filter: blur(4px);
 }
 
-.modal-card {
+:global(.modal-card) {
   width: 100%;
   max-width: 56rem;
   border-radius: 1rem 1rem 0 0;
@@ -108,7 +78,7 @@ const showBetslip = computed(() => {
     0 4px 16px oklch(0% 0 0 / 0.08);
   text-align: left;
 }
-[data-theme="dark"] .modal-card {
+:global([data-theme="dark"] .modal-card) {
   background: var(--card);
   border-color: oklch(100% 0 0 / 0.06);
   box-shadow:

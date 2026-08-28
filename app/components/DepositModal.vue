@@ -1,13 +1,7 @@
 <script setup>
 import { storeToRefs } from "pinia";
 import { computed, ref } from "vue";
-import {
-  TransitionRoot,
-  TransitionChild,
-  Dialog,
-  DialogPanel,
-  DialogTitle,
-} from "@headlessui/vue";
+import AppDialog from "@/components/ui/AppDialog.vue";
 
 import { useModalStore } from "@/stores/modal";
 
@@ -25,74 +19,40 @@ const showDialog = computed(() => {
 const { closeModal } = useModalStore();
 </script>
 <template>
-  <TransitionRoot appear :show="showDialog" as="template">
-    <Dialog
-      as="div"
-      style="z-index: 1000"
-      class="relative z-50"
-      :initial-focus="closeButtonRef"
-    >
-      <TransitionChild
-        as="template"
-        enter="duration-300 ease-out"
-        enter-from="opacity-0"
-        enter-to="opacity-100"
-        leave="duration-200 ease-in"
-        leave-from="opacity-100"
-        leave-to="opacity-0"
-      >
-        <div class="fixed inset-0 bg-black/75" />
-      </TransitionChild>
-
-      <div class="fixed inset-0 overflow-y-auto">
-        <div
-          class="z-50 flex min-h-full items-center justify-center p-4 text-center"
-        >
-          <TransitionChild
-            as="template"
-            enter="duration-300 ease-out"
-            enter-from="opacity-0 scale-95"
-            enter-to="opacity-100 scale-100"
-            leave="duration-200 ease-in"
-            leave-from="opacity-100 scale-100"
-            leave-to="opacity-0 scale-95"
+  <AppDialog
+    :open="showDialog"
+    :initial-focus="closeButtonRef"
+    z-class="z-1000"
+    container-class="z-50 flex min-h-full items-center justify-center p-4 text-center"
+    panel-class="w-full max-w-md transform bg-white dark:bg-background text-left align-middle shadow-2xl transition-all overflow-hidden rounded-2xl border border-gray-200/80 dark:border-white/6"
+  >
+    <template #default="{ titleId }">
+      <!-- Accent header bar -->
+      <div class="relative overflow-hidden px-5 pt-5 pb-4">
+        <div class="absolute inset-0 bg-gradient-to-r from-brand-bright/8 via-primary/5 to-transparent dark:from-brand-bright/10 dark:via-primary/5"></div>
+        <div class="relative flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl bg-brand-bright/15 dark:bg-brand-bright/20 flex items-center justify-center">
+              <Icon name="tabler:credit-card" class="w-4.5 h-4.5 text-brand-bright" aria-hidden="true" />
+            </div>
+            <h3 :id="titleId" class="text-base font-bold text-gray-900 dark:text-white">
+              Deposit Funds
+            </h3>
+          </div>
+          <button
+            ref="closeButtonRef"
+            class="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/5 transition-colors cursor-pointer"
+            aria-label="Close deposit dialog"
+            @click="closeModal"
           >
-            <DialogPanel
-              class="w-full max-w-md transform bg-white dark:bg-background text-left align-middle shadow-2xl transition-all overflow-hidden rounded-2xl border border-gray-200/80 dark:border-white/6"
-            >
-              <!-- Accent header bar -->
-              <div class="relative overflow-hidden px-5 pt-5 pb-4">
-                <div class="absolute inset-0 bg-gradient-to-r from-brand-bright/8 via-primary/5 to-transparent dark:from-brand-bright/10 dark:via-primary/5"></div>
-                <div class="relative flex items-center justify-between">
-                  <div class="flex items-center gap-3">
-                    <div class="w-9 h-9 rounded-xl bg-brand-bright/15 dark:bg-brand-bright/20 flex items-center justify-center">
-                      <Icon name="tabler:credit-card" class="w-4.5 h-4.5 text-brand-bright" aria-hidden="true" />
-                    </div>
-                    <DialogTitle
-                      as="h3"
-                      class="text-base font-bold text-gray-900 dark:text-white"
-                    >
-                      Deposit Funds
-                    </DialogTitle>
-                  </div>
-                  <button
-                    ref="closeButtonRef"
-                    class="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-white/5 transition-colors cursor-pointer"
-                    aria-label="Close deposit dialog"
-                    @click="closeModal"
-                  >
-                    <Icon name="tabler:x" class="w-5 h-5" />
-                  </button>
-                </div>
-              </div>
-              <!-- Form content -->
-              <div class="px-5 pb-5">
-                <DepositForm />
-              </div>
-            </DialogPanel>
-          </TransitionChild>
+            <Icon name="tabler:x" class="w-5 h-5" />
+          </button>
         </div>
       </div>
-    </Dialog>
-  </TransitionRoot>
+      <!-- Form content -->
+      <div class="px-5 pb-5">
+        <DepositForm />
+      </div>
+    </template>
+  </AppDialog>
 </template>

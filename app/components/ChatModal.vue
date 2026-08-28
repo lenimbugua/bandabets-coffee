@@ -1,11 +1,5 @@
 <script setup>
-import {
-  Dialog,
-  DialogPanel,
-  DialogTitle,
-  TransitionChild,
-  TransitionRoot,
-} from "@headlessui/vue";
+import AppDialog from "@/components/ui/AppDialog.vue";
 
 import { storeToRefs } from "pinia";
 import { useModalStore } from "@/stores/modal";
@@ -23,66 +17,38 @@ const showBetslip = computed(() => {
 });
 </script>
 <template>
-  <TransitionRoot appear :show="showBetslip" as="template">
-    <Dialog
-      as="div"
-      class="relative z-200"
-      :initial-focus="closeButtonRef"
-      @close="closeModal"
-    >
-      <TransitionChild
-        as="template"
-        enter="duration-300 ease-out"
-        enter-from="opacity-0"
-        enter-to="opacity-100"
-        leave="duration-200 ease-in"
-        leave-from="opacity-100"
-        leave-to="opacity-0"
+  <AppDialog
+    :open="showBetslip"
+    :initial-focus="closeButtonRef"
+    z-class="z-200"
+    overlay-class="bg-black/50"
+    container-class="flex min-h-full items-end justify-center text-center"
+    panel-class="w-full max-w-4xl bg-white dark:bg-background transform overflow-hidden text-left align-middle shadow-xl transition-all"
+    @close="closeModal"
+  >
+    <template #default="{ titleId }">
+      <div
+        class="flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-white/5"
       >
-        <div class="fixed inset-0 bg-black/50" />
-      </TransitionChild>
-      <div class="fixed z-200 bottom-0 right-0 left-0 overflow-y-auto">
-        <div class="flex min-h-full items-center justify-center text-center">
-          <TransitionChild
-            as="template"
-            enter="duration-300 ease-out"
-            enter-from="opacity-0 scale-95"
-            enter-to="opacity-100 scale-100"
-            leave="duration-200 ease-in"
-            leave-from="opacity-100 scale-100"
-            leave-to="opacity-0 scale-95"
-          >
-            <DialogPanel
-              class="w-full max-w-4xl bg-white dark:bg-background transform overflow-hidden text-left align-middle shadow-xl transition-all"
-            >
-              <div
-                class="flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-white/5"
-              >
-                <DialogTitle
-                  class="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wide"
-                >
-                  <slot name="title" />
-                </DialogTitle>
-                <button ref="closeButtonRef" class="p-1 rounded-lg text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors cursor-pointer outline-hidden" aria-label="Close chat" @click="closeModal">
-                  <Icon name="tabler:x" class="w-5 h-5" />
-                </button>
-              </div>
-              <!-- TAWK DISABLED — restore later
-              <div class="bg-white dark:bg-background h-160">
-                <iframe
-                  frameborder="0"
-                  allowfullscreen=""
-                  webkitallowfullscreen=""
-                  mozallowfullscreen=""
-                  class="w-full h-full z-999"
-                  src="https://tawk.to/chat/67386bf82480f5b4f59eef63/1icq6bhh5"
-                ></iframe>
-              </div>
-              -->
-            </DialogPanel>
-          </TransitionChild>
-        </div>
+        <h2 :id="titleId" class="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wide">
+          <slot name="title" />
+        </h2>
+        <button ref="closeButtonRef" class="p-1 rounded-lg text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors cursor-pointer outline-hidden" aria-label="Close chat" @click="closeModal">
+          <Icon name="tabler:x" class="w-5 h-5" />
+        </button>
       </div>
-    </Dialog>
-  </TransitionRoot>
+      <!-- TAWK DISABLED — restore later
+      <div class="bg-white dark:bg-background h-160">
+        <iframe
+          frameborder="0"
+          allowfullscreen=""
+          webkitallowfullscreen=""
+          mozallowfullscreen=""
+          class="w-full h-full z-999"
+          src="https://tawk.to/chat/67386bf82480f5b4f59eef63/1icq6bhh5"
+        ></iframe>
+      </div>
+      -->
+    </template>
+  </AppDialog>
 </template>

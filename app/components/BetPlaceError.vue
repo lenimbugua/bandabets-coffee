@@ -1,6 +1,5 @@
 <script setup>
 import { storeToRefs } from "pinia";
-import { DialogTitle } from "@headlessui/vue";
 import { useBetslipStore } from "../stores/sports-betslip.js";
 import { useModalStore } from "@/stores/modal";
 const { closeModal } = useModalStore();
@@ -26,12 +25,9 @@ const { betPlaceError } = storeToRefs(useBetslipStore());
     >
       <Icon name="tabler:x" class="text-gray-900 dark:text-white w-5 h-5" />
     </div>
-    <DialogTitle
-      as="h3"
-      class="w-full flex justify-center text-lg font-medium leading-6 text-red-500"
-    >
+    <h3 class="w-full flex justify-center text-lg font-medium leading-6 text-red-500">
       Error !
-    </DialogTitle>
+    </h3>
     <div
       class="mt-2 px-2 rounded-md text-gray-600 dark:text-slate-300 text-center"
     >
