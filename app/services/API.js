@@ -30,6 +30,8 @@ function toResponse(raw) {
 function toAxiosLikeError(error) {
   // ofetch's FetchError carries the parsed body on .data and the Response on
   // .response; callers read err.response.data.* and err.response.status.
+  // Callers also read err.status (axios mirrored the HTTP status onto the
+  // error itself), so we mirror it here too.
   const response = error?.response
     ? { data: error.data, status: error.status ?? error.response.status, headers: error.response.headers }
     : undefined;
@@ -37,6 +39,7 @@ function toAxiosLikeError(error) {
     error?.data?.statusMessage || error?.data?.message || error?.message || "Request failed",
   );
   wrapped.response = response;
+  wrapped.status = response?.status;
   wrapped.cause = error;
   return wrapped;
 }
