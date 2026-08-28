@@ -1,6 +1,5 @@
 <script setup>
 import { useSportsQueryParamsStore } from "@/stores/sports-query-params";
-import { Menu, MenuButton } from "@headlessui/vue";
 import { computed } from "vue";
 
 import { useMatches2Store } from "../stores/matches2";
@@ -260,8 +259,9 @@ function selectDate(day) {
                   class="pt-2"
                   @click="selectDate(day)"
                 >
-                  <Menu as="div">
-                    <MenuButton
+                  <div>
+                    <button
+                      type="button"
                       :class="[
                         'w-full flex justify-center',
                         isSelectedDate(
@@ -282,8 +282,8 @@ function selectDate(day) {
                       class="px-2 py-2 rounded-full flex w-full justify-center hover:bg-background hover:text-gray-400"
                     >
                       {{ day }}
-                    </MenuButton>
-                  </Menu>
+                    </button>
+                  </div>
                 </td>
               </tr>
             </tbody>
