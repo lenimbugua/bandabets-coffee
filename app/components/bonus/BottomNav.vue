@@ -30,7 +30,7 @@ const navItems = [
         @click="emit('update:activeTab', item.id)"
       >
         <div class="relative">
-          <Icon :name="item.icon" :class="['w-5 h-5', item.highlight && 'w-6 h-6']" />
+          <Icon :name="item.icon" :class="item.highlight ? 'w-6 h-6' : 'w-5 h-5'" />
           <span
             v-if="item.badge"
             class="absolute -top-1.5 -right-2 bg-destructive text-destructive-foreground text-[8px] font-bold w-4 h-4 rounded-full flex items-center justify-center"
@@ -38,7 +38,7 @@ const navItems = [
             {{ item.badge }}
           </span>
         </div>
-        <span :class="['text-[10px] font-medium', item.highlight && 'text-xs font-bold']">
+        <span :class="item.highlight ? 'text-xs font-bold' : 'text-[10px] font-medium'">
           {{ item.label }}
         </span>
         <div
