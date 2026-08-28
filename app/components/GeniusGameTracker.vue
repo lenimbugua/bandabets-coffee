@@ -1,5 +1,6 @@
 <script setup lang="js">
-// import { Tab, TabGroup, TabList } from "@headlessui/vue";
+// import AppTabs from "@/components/ui/AppTabs.vue";
+// import AppTab from "@/components/ui/AppTab.vue";
 import { useSportsQueryParamsStore } from "@/stores/sports-query-params";
 import { onMounted, toRefs } from "vue";
 import { useGeniusGameTracker } from "../composables/useGeniusGameTracker";
@@ -31,27 +32,26 @@ onMounted(() => {
       allowfullscreen
     ></iframe>
   </div>
-  <!-- <TabGroup>
-    <TabList class="flex justify-between rounded-md p-0.5 py-2.5">
-      <Tab
-        v-for="widget in widgets"
-        :key="widget"
-        v-slot="{ selected }"
-        as="template"
-        @click="formGameTrackerUrl(widget)"
+  <!-- <AppTabs role="tablist" class="flex justify-between rounded-md p-0.5 py-2.5">
+    <AppTab
+      v-for="widget in widgets"
+      :key="widget"
+      v-slot="{ selected, attrs }"
+      as="template"
+      @click="formGameTrackerUrl(widget)"
+    >
+      <div
+        :class="[
+          'cursor-pointer   py-0 px-1 text-xs whitespace-nowrap text-center uppercase font-medium',
+          ' focus:outline-hidden',
+          selected
+            ? 'border-b-2 border-brand-mid text-brand-mid font-semibold'
+            : 'dark:text-gray-300 text-gray-800',
+        ]"
+        v-bind="attrs"
       >
-        <div
-          :class="[
-            'cursor-pointer   py-0 px-1 text-xs whitespace-nowrap text-center uppercase font-medium',
-            ' focus:outline-hidden',
-            selected
-              ? 'border-b-2 border-brand-mid text-brand-mid font-semibold'
-              : 'dark:text-gray-300 text-gray-800',
-          ]"
-        >
-          {{ widget }}
-        </div>
-      </Tab>
-    </TabList>
-  </TabGroup> -->
+        {{ widget }}
+      </div>
+    </AppTab>
+  </AppTabs> -->
 </template>

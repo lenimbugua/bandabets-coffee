@@ -2,22 +2,25 @@
 import BookedBetsCategory from "@/components/community-bets/BookedBetsCategory.vue";
 import BookedBetsFAQs from "@/components/community-bets/BookedBetsFAQs.vue";
 import LoadCode from "@/components/community-bets/LoadCode.vue";
-import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@headlessui/vue";
+import AppTabs from "@/components/ui/AppTabs.vue";
+import AppTab from "@/components/ui/AppTab.vue";
+import AppTabPanel from "@/components/ui/AppTabPanel.vue";
 import { ref } from "vue";
 
 const categories = ref(["Bets Hub", "Load Code", "FAQ"]);
 </script>
 
 <template>
-  <TabGroup>
-    <TabList
+  <AppTabs>
+    <div
+      role="tablist"
       aria-label="Booked bets navigation"
       class="flex gap-2"
     >
-      <Tab
+      <AppTab
         v-for="category in categories"
         :key="category"
-        v-slot="{ selected }"
+        v-slot="{ selected, attrs }"
         as="template"
       >
         <button
@@ -27,21 +30,22 @@ const categories = ref(["Bets Hub", "Load Code", "FAQ"]);
               ? 'bg-pill-selected text-pill-selected-foreground border-pill-selected'
               : 'bg-card text-muted-foreground border-border/50 hover:text-foreground hover:border-border',
           ]"
+          v-bind="attrs"
         >
           {{ category }}
         </button>
-      </Tab>
-    </TabList>
-    <TabPanels class="mt-4">
-      <TabPanel>
+      </AppTab>
+    </div>
+    <div class="mt-4">
+      <AppTabPanel>
         <BookedBetsCategory />
-      </TabPanel>
-      <TabPanel class="mb-16 md:mb-20">
+      </AppTabPanel>
+      <AppTabPanel class="mb-16 md:mb-20">
         <LoadCode />
-      </TabPanel>
-      <TabPanel>
+      </AppTabPanel>
+      <AppTabPanel>
         <BookedBetsFAQs />
-      </TabPanel>
-    </TabPanels>
-  </TabGroup>
+      </AppTabPanel>
+    </div>
+  </AppTabs>
 </template>

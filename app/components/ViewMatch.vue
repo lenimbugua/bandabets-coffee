@@ -1,6 +1,8 @@
 <script setup>
 import { useSportsQueryParamsStore } from "@/stores/sports-query-params";
-import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@headlessui/vue";
+import AppTabs from "@/components/ui/AppTabs.vue";
+import AppTab from "@/components/ui/AppTab.vue";
+import AppTabPanel from "@/components/ui/AppTabPanel.vue";
 import { useHead } from "@unhead/vue";
 import { computed, ref, toRefs } from "vue";
 import { onBeforeRouteLeave, useRoute } from "vue-router";
@@ -175,18 +177,19 @@ onBeforeRouteLeave(() => {
       <div v-if="matchDetails">
         <MatchDetailsMatch :match-details />
 
-        <TabGroup>
+        <AppTabs>
           <!-- Tab navigation -->
-          <TabList
+          <div
+            role="tablist"
             aria-label="Match detail tabs"
             class="sticky top-12 md:top-24 lg:top-30 z-60 flex gap-2 mx-3 mt-4 mb-3 overflow-x-auto scrollbar-hide"
           >
-            <Tab
+            <AppTab
               v-for="tab in matchDetails.isLiveCoverage
                 ? liveTabs
                 : prematchTabs"
               :key="tab.name"
-              v-slot="{ selected }"
+              v-slot="{ selected, attrs }"
               as="template"
             >
               <button
@@ -196,6 +199,7 @@ onBeforeRouteLeave(() => {
                     : 'tab-idle text-gray-500 dark:text-white/65 hover:text-gray-600 dark:hover:text-white/80',
                 ]"
                 class="relative flex items-center gap-1.5 px-4 py-2 rounded-xl text-[0.65rem] font-medium tracking-[0.02em] whitespace-nowrap transition-all duration-200 cursor-pointer focus:outline-hidden"
+                v-bind="attrs"
               >
                 <AppIcons :icon-name="tab.icon" icon-css="h-3.5 w-3.5 opacity-60" />
                 <span>{{ tab.alias }}</span>
@@ -206,21 +210,21 @@ onBeforeRouteLeave(() => {
                   New
                 </span>
               </button>
-            </Tab>
-          </TabList>
+            </AppTab>
+          </div>
 
-          <TabPanels>
-            <TabPanel>
+          <div>
+            <AppTabPanel>
               <MatchDetails />
-            </TabPanel>
-            <TabPanel v-if="!matchDetails.isLiveCoverage">
+            </AppTabPanel>
+            <AppTabPanel v-if="!matchDetails.isLiveCoverage">
               <BetBuilder />
-            </TabPanel>
-            <TabPanel>
+            </AppTabPanel>
+            <AppTabPanel>
               <GeniusGameTracker v-if="isGeniusGameTrackerSport()" />
-            </TabPanel>
-          </TabPanels>
-        </TabGroup>
+            </AppTabPanel>
+          </div>
+        </AppTabs>
       </div>
       <EmptyState v-else />
     </div>

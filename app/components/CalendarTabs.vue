@@ -1,5 +1,6 @@
 <script setup>
-import { TabGroup, TabList, Tab } from "@headlessui/vue";
+import AppTabs from "@/components/ui/AppTabs.vue";
+import AppTab from "@/components/ui/AppTab.vue";
 import { useSportsStore } from "@/stores/sports";
 import CalendarPopover from "./CalendarPopover.vue";
 import { useMatchesStore } from "../stores/matches";
@@ -28,55 +29,57 @@ function fetchMatchesByDate(date) {
     class="px-1.5 sm:px-3 flex text-lg font-bold w-full items-center justify-between pl-2 rounded-t-md"
   >
     <div class="capitalize">{{ selectedSport }}</div>
-    <TabGroup>
-      <TabList
-        aria-label="Match day filters"
-        class="flex items-center space-x-3 sm:space-x-4 justify-between text-xs"
-      >
-        <Tab v-slot="{ selected }" as="template">
-          <div
-            :class="[
-              'w-full cursor-pointer text-[0.9rem] text-center py-2 sm:py-4 font-bold',
-              ' focus:outline-hidden',
-              selected ? ' ' : '',
-            ]"
-            :style="[selected ? 'border-bottom: 2px solid var(--brand-bright);' : '']"
-          >
-            <HoursTab />
-          </div>
-        </Tab>
-        <Tab
-          v-for="day in nextFourDays"
-          :key="day.date"
-          v-slot="{ selected }"
-          as="template"
-          @click="fetchMatchesByDate(day.date)"
+    <AppTabs
+      role="tablist"
+      aria-label="Match day filters"
+      class="flex items-center space-x-3 sm:space-x-4 justify-between text-xs"
+    >
+      <AppTab v-slot="{ selected, attrs }" as="template">
+        <div
+          :class="[
+            'w-full cursor-pointer text-[0.9rem] text-center py-2 sm:py-4 font-bold',
+            ' focus:outline-hidden',
+            selected ? ' ' : '',
+          ]"
+          :style="[selected ? 'border-bottom: 2px solid var(--brand-bright);' : '']"
+          v-bind="attrs"
         >
-          <div
-            :class="[
-              'w-full cursor-pointer text-[0.9rem] text-center py-2 sm:py-4 font-bold uppercase',
-              ' focus:outline-hidden',
-              selected ? '' : '',
-            ]"
-            :style="[selected ? 'border-bottom: 2px solid var(--brand-bright);' : '']"
-          >
-            {{ day.day }}
-          </div>
-        </Tab>
+          <HoursTab />
+        </div>
+      </AppTab>
+      <AppTab
+        v-for="day in nextFourDays"
+        :key="day.date"
+        v-slot="{ selected, attrs }"
+        as="template"
+        @click="fetchMatchesByDate(day.date)"
+      >
+        <div
+          :class="[
+            'w-full cursor-pointer text-[0.9rem] text-center py-2 sm:py-4 font-bold uppercase',
+            ' focus:outline-hidden',
+            selected ? '' : '',
+          ]"
+          :style="[selected ? 'border-bottom: 2px solid var(--brand-bright);' : '']"
+          v-bind="attrs"
+        >
+          {{ day.day }}
+        </div>
+      </AppTab>
 
-        <Tab v-slot="{ selected }" as="template">
-          <div
-            :class="[
-              'w-full flex  text-[0.9rem] justify-center items-center py-2 sm:py-4 font-bold',
-              ' focus:outline-hidden',
-              selected ? '' : '',
-            ]"
-            :style="[selected ? 'border-bottom: 2px solid var(--brand-bright);' : '']"
-          >
-            <CalendarPopover />
-          </div>
-        </Tab>
-      </TabList>
-    </TabGroup>
+      <AppTab v-slot="{ selected, attrs }" as="template">
+        <div
+          :class="[
+            'w-full flex  text-[0.9rem] justify-center items-center py-2 sm:py-4 font-bold',
+            ' focus:outline-hidden',
+            selected ? '' : '',
+          ]"
+          :style="[selected ? 'border-bottom: 2px solid var(--brand-bright);' : '']"
+          v-bind="attrs"
+        >
+          <CalendarPopover />
+        </div>
+      </AppTab>
+    </AppTabs>
   </div>
 </template>

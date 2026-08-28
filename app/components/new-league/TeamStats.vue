@@ -1,5 +1,7 @@
 <script setup>
-import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@headlessui/vue";
+import AppTabs from "@/components/ui/AppTabs.vue";
+import AppTab from "@/components/ui/AppTab.vue";
+import AppTabPanel from "@/components/ui/AppTabPanel.vue";
 import { ref } from "vue";
 import HeadToHead from "./HeadToHead.vue";
 const tabs = ref([
@@ -124,15 +126,16 @@ const data = ref({
 console.log(data);
 </script>
 <template>
-  <TabGroup>
-    <TabList
+  <AppTabs>
+    <div
+      role="tablist"
       aria-label="Team statistics"
       class="w-full justify-between flex rounded-t-md pt-1 group bg-stone-300 shadow-lg"
     >
-      <Tab
+      <AppTab
         v-for="tab in tabs"
         :key="tab.name"
-        v-slot="{ selected }"
+        v-slot="{ selected, attrs }"
         as="template"
       >
         <div
@@ -143,15 +146,16 @@ console.log(data);
               ? 'text-brand-teal border-b border-red-500'
               : 'text-gray-600',
           ]"
+          v-bind="attrs"
         >
           {{ tab.name }}
         </div>
-      </Tab>
-    </TabList>
-    <TabPanels class="shadow-md bg-gray-200">
-      <TabPanel><HeadToHead /> </TabPanel>
-      <TabPanel><HeadToHead /> </TabPanel>
-      <TabPanel><HeadToHead /> </TabPanel>
-    </TabPanels>
-  </TabGroup>
+      </AppTab>
+    </div>
+    <div class="shadow-md bg-gray-200">
+      <AppTabPanel><HeadToHead /> </AppTabPanel>
+      <AppTabPanel><HeadToHead /> </AppTabPanel>
+      <AppTabPanel><HeadToHead /> </AppTabPanel>
+    </div>
+  </AppTabs>
 </template>

@@ -1,7 +1,8 @@
 <script setup>
 import { useScrollToSelected } from "@/composables/useScrollToSelectedSport";
 import { useSports } from "@/composables/useSports";
-import { Tab, TabGroup, TabList } from "@headlessui/vue";
+import AppTabs from "@/components/ui/AppTabs.vue";
+import AppTab from "@/components/ui/AppTab.vue";
 import { toRefs } from "vue";
 import { useSportsStore } from "../stores/sports";
 import { useSportsNavigationStore } from "../stores/sports-navigation";
@@ -30,13 +31,14 @@ const isSelected = (id) => {
 <template>
   <!-- as="div": parents (SportsFilterBar/MatchFilters) have scoped styles, and a
        renderless root can't receive their data-v attribute during SSR. -->
-  <TabGroup as="div">
+  <AppTabs>
     <!-- w-max, not justify-between: the row scrolls inside SportsFilterBar, and a
          distributed row would squeeze the tabs instead of letting them overflow. -->
-    <TabList aria-label="Sports categories" class="flex items-center gap-5 w-max">
-      <Tab
+    <div role="tablist" aria-label="Sports categories" class="flex items-center gap-5 w-max">
+      <AppTab
         v-for="thisSport in games"
         :key="thisSport.id"
+        v-slot="{ attrs }"
         as="template"
         @click="getMatches(thisSport.id, thisSport.name, thisSport.icon, false)"
       >
@@ -49,6 +51,7 @@ const isSelected = (id) => {
               ? 'text-selected [&_svg]:text-selected'
               : 'text-foreground hover:text-selected [&_svg]:text-foreground',
           ]"
+          v-bind="attrs"
         >
           <!-- Icon -->
           <SportsIcons :icon="thisSport.icon" size="h-4.5 w-4.5" />
@@ -63,7 +66,7 @@ const isSelected = (id) => {
             aria-hidden="true"
           ></span>
         </div>
-      </Tab>
-    </TabList>
-  </TabGroup>
+      </AppTab>
+    </div>
+  </AppTabs>
 </template>

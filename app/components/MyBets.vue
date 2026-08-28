@@ -1,6 +1,8 @@
 
 <script setup>
-import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@headlessui/vue";
+import AppTabs from "@/components/ui/AppTabs.vue";
+import AppTab from "@/components/ui/AppTab.vue";
+import AppTabPanel from "@/components/ui/AppTabPanel.vue";
 import { storeToRefs } from "pinia";
 import { ref } from "vue";
 import { useBetsStore } from "../stores/bets";
@@ -56,59 +58,59 @@ async function filterBetsByStatus(status) {
       </button>
       <h1 class="page-title">My Bets</h1>
     </div>
-    <TabGroup>
-      <TabList aria-label="Bet status filters" class="pill-bar">
-        <Tab
+    <AppTabs>
+      <div role="tablist" aria-label="Bet status filters" class="pill-bar">
+        <AppTab
           v-for="category in categories"
           :key="category.name"
-          v-slot="{ selected }"
+          v-slot="{ selected, attrs }"
           as="template"
           @click="filterBetsByStatus(category.status)"
         >
-          <button :class="['pill focus:outline-none', selected && 'pill-active']">
+          <button :class="['pill focus:outline-none', selected && 'pill-active']" v-bind="attrs">
             {{ category.name }}
           </button>
-        </Tab>
-      </TabList>
-      <TabPanels>
+        </AppTab>
+      </div>
+      <div>
         <!-- All Bets -->
-        <TabPanel>
+        <AppTabPanel>
           <TheBets />
-        </TabPanel>
+        </AppTabPanel>
 
         <!-- Open -->
-        <TabPanel>
+        <AppTabPanel>
           <TheBets />
-        </TabPanel>
+        </AppTabPanel>
 
         <!-- Settled -->
-        <TabPanel>
-          <TabGroup>
-            <TabList aria-label="Settled bet categories" class="sub-pill-bar mt-2">
-              <Tab
+        <AppTabPanel>
+          <AppTabs>
+            <div role="tablist" aria-label="Settled bet categories" class="sub-pill-bar mt-2">
+              <AppTab
                 v-for="category in settledCategories"
                 :key="category.name"
-                v-slot="{ selected }"
+                v-slot="{ selected, attrs }"
                 as="template"
                 @click="filterBetsByStatus(category.status)"
               >
-                <button :class="['sub-pill outline-none', selected && 'sub-pill-active']">
+                <button :class="['sub-pill outline-none', selected && 'sub-pill-active']" v-bind="attrs">
                   {{ category.name }}
                 </button>
-              </Tab>
-            </TabList>
-            <TabPanels>
-              <TabPanel><TheBets /></TabPanel>
-              <TabPanel><TheBets /></TabPanel>
-              <TabPanel><TheBets /></TabPanel>
-              <TabPanel><TheBets /></TabPanel>
-              <TabPanel><TheBets /></TabPanel>
-              <TabPanel><TheBets /></TabPanel>
-            </TabPanels>
-          </TabGroup>
-        </TabPanel>
-      </TabPanels>
-    </TabGroup>
+              </AppTab>
+            </div>
+            <div>
+              <AppTabPanel><TheBets /></AppTabPanel>
+              <AppTabPanel><TheBets /></AppTabPanel>
+              <AppTabPanel><TheBets /></AppTabPanel>
+              <AppTabPanel><TheBets /></AppTabPanel>
+              <AppTabPanel><TheBets /></AppTabPanel>
+              <AppTabPanel><TheBets /></AppTabPanel>
+            </div>
+          </AppTabs>
+        </AppTabPanel>
+      </div>
+    </AppTabs>
   </div>
 </template>
 

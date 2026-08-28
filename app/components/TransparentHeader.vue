@@ -1,6 +1,7 @@
 <script setup>
 import { useRouter, useRoute } from "vue-router";
-import { TabGroup, TabList, Tab } from "@headlessui/vue";
+import AppTabs from "@/components/ui/AppTabs.vue";
+import AppTab from "@/components/ui/AppTab.vue";
 import ThemeSwitch from "./ThemeSwitch.vue";
 
 import { useLoginStore } from "../stores/login";
@@ -76,31 +77,30 @@ function isSelected(name) {
     >
       <div class="sm:flex justify-between items-center sm:space-x-12">
         <TheLogo />
-        <TabGroup>
-          <TabList aria-label="Site navigation" class="flex space-x-2 items-end">
-            <Tab v-for="link in links" :key="link.name" as="template">
-              <div
-                role="link"
-                :class="[
-                  'capitalize rounded-md text-md p-2 text-gray-600 dark:text-slate-400 cursor-pointer flex items-center transition-colors duration-200',
-                  'focus:outline-hidden',
+        <AppTabs role="tablist" aria-label="Site navigation" class="flex space-x-2 items-end">
+          <AppTab v-for="link in links" :key="link.name" v-slot="{ attrs }" as="template">
+            <div
+              role="link"
+              :class="[
+                'capitalize rounded-md text-md p-2 text-gray-600 dark:text-slate-400 cursor-pointer flex items-center transition-colors duration-200',
+                'focus:outline-hidden',
 
-                  isSelected(link.path)
-                    ? 'font-bold text-brand-bright bg-brand-bright/10 dark:bg-brand-bright/15'
-                    : 'font-medium hover:text-gray-900 dark:hover:text-white/80 hover:bg-gray-100/80 dark:hover:bg-white/[0.04]',
-                ]"
-                @click="goToLink(link.path)"
-              >
-                <NavLinksIcons
-                  v-if="link.icon"
-                  :icon="link.icon"
-                  :icon-css="link.iconCss"
-                />
-                {{ link.name }}
-              </div>
-            </Tab>
-          </TabList>
-        </TabGroup>
+                isSelected(link.path)
+                  ? 'font-bold text-brand-bright bg-brand-bright/10 dark:bg-brand-bright/15'
+                  : 'font-medium hover:text-gray-900 dark:hover:text-white/80 hover:bg-gray-100/80 dark:hover:bg-white/[0.04]',
+              ]"
+              v-bind="attrs"
+              @click="goToLink(link.path)"
+            >
+              <NavLinksIcons
+                v-if="link.icon"
+                :icon="link.icon"
+                :icon-css="link.iconCss"
+              />
+              {{ link.name }}
+            </div>
+          </AppTab>
+        </AppTabs>
       </div>
       <div class="flex justify-between space-x-3 md:space-x-5 items-center">
         <div class="flex flex-col">

@@ -1,7 +1,8 @@
 <script setup>
 import { useScrollToSelected } from "@/composables/useScrollToSelectedSport";
 import formatStuff from "@/utilities/format-stuff";
-import { Tab, TabGroup, TabList } from "@headlessui/vue";
+import AppTabs from "@/components/ui/AppTabs.vue";
+import AppTab from "@/components/ui/AppTab.vue";
 import { toRefs } from "vue";
 import { useRouter } from "vue-router";
 import { useLiveMatchesStore } from "../stores/live-matches";
@@ -44,28 +45,28 @@ const isSelected = (id) => {
         Live
       </span>
       <div class="w-px h-4 bg-gray-300 dark:bg-white/20 shrink-0"></div>
-      <TabGroup>
-        <TabList aria-label="Live sports categories" class="flex items-center gap-3">
-          <Tab
-            v-for="sport in sports"
-            :key="sport.sportName"
-            as="template"
-            @click="getMatches(sport)"
+      <AppTabs role="tablist" aria-label="Live sports categories" class="flex items-center gap-3">
+        <AppTab
+          v-for="sport in sports"
+          :key="sport.sportName"
+          v-slot="{ attrs }"
+          as="template"
+          @click="getMatches(sport)"
+        >
+          <button
+            :ref="(el) => (sportRefs[sport.sportId] = el)"
+            :class="[
+              isSelected(sport.sportId)
+                ? 'text-red-500 font-semibold'
+                : 'text-gray-500 dark:text-white/60 hover:text-gray-700 dark:hover:text-white/80',
+            ]"
+            class="text-[0.75rem] font-medium whitespace-nowrap shrink-0 transition-colors cursor-pointer focus:outline-hidden capitalize"
+            v-bind="attrs"
           >
-            <button
-              :ref="(el) => (sportRefs[sport.sportId] = el)"
-              :class="[
-                isSelected(sport.sportId)
-                  ? 'text-red-500 font-semibold'
-                  : 'text-gray-500 dark:text-white/60 hover:text-gray-700 dark:hover:text-white/80',
-              ]"
-              class="text-[0.75rem] font-medium whitespace-nowrap shrink-0 transition-colors cursor-pointer focus:outline-hidden capitalize"
-            >
-              {{ sport.sportName }}
-            </button>
-          </Tab>
-        </TabList>
-      </TabGroup>
+            {{ sport.sportName }}
+          </button>
+        </AppTab>
+      </AppTabs>
     </div>
   </div>
 </template>

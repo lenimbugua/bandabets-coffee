@@ -1,6 +1,7 @@
 <script setup>
 import { useCompetitions } from "@/composables/haki-league/useCompetitions.js";
-import { Tab, TabGroup, TabList } from "@headlessui/vue";
+import AppTabs from "@/components/ui/AppTabs.vue";
+import AppTab from "@/components/ui/AppTab.vue";
 
 const {
   competitions,
@@ -19,39 +20,38 @@ const {
       >
         Competitions
       </div>
-      <TabGroup>
-        <TabList aria-label="League competitions">
-          <Tab
-            v-for="competition in competitions"
-            :key="competition.name"
-            v-slot="{ selected }"
-            as="template"
+      <AppTabs role="tablist" aria-label="League competitions">
+        <AppTab
+          v-for="competition in competitions"
+          :key="competition.name"
+          v-slot="{ selected, attrs }"
+          as="template"
+        >
+          <div
+            class="flex flex-col p-4"
+            :class="[
+              'w-full cursor-pointer  py-2 text-md text-center font-semibold',
+              ' focus:outline-hidden',
+              selected
+                ? 'bg-brand-dark text-white shadow-sm'
+                : 'dark:text-slate-400 text-gray-950/80',
+            ]"
+            v-bind="attrs"
           >
-            <div
-              class="flex flex-col p-4"
-              :class="[
-                'w-full cursor-pointer  py-2 text-md text-center font-semibold',
-                ' focus:outline-hidden',
-                selected
-                  ? 'bg-brand-dark text-white shadow-sm'
-                  : 'dark:text-slate-400 text-gray-950/80',
-              ]"
-            >
-              <div class="relative w-20 h-12">
-                <img
-                  :src="formFlagUrl(competition.flag)"
-                  :alt="competition.name"
-                  class="absolute inset-0 h-full w-full object-cover rounded-md"
-                  loading="lazy"
-                />
-              </div>
-              <div class="text-xs py-0.5">
-                {{ competition.name }}
-              </div>
+            <div class="relative w-20 h-12">
+              <img
+                :src="formFlagUrl(competition.flag)"
+                :alt="competition.name"
+                class="absolute inset-0 h-full w-full object-cover rounded-md"
+                loading="lazy"
+              />
             </div>
-          </Tab>
-        </TabList>
-      </TabGroup>
+            <div class="text-xs py-0.5">
+              {{ competition.name }}
+            </div>
+          </div>
+        </AppTab>
+      </AppTabs>
     </div>
   </div>
 </template>

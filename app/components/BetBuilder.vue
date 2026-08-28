@@ -1,5 +1,7 @@
 <script setup>
-import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@headlessui/vue";
+import AppTabs from "@/components/ui/AppTabs.vue";
+import AppTab from "@/components/ui/AppTab.vue";
+import AppTabPanel from "@/components/ui/AppTabPanel.vue";
 import { ref, toRefs } from "vue";
 import { useBetBuilderStore } from "../stores/betbuilder";
 import { useMatchesStore } from "../stores/matches";
@@ -123,17 +125,18 @@ function getSpecifier(outcome) {
 </script>
 <template>
   <div>
-    <TabGroup>
+    <AppTabs>
       <!-- Tab bar (hidden when tabs array is empty) -->
-      <TabList
+      <div
         v-if="tabs.length"
+        role="tablist"
         aria-label="Bet builder markets"
         class="flex gap-2 px-4 py-2.5 border-b border-gray-100/60 dark:border-white/4 bg-card"
       >
-        <Tab
+        <AppTab
           v-for="(tab, index) in tabs"
           :key="index"
-          v-slot="{ selected }"
+          v-slot="{ selected, attrs }"
           as="template"
         >
           <button
@@ -143,15 +146,16 @@ function getSpecifier(outcome) {
                 : 'text-gray-400 dark:text-white/25 border-transparent hover:bg-gray-50 dark:hover:bg-white/3 hover:text-gray-600 dark:hover:text-white/45',
             ]"
             class="px-3.5 py-1.5 rounded-lg text-[0.6rem] font-medium tracking-[0.08em] uppercase whitespace-nowrap border transition-all duration-200 cursor-pointer focus:outline-hidden"
+            v-bind="attrs"
           >
             {{ tab }}
           </button>
-        </Tab>
-      </TabList>
+        </AppTab>
+      </div>
 
       <div class="overflow-y-auto scrollbar-hide max-h-[calc(100vh-4rem)]">
-        <TabPanels>
-          <TabPanel class="w-full">
+        <div>
+          <AppTabPanel class="w-full">
             <!-- Sticky slip counter -->
             <div
               class="sticky top-0 z-40 bg-white dark:bg-background border-b border-gray-100/60 dark:border-white/4"
@@ -300,10 +304,10 @@ function getSpecifier(outcome) {
                 </div>
               </div>
             </div>
-          </TabPanel>
-        </TabPanels>
+          </AppTabPanel>
+        </div>
       </div>
-    </TabGroup>
+    </AppTabs>
   </div>
 
   <EmptyState v-if="!data" />

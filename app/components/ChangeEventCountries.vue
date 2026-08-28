@@ -1,5 +1,6 @@
 <script setup>
-import { Tab, TabGroup, TabList } from "@headlessui/vue";
+import AppTabs from "@/components/ui/AppTabs.vue";
+import AppTab from "@/components/ui/AppTab.vue";
 
 import { toRefs } from "vue";
 
@@ -17,26 +18,27 @@ const countryIsSelected = (country) =>
   country.countryName === selectedCountry.value;
 </script>
 <template>
-  <TabGroup>
-    <TabList
-      aria-label="Country filters"
-      class="country-bar"
+  <AppTabs
+    role="tablist"
+    aria-label="Country filters"
+    class="country-bar"
+  >
+    <AppTab
+      v-for="country in countries"
+      :key="country.countryName"
+      v-slot="{ attrs }"
+      as="template"
+      @click="getCompetitionsByCountry(country.countryName, true)"
     >
-      <Tab
-        v-for="country in countries"
-        :key="country.countryName"
-        as="template"
-        @click="getCompetitionsByCountry(country.countryName, true)"
+      <button
+        :class="['country-tab', countryIsSelected(country) && 'country-tab--active']"
+        v-bind="attrs"
       >
-        <button
-          :class="['country-tab', countryIsSelected(country) && 'country-tab--active']"
-        >
-          <img class="country-flag" :src="country.flagUrl" :alt="country.countryName + ' flag'" loading="lazy" />
-          <span>{{ country.countryName }}</span>
-        </button>
-      </Tab>
-    </TabList>
-  </TabGroup>
+        <img class="country-flag" :src="country.flagUrl" :alt="country.countryName + ' flag'" loading="lazy" />
+        <span>{{ country.countryName }}</span>
+      </button>
+    </AppTab>
+  </AppTabs>
 </template>
 
 <style scoped>

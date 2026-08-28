@@ -1,7 +1,8 @@
 <script setup>
 import { useCompetionsStore } from "@/stores/competitions";
 import { useCountriesStore } from "@/stores/countries";
-import { Tab, TabGroup, TabList } from "@headlessui/vue";
+import AppTabs from "@/components/ui/AppTabs.vue";
+import AppTab from "@/components/ui/AppTab.vue";
 import { toRefs } from "vue";
 
 const { setSelectedCompetition } = useCountriesStore();
@@ -21,22 +22,22 @@ const competitionIsSelected = (competitionName) =>
   competitionName === selectedCompetition.value;
 </script>
 <template>
-  <TabGroup>
-    <TabList aria-label="Competition filters" class="comp-bar">
-      <Tab
-        v-for="competition in selectedCompetitions"
-        :key="competition"
-        as="template"
-        @click="fetchGame(competition)"
+  <AppTabs role="tablist" aria-label="Competition filters" class="comp-bar">
+    <AppTab
+      v-for="competition in selectedCompetitions"
+      :key="competition"
+      v-slot="{ attrs }"
+      as="template"
+      @click="fetchGame(competition)"
+    >
+      <button
+        :class="['comp-pill', competitionIsSelected(competition.competitionName) && 'comp-pill--active']"
+        v-bind="attrs"
       >
-        <button
-          :class="['comp-pill', competitionIsSelected(competition.competitionName) && 'comp-pill--active']"
-        >
-          {{ competition.competitionName }}
-        </button>
-      </Tab>
-    </TabList>
-  </TabGroup>
+        {{ competition.competitionName }}
+      </button>
+    </AppTab>
+  </AppTabs>
 </template>
 
 <style scoped>

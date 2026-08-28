@@ -1,5 +1,6 @@
 <script setup>
-import { Tab, TabGroup, TabList } from "@headlessui/vue";
+import AppTabs from "@/components/ui/AppTabs.vue";
+import AppTab from "@/components/ui/AppTab.vue";
 import { storeToRefs } from "pinia";
 import { ref, toRefs } from "vue";
 import { useMatchesStore } from "../stores/matches";
@@ -83,43 +84,44 @@ function marketHasSelection(market) {
     <div
       class="sticky top-[5.5rem] md:top-[10rem] z-55 rounded-xl mb-3 filter-bar"
     >
-      <TabGroup>
-        <TabList
-          aria-label="Match market filters"
-          class="flex gap-1.5 px-3 py-2.5 w-full scrollbar-hide overflow-x-auto"
-        >
-          <Tab v-slot="{ selected }" as="template" @click="setSelectedgroup(0)">
-            <button
-              :class="[
-                selected
-                  ? 'bg-primary text-primary-foreground font-semibold shadow-sm'
-                  : 'text-muted-foreground hover:bg-surface-interactive hover:text-foreground',
-              ]"
-              class="px-3.5 py-1.5 rounded-lg text-[0.65rem] font-medium whitespace-nowrap transition-all duration-150 cursor-pointer focus:outline-hidden"
-            >
-              All
-            </button>
-          </Tab>
-          <Tab
-            v-for="tab in marketGroups"
-            :key="tab.groupId"
-            v-slot="{ selected }"
-            as="template"
-            @click="setSelectedgroup(tab.groupId)"
+      <AppTabs
+        role="tablist"
+        aria-label="Match market filters"
+        class="flex gap-1.5 px-3 py-2.5 w-full scrollbar-hide overflow-x-auto"
+      >
+        <AppTab v-slot="{ selected, attrs }" as="template" @click="setSelectedgroup(0)">
+          <button
+            :class="[
+              selected
+                ? 'bg-primary text-primary-foreground font-semibold shadow-sm'
+                : 'text-muted-foreground hover:bg-surface-interactive hover:text-foreground',
+            ]"
+            class="px-3.5 py-1.5 rounded-lg text-[0.65rem] font-medium whitespace-nowrap transition-all duration-150 cursor-pointer focus:outline-hidden"
+            v-bind="attrs"
           >
-            <button
-              :class="[
-                selected
-                  ? 'bg-primary text-primary-foreground font-semibold shadow-sm'
-                  : 'text-muted-foreground hover:bg-surface-interactive hover:text-foreground',
-              ]"
-              class="px-3.5 py-1.5 rounded-lg text-[0.65rem] font-medium whitespace-nowrap transition-all duration-150 cursor-pointer focus:outline-hidden"
-            >
-              {{ tab.groupName }}
-            </button>
-          </Tab>
-        </TabList>
-      </TabGroup>
+            All
+          </button>
+        </AppTab>
+        <AppTab
+          v-for="tab in marketGroups"
+          :key="tab.groupId"
+          v-slot="{ selected, attrs }"
+          as="template"
+          @click="setSelectedgroup(tab.groupId)"
+        >
+          <button
+            :class="[
+              selected
+                ? 'bg-primary text-primary-foreground font-semibold shadow-sm'
+                : 'text-muted-foreground hover:bg-surface-interactive hover:text-foreground',
+            ]"
+            class="px-3.5 py-1.5 rounded-lg text-[0.65rem] font-medium whitespace-nowrap transition-all duration-150 cursor-pointer focus:outline-hidden"
+            v-bind="attrs"
+          >
+            {{ tab.groupName }}
+          </button>
+        </AppTab>
+      </AppTabs>
     </div>
 
     <!-- Market cards -->

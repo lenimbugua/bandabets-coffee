@@ -1,5 +1,6 @@
 <script setup>
-import { TabGroup, TabList } from "@headlessui/vue";
+import AppTabs from "@/components/ui/AppTabs.vue";
+import AppTab from "@/components/ui/AppTab.vue";
 import { ref } from "vue";
 
 import { usePopularStore } from "../stores/popular";
@@ -35,18 +36,18 @@ getGamesByCategory(popular);
   <div
     class="scrollbar-hide items-end flex justify-between space-x-3 lg:space-x-4 whitespace-nowrap no-scrollbar overflow-x-scroll"
   >
-    <TabGroup>
-      <TabList
+    <AppTabs role="tablist">
+      <AppTab
         v-for="category in tabs"
         :key="category.name"
-        v-slot="{ selected }"
+        v-slot="{ selected, attrs }"
         as="template"
-        class="text-center text-slate-500 hover:text-muted-foreground cursor-pointer py-2"
         @click="getGamesByCategory(category.name)"
       >
         <div
-          class="flex-col justify-center items-center inline-flex"
+          class="flex-col justify-center items-center inline-flex text-center text-slate-500 hover:text-muted-foreground cursor-pointer py-2"
           data-state="closed"
+          v-bind="attrs"
         >
           <div
             :class="[
@@ -65,7 +66,7 @@ getGamesByCategory(popular);
             {{ category.name }}
           </div>
         </div>
-      </TabList>
-    </TabGroup>
+      </AppTab>
+    </AppTabs>
   </div>
 </template>
