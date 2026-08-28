@@ -17,7 +17,8 @@
  * the template form).
  *
  * Keyboard (roving tabindex): ArrowLeft/ArrowRight (ArrowUp/ArrowDown when
- * the AppTabs is `vertical`), Home, End move focus and select.
+ * the AppTabs is `vertical`), Home, End move focus and select; Enter/Space
+ * activate the focused tab and fire its @click exactly once.
  */
 import { computed, inject, onBeforeUnmount, reactive, useAttrs, useId } from "vue";
 

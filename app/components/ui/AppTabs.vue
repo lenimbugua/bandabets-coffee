@@ -75,10 +75,21 @@ function indexOfTab(id) {
   return tabs.findIndex((t) => t.id === id);
 }
 
+// Only tabs registered with THIS group (nested AppTabs have their own
+// provider), resolved by id in DOM order.
 function tabElements() {
-  return Array.from(root.value?.querySelectorAll('[role="tab"]') ?? []).filter(
-    (el) => !el.disabled && el.getAttribute("aria-disabled") !== "true"
-  );
+  return tabs
+    .map((t) => document.getElementById(t.id))
+    .filter(
+      (el) => el && !el.disabled && el.getAttribute("aria-disabled") !== "true"
+    );
+}
+
+// Native activation: <button> fires click on Enter/Space, <a href> on Enter.
+function activatesNatively(el, key) {
+  if (el.tagName === "BUTTON") return true;
+  if (el.tagName === "A" && el.hasAttribute("href") && key === "Enter") return true;
+  return false;
 }
 
 function onTabKeydown(event) {
@@ -87,6 +98,16 @@ function onTabKeydown(event) {
   const els = tabElements();
   if (!els.length) return;
   const current = els.indexOf(event.currentTarget);
+  if (event.key === "Enter" || event.key === " ") {
+    if (current === -1) return;
+    if (!activatesNatively(event.currentTarget, event.key)) {
+      // Non-button roots (div / RouterLink): select and run the consumer's
+      // @click via a synthetic click; buttons/links already do this natively.
+      event.preventDefault();
+      event.currentTarget.click();
+    }
+    return;
+  }
   let target = null;
   switch (event.key) {
     case prevKey:
@@ -151,7 +172,7 @@ defineExpose({ selectedIndex, select });
 </script>
 
 <template>
-  <div ref="root">
+  <div ref="root" :aria-orientation="vertical ? 'vertical' : undefined">
     <slot :selected-index="selectedIndex" :select="select" />
   </div>
 </template>
