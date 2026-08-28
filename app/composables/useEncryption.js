@@ -1,35 +1,75 @@
-// Subpath imports pull only the PBKDF2 + AES + Hex/Utf8 pieces of crypto-js
-// (≈10 KB gzip) instead of the whole library (≈45 KB gzip) into the login
-// chunk that is preloaded on every page. AES's default mode is already CBC
-// with Pkcs7 padding, which is what the previous explicit `mode: CBC` used,
-// so the output is byte-identical (verified against fixed inputs).
-import PBKDF2 from "crypto-js/pbkdf2";
-import AES from "crypto-js/aes";
-import Hex from "crypto-js/enc-hex";
-import Utf8 from "crypto-js/enc-utf8";
-
+// Web Crypto replacement for crypto-js: PBKDF2 (SHA-256, 100 iterations,
+// 256-bit key — crypto-js 4.2.0's PBKDF2 default hasher is SHA-256) + AES-CBC
+// with PKCS#7 padding, matching crypto-js's defaults exactly so ciphertext
+// stays byte-identical for the backend, which still decrypts with the old
+// crypto-js-derived key/iv/salt (verified against fixed inputs). `crypto.subtle`
+// is available both in the browser and on the Node 24 server (no `window`
+// dependency), so these functions work unchanged during SSR route middleware.
 const keyValue = "cXB4DaTfYrsYuPdZ"; // your key value (eg: key)
 const ivKey = "a2xhcgHgXCV6R4wD";
 const salt = "BM3ex5RtPToYioP7";
 
-function deriveKey() {
-  return PBKDF2(keyValue, salt, { keySize: 256 / 32, iterations: 100 });
+const textEncoder = new TextEncoder();
+const textDecoder = new TextDecoder();
+
+function toHex(buffer) {
+  return Array.from(new Uint8Array(buffer))
+    .map((byte) => byte.toString(16).padStart(2, "0"))
+    .join("");
 }
 
-export function encryptData(data) {
+function fromHex(hex) {
+  const bytes = new Uint8Array(hex.length / 2);
+  for (let i = 0; i < bytes.length; i++) {
+    bytes[i] = parseInt(hex.substr(i * 2, 2), 16);
+  }
+  return bytes;
+}
+
+async function deriveKey() {
+  const baseKey = await crypto.subtle.importKey(
+    "raw",
+    textEncoder.encode(keyValue),
+    "PBKDF2",
+    false,
+    ["deriveKey"],
+  );
+  return crypto.subtle.deriveKey(
+    {
+      name: "PBKDF2",
+      salt: textEncoder.encode(salt),
+      iterations: 100,
+      hash: "SHA-256",
+    },
+    baseKey,
+    { name: "AES-CBC", length: 256 },
+    false,
+    ["encrypt", "decrypt"],
+  );
+}
+
+export async function encryptData(data) {
   if (data) {
-    const key = deriveKey();
-    const iv = Utf8.parse(ivKey);
-    const encrypted = AES.encrypt(JSON.stringify(data), key, { iv });
-    return encrypted.ciphertext.toString(Hex);
+    const key = await deriveKey();
+    const iv = textEncoder.encode(ivKey);
+    const encrypted = await crypto.subtle.encrypt(
+      { name: "AES-CBC", iv },
+      key,
+      textEncoder.encode(JSON.stringify(data)),
+    );
+    return toHex(encrypted);
   }
 }
 
-export function decrypteData(data) {
+export async function decrypteData(data) {
   if (data) {
-    const key = deriveKey();
-    const iv = Utf8.parse(ivKey);
-    const decrypted = AES.decrypt({ ciphertext: Hex.parse(data) }, key, { iv });
-    return decrypted.toString(Utf8);
+    const key = await deriveKey();
+    const iv = textEncoder.encode(ivKey);
+    const decrypted = await crypto.subtle.decrypt(
+      { name: "AES-CBC", iv },
+      key,
+      fromHex(data),
+    );
+    return textDecoder.decode(decrypted);
   }
 }

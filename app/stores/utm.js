@@ -9,7 +9,7 @@ export const useUtmStore = defineStore("utm-store", {
   }),
 
   actions: {
-    getUtm(to) {
+    async getUtm(to) {
       if (to.query.utm_source) {
         const utmParams = {
           utmSource: to.query.utm_source,
@@ -20,7 +20,7 @@ export const useUtmStore = defineStore("utm-store", {
           utmContent: to.query.utm_content,
         };
         this.utm = utmParams;
-        this.extra = encryptData(utmParams);
+        this.extra = await encryptData(utmParams);
       }
     },
     getBtag(to) {

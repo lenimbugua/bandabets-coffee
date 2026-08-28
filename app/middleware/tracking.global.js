@@ -1,8 +1,8 @@
 import { useUtmStore } from "@/stores/utm";
 
-export default defineNuxtRouteMiddleware((to) => {
+export default defineNuxtRouteMiddleware(async (to) => {
   const { getUtm, getBtag, getReferralCode } = useUtmStore();
-  getUtm(to);
+  await getUtm(to);
   getBtag(to);
   getReferralCode(to);
 });

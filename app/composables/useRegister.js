@@ -38,8 +38,8 @@ export function useRegister() {
     }
     const body = {
       msisdn: msisdn.value,
-      password: encryptData(password.value),
-      confirmPassword: encryptData(confirmPassword.value),
+      password: await encryptData(password.value),
+      confirmPassword: await encryptData(confirmPassword.value),
     };
     await createAccount(body, router);
 
