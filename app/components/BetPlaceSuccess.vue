@@ -1,6 +1,8 @@
 <script setup>
 import { useModalStore } from "@/stores/modal";
+import { inject } from "vue";
 const { closeModal } = useModalStore();
+const dialogTitleId = inject("dialogTitleId", null);
 </script>
 <template>
   <div class="relative">
@@ -22,7 +24,7 @@ const { closeModal } = useModalStore();
     </div>
 
     <!-- Title -->
-    <h3 class="text-xl font-bold text-center text-gray-900 dark:text-white mb-4">
+    <h3 :id="dialogTitleId" class="text-xl font-bold text-center text-gray-900 dark:text-white mb-4">
       Successful!
     </h3>
 

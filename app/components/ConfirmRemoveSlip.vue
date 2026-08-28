@@ -1,6 +1,6 @@
 <script setup>
 import { useModalStore } from "@/stores/modal";
-import { toRefs } from "vue";
+import { inject, toRefs } from "vue";
 import { useBetBuilderStore } from "../stores/betbuilder";
 import { useBetslipStore } from "../stores/sports-betslip.js";
 
@@ -23,6 +23,7 @@ function removeTheBet() {
   addBetbuilderToBetslip(props.selections, decimalPrice.value);
   closeModal();
 }
+const dialogTitleId = inject("dialogTitleId", null);
 </script>
 <template>
   <div>
@@ -42,7 +43,7 @@ function removeTheBet() {
     >
       <Icon name="tabler:x" class="text-gray-900 dark:text-white w-5 h-5" />
     </button>
-    <h3 class="w-full flex justify-center text-lg font-medium leading-6 text-red-500">
+    <h3 :id="dialogTitleId" class="w-full flex justify-center text-lg font-medium leading-6 text-red-500">
       Conflicting Bets
     </h3>
     <div

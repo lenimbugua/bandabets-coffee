@@ -1,5 +1,6 @@
 <script setup>
 import { useModalStore } from "@/stores/modal";
+import { inject } from "vue";
 import { storeToRefs } from "pinia";
 import { useBetsStore } from "../stores/bets";
 import TheButtonSpin from "./TheButtonSpin.vue";
@@ -14,6 +15,7 @@ async function cancelTheBet() {
   await cancelBet(selectedId.value);
   closeModal();
 }
+const dialogTitleId = inject("dialogTitleId", null);
 </script>
 <template>
   <div>
@@ -32,7 +34,7 @@ async function cancelTheBet() {
     >
       <Icon name="tabler:x" class="text-gray-900 dark:text-white w-5 h-5" />
     </div>
-    <h3 class="w-full flex justify-center text-lg font-medium leading-6 text-red-500">
+    <h3 :id="dialogTitleId" class="w-full flex justify-center text-lg font-medium leading-6 text-red-500">
       Are you sure?
     </h3>
     <div

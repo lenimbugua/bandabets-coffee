@@ -1,11 +1,5 @@
 <script setup>
-import {
-  Dialog,
-  DialogPanel,
-  DialogTitle,
-  TransitionChild,
-  TransitionRoot,
-} from "@headlessui/vue";
+import AppDialog from "@/components/ui/AppDialog.vue";
 import { storeToRefs } from "pinia";
 import { computed } from "vue";
 
@@ -25,59 +19,28 @@ const showDialog = computed(() => {
 const { closeModal } = useModalStore();
 </script>
 <template>
-  <TransitionRoot appear :show="showDialog" as="template">
-    <Dialog
-      as="div"
-      style="z-index: 1000"
-      class="relative z-50"
-      @close="closeModal"
-    >
-      <TransitionChild
-        as="template"
-        enter="duration-300 ease-out"
-        enter-from="opacity-0"
-        enter-to="opacity-100"
-        leave="duration-200 ease-in"
-        leave-from="opacity-100"
-        leave-to="opacity-0"
+  <AppDialog
+    :open="showDialog"
+    z-class="z-1000"
+    container-class="z-50 flex min-h-full items-center justify-center p-4 text-center"
+    panel-class="w-full max-w-md transform bg-white dark:bg-background text-left align-middle shadow-xl transition-all overflow-hidden"
+    @close="closeModal"
+  >
+    <template #default="{ titleId }">
+      <div
+        class="flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-white/5"
       >
-        <div class="fixed inset-0 bg-black/75" />
-      </TransitionChild>
-
-      <div class="fixed inset-0 overflow-y-auto">
-        <div
-          class="z-50 flex min-h-full items-center justify-center p-4 text-center"
-        >
-          <TransitionChild
-            as="template"
-            enter="duration-300 ease-out"
-            enter-from="opacity-0 scale-95"
-            enter-to="opacity-100 scale-100"
-            leave="duration-200 ease-in"
-            leave-from="opacity-100 scale-100"
-            leave-to="opacity-0 scale-95"
-          >
-            <DialogPanel
-              class="w-full max-w-md transform bg-white dark:bg-background text-left align-middle shadow-xl transition-all overflow-hidden"
-            >
-              <div
-                class="flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-white/5"
-              >
-                <DialogTitle class="flex items-center gap-1 text-sm font-bold text-amber-400">
-                  <span>1 Cut Win</span>
-                  <OneCutIcon />
-                </DialogTitle>
-                <button class="p-1 rounded-lg text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors cursor-pointer outline-hidden" aria-label="Close" @click="closeModal">
-                  <Icon name="tabler:x" class="w-5 h-5" />
-                </button>
-              </div>
-              <div class="max-h-[85vh] overflow-y-scroll scrollbar-hide">
-                <OneCutPromo />
-              </div>
-            </DialogPanel>
-          </TransitionChild>
-        </div>
+        <h2 :id="titleId" class="flex items-center gap-1 text-sm font-bold text-amber-400">
+          <span>1 Cut Win</span>
+          <OneCutIcon />
+        </h2>
+        <button class="p-1 rounded-lg text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors cursor-pointer outline-hidden" aria-label="Close" @click="closeModal">
+          <Icon name="tabler:x" class="w-5 h-5" />
+        </button>
       </div>
-    </Dialog>
-  </TransitionRoot>
+      <div class="max-h-[85vh] overflow-y-scroll scrollbar-hide">
+        <OneCutPromo />
+      </div>
+    </template>
+  </AppDialog>
 </template>

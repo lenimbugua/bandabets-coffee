@@ -1,10 +1,5 @@
 <script setup>
-import {
-  Dialog,
-  DialogPanel,
-  TransitionChild,
-  TransitionRoot,
-} from "@headlessui/vue";
+import AppDialog from "@/components/ui/AppDialog.vue";
 import { storeToRefs } from "pinia";
 import { computed, ref } from "vue";
 import { useRouter } from "vue-router";
@@ -45,73 +40,47 @@ function goHome() {
 </script>
 
 <template>
-  <TransitionRoot as="template" :show="showDrawer">
-    <Dialog
-      as="div"
-      class="relative z-70"
-      :initial-focus="closeButtonRef"
-      @close="closeModal"
-    >
-      <!-- Backdrop -->
-      <TransitionChild
-        as="template"
-        enter="duration-300 ease-out"
-        enter-from="opacity-0"
-        enter-to="opacity-100"
-        leave="duration-200 ease-in"
-        leave-from="opacity-100"
-        leave-to="opacity-0"
-      >
-        <div class="fixed inset-0 bg-black/40 backdrop-blur-sm" />
-      </TransitionChild>
-
-      <!-- Panel from left -->
-      <div class="fixed inset-0 z-70 flex justify-start">
-        <TransitionChild
-          as="template"
-          enter="transition ease-out duration-300 transform"
-          enter-from="-translate-x-full"
-          enter-to="translate-x-0"
-          leave="transition ease-in duration-200 transform"
-          leave-from="translate-x-0"
-          leave-to="-translate-x-full"
-        >
-          <DialogPanel class="relative w-full max-w-xs bg-white dark:bg-background h-full flex flex-col shadow-2xl">
-            <!-- Header -->
-            <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-white/5">
-              <div class="cursor-pointer" @click="goHome">
-                <TheLogo />
-              </div>
-              <button
-                ref="closeButtonRef"
-                class="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-white/5 outline-hidden"
-                aria-label="Close"
-                @click="closeModal"
-              >
-                <Icon name="tabler:x" class="w-5 h-5 text-muted-foreground" />
-              </button>
-            </div>
-
-            <!-- Shared tabs + content -->
-            <ExploreContent />
-
-            <!-- Footer: logout only — the theme switcher lives at the top of
-                 the drawer content (ExploreContent) now -->
-            <div
-              v-if="isAuthenticated"
-              class="border-t border-gray-200/60 dark:border-white/6 px-4 py-3 flex items-center justify-end gap-3"
-            >
-              <button
-                class="flex items-center gap-1.5 text-[0.7rem] font-medium text-red-500/80 hover:text-red-600 dark:text-red-400/70 dark:hover:text-red-400 transition-colors"
-                @click="handleLogout"
-              >
-                <Icon name="tabler:logout" class="w-3.5 h-3.5" aria-hidden="true" />
-                <span>Logout</span>
-              </button>
-            </div>
-          </DialogPanel>
-        </TransitionChild>
+  <AppDialog
+    :open="showDrawer"
+    :initial-focus="closeButtonRef"
+    aria-label="Menu"
+    z-class="z-70"
+    overlay-class="bg-black/40 backdrop-blur-sm"
+    container-class="z-70 flex justify-start h-full"
+    panel-class="relative w-full max-w-xs bg-white dark:bg-background h-full flex flex-col shadow-2xl"
+    @close="closeModal"
+  >
+    <!-- Header -->
+    <div class="flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-white/5">
+      <div class="cursor-pointer" @click="goHome">
+        <TheLogo />
       </div>
-    </Dialog>
-  </TransitionRoot>
+      <button
+        ref="closeButtonRef"
+        class="p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-white/5 outline-hidden"
+        aria-label="Close"
+        @click="closeModal"
+      >
+        <Icon name="tabler:x" class="w-5 h-5 text-muted-foreground" />
+      </button>
+    </div>
+
+    <!-- Shared tabs + content -->
+    <ExploreContent />
+
+    <!-- Footer: logout only — the theme switcher lives at the top of
+         the drawer content (ExploreContent) now -->
+    <div
+      v-if="isAuthenticated"
+      class="border-t border-gray-200/60 dark:border-white/6 px-4 py-3 flex items-center justify-end gap-3"
+    >
+      <button
+        class="flex items-center gap-1.5 text-[0.7rem] font-medium text-red-500/80 hover:text-red-600 dark:text-red-400/70 dark:hover:text-red-400 transition-colors"
+        @click="handleLogout"
+      >
+        <Icon name="tabler:logout" class="w-3.5 h-3.5" aria-hidden="true" />
+        <span>Logout</span>
+      </button>
+    </div>
+  </AppDialog>
 </template>

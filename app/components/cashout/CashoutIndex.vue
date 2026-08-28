@@ -1,7 +1,7 @@
 <script setup>
 import { useCashoutStore } from "@/stores/cashout";
 import { useModalStore } from "@/stores/modal";
-import { onBeforeUnmount, toRefs, computed } from "vue";
+import { inject, onBeforeUnmount, toRefs, computed } from "vue";
 import AutoCashout from "./AutoCashout.vue";
 import FullCashout from "./FullCashout.vue";
 import { useBetsStore } from "@/stores/bets";
@@ -27,6 +27,7 @@ onBeforeUnmount(() => {
   fetchBet();
   closeModal();
 });
+const dialogTitleId = inject("dialogTitleId", null);
 </script>
 <template>
   <div class="cashout-modal">
@@ -37,7 +38,7 @@ onBeforeUnmount(() => {
           <Icon name="tabler:arrow-up" class="w-4 h-4" aria-hidden="true" />
         </div>
         <div>
-          <h2 class="cashout-title">Cashout</h2>
+          <h2 :id="dialogTitleId" class="cashout-title">Cashout</h2>
           <p class="cashout-bet-id">Bet #{{ betId }}</p>
         </div>
       </div>

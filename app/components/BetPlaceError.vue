@@ -2,8 +2,10 @@
 import { storeToRefs } from "pinia";
 import { useBetslipStore } from "../stores/sports-betslip.js";
 import { useModalStore } from "@/stores/modal";
+import { inject } from "vue";
 const { closeModal } = useModalStore();
 const { betPlaceError } = storeToRefs(useBetslipStore());
+const dialogTitleId = inject("dialogTitleId", null);
 </script>
 <template>
   <div>
@@ -25,7 +27,7 @@ const { betPlaceError } = storeToRefs(useBetslipStore());
     >
       <Icon name="tabler:x" class="text-gray-900 dark:text-white w-5 h-5" />
     </div>
-    <h3 class="w-full flex justify-center text-lg font-medium leading-6 text-red-500">
+    <h3 :id="dialogTitleId" class="w-full flex justify-center text-lg font-medium leading-6 text-red-500">
       Error !
     </h3>
     <div
