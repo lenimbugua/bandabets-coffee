@@ -172,6 +172,9 @@ defineExpose({ selectedIndex, select });
 </script>
 
 <template>
+  <!-- When `vertical` is used, the consumer must put `role="tablist"` on
+       this <AppTabs> root (it falls through via attr inheritance) so that
+       `aria-orientation` lands on the actual tablist element. -->
   <div ref="root" :aria-orientation="vertical ? 'vertical' : undefined">
     <slot :selected-index="selectedIndex" :select="select" />
   </div>

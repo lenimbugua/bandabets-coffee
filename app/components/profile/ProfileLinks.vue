@@ -27,7 +27,7 @@ const signOut = () => {
       >
         <div class="flex items-center gap-3">
           <div class="w-8 h-8 rounded-lg bg-blue-50 dark:bg-blue-500/10 flex items-center justify-center">
-            <Icon name="tabler:copy" class="w-4 h-4 text-blue-500" aria-hidden="true" />
+            <Icon name="tabler:receipt" class="w-4 h-4 text-blue-500" aria-hidden="true" />
           </div>
           <span class="text-[0.8rem] font-medium text-gray-800 dark:text-gray-200">My Bets</span>
         </div>

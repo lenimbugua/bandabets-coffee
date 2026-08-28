@@ -88,7 +88,7 @@ function focusInitial(attempt = 0) {
   (first || panel.value)?.focus({ preventScroll: true });
 }
 
-const instance = { onKeydown, onFocusin };
+const instance = { onKeydown, onFocusin, panel };
 
 function activate() {
   if (active) return;
@@ -180,7 +180,19 @@ function topmost() {
   return stack[stack.length - 1];
 }
 function documentKeydown(event) {
-  topmost()?.onKeydown(event);
+  const top = topmost();
+  if (!top) return;
+  // Nested AppMenu/AppListbox handle their own Escape/Tab in the bubble
+  // phase and stopPropagation there — but this listener runs in the
+  // capture phase, so it would otherwise close the dialog first. Let the
+  // event continue through to the menu/listbox when the target is inside
+  // one that lives within the topmost dialog's panel.
+  const panelEl = top.panel?.value;
+  if (panelEl) {
+    const ownerWidget = event.target.closest?.('[role="menu"],[role="listbox"]');
+    if (ownerWidget && panelEl.contains(ownerWidget)) return;
+  }
+  top.onKeydown(event);
 }
 function documentFocusin(event) {
   topmost()?.onFocusin(event);

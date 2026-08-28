@@ -46,7 +46,7 @@ function goHome() {
     aria-label="Menu"
     z-class="z-70"
     overlay-class="bg-black/40 backdrop-blur-sm"
-    container-class="z-70 flex justify-start h-full"
+    container-class="flex justify-start h-full"
     panel-class="relative w-full max-w-xs bg-white dark:bg-background h-full flex flex-col shadow-2xl"
     @close="closeModal"
   >

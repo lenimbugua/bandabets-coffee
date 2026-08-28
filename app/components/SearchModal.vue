@@ -70,7 +70,6 @@ function clearSearch() {
             placeholder="Search matches, teams, leagues..."
             aria-label="Search for matches, competitions, teams"
             class="w-full bg-background border-2 border-border rounded-lg pl-9 pr-8 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-colors"
-            @keyup.esc="closeModal"
             @input="debounceSearch(searchTerm)"
           />
           <button

@@ -1,8 +1,6 @@
 <script setup>
 import AppTabs from "@/components/ui/AppTabs.vue";
 import AppTab from "@/components/ui/AppTab.vue";
-// import AppTabPanel from "@/components/ui/AppTabPanel.vue"; // for the commented-out panels below
-// import { useLeagueStore } from "../stores/league";
 
 // const { competitionIsLoading, status, liveTimerElapsedSeconds } = storeToRefs(
 //   useLeagueStore()

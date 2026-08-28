@@ -1,7 +1,7 @@
 <script setup>
 import AppDialog from "@/components/ui/AppDialog.vue";
 import { storeToRefs } from "pinia";
-import { computed } from "vue";
+import { computed, ref } from "vue";
 
 import { useCasino } from "@/composables/useCasino";
 import { useModalStore } from "@/stores/modal";
@@ -33,6 +33,8 @@ const showDialog = computed(() => {
   return modalType.value === roadblock && showModal.value;
 });
 const { closeModal } = useModalStore();
+
+const closeButtonRef = ref(null);
 
 function launchJetX() {
   launchCasino(jetXId, "jetX");
@@ -66,6 +68,7 @@ const handleRoadBlockClick = () => {
 <template>
   <AppDialog
     :open="showDialog"
+    :initial-focus="closeButtonRef"
     aria-label="Promotional offer"
     z-class="z-1000"
     container-class="z-50 flex min-h-full items-center justify-center p-4 text-center"

@@ -22,7 +22,7 @@ const { closeModal } = useModalStore();
     :open="showDialog"
     aria-label="Loading"
     z-class="z-1000"
-    container-class="z-50 flex min-h-full items-center justify-center p-4 text-center"
+    container-class="flex min-h-full items-center justify-center p-4 text-center"
     panel-class="w-full max-w-md transform rounded-2xl bg-transparent p-6 text-left align-middle shadow-xl transition-all"
     @close="closeModal"
   >
