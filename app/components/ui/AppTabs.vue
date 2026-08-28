@@ -115,6 +115,19 @@ onMounted(() => {
   sortByDom(panels);
 });
 
+// Clamp when a v-for tab list shrinks below the selected index.
+watch(
+  () => tabs.length,
+  (len) => {
+    if (len === 0) return;
+    if (selectedIndex.value > len - 1) {
+      internal.value = len - 1;
+      if (typeof props.modelValue === "number") emit("update:modelValue", len - 1);
+      emit("change", len - 1);
+    }
+  }
+);
+
 watch(
   () => props.modelValue,
   (v) => {

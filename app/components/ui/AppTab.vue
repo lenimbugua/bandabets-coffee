@@ -12,14 +12,14 @@
  *     <div v-bind="attrs" :class="selected ? '…' : '…'">Label</div>
  *   </AppTab>
  * `attrs` = { role, id, 'aria-selected', 'aria-controls', tabindex, onClick,
- * onKeydown }. Any `@click` on `<AppTab>` itself fires after selection in both
+ * onKeydown }. A consumer `id` attribute on <AppTab> is used as the tab id. Any `@click` on `<AppTab>` itself fires after selection in both
  * forms (passed through in the default form, merged into `attrs.onClick` in
  * the template form).
  *
  * Keyboard (roving tabindex): ArrowLeft/ArrowRight (ArrowUp/ArrowDown when
  * the AppTabs is `vertical`), Home, End move focus and select.
  */
-import { computed, inject, onBeforeUnmount, useAttrs, useId } from "vue";
+import { computed, inject, onBeforeUnmount, reactive, useAttrs, useId } from "vue";
 
 defineOptions({ inheritAttrs: false });
 
@@ -31,18 +31,20 @@ const props = defineProps({
 
 const emit = defineEmits(["click"]);
 const attrs = useAttrs();
-const id = useId();
+const generated = useId();
+// A consumer-provided `id` wins over the generated one.
+const id = computed(() => attrs.id ?? generated);
 
 const ctx = inject("app-tabs", null);
 if (!ctx) {
   throw new Error("<AppTab> must be used inside <AppTabs>");
 }
 
-const entry = { id };
+const entry = reactive({ id });
 const unregister = ctx.registerTab(entry);
 onBeforeUnmount(unregister);
 
-const index = computed(() => ctx.indexOfTab(id));
+const index = computed(() => ctx.indexOfTab(id.value));
 const selected = computed(() => index.value === ctx.selectedIndex.value);
 const panelId = computed(() => ctx.panels[index.value]?.id);
 
@@ -63,7 +65,7 @@ function onKeydown(event) {
 
 const tabAttrs = computed(() => ({
   role: "tab",
-  id,
+  id: id.value,
   type: "button",
   "aria-selected": selected.value ? "true" : "false",
   "aria-controls": panelId.value,

@@ -39,6 +39,8 @@ const props = defineProps({
   },
   /** z-index utility applied to the dialog root. */
   zClass: { type: String, default: "z-50" },
+  /** Accessible name when there is no visible title; suppresses aria-labelledby. */
+  ariaLabel: { type: String, default: null },
 });
 
 const emit = defineEmits(["close"]);
@@ -56,7 +58,9 @@ let active = false;
 function focusables() {
   if (!panel.value) return [];
   return Array.from(panel.value.querySelectorAll(FOCUSABLE)).filter(
-    (el) => el.offsetParent !== null || el === document.activeElement
+    (el) =>
+      (el.checkVisibility ? el.checkVisibility() : el.getClientRects().length > 0) &&
+      !el.closest("[inert]")
   );
 }
 
@@ -77,17 +81,21 @@ function focusInitial() {
   (first || panel.value)?.focus({ preventScroll: true });
 }
 
+const instance = { onKeydown, onFocusin };
+
 function activate() {
   if (active) return;
   active = true;
   previouslyFocused = document.activeElement;
   lockScroll();
+  pushDialog(instance);
   nextTick(focusInitial);
 }
 
 function deactivate() {
   if (!active) return;
   active = false;
+  popDialog(instance);
   unlockScroll();
   const el = previouslyFocused;
   previouslyFocused = null;
@@ -96,8 +104,18 @@ function deactivate() {
   }
 }
 
+// Both handlers are invoked from document-level listeners (see the module
+// script) and only for the topmost open dialog.
+function onFocusin(event) {
+  if (!panel.value || panel.value.contains(event.target)) return;
+  if (root.value?.contains(event.target)) return; // gutter/overlay, handled by click
+  const [first] = focusables();
+  (first || panel.value).focus({ preventScroll: true });
+}
+
 function onKeydown(event) {
   if (event.key === "Escape") {
+    event.preventDefault();
     event.stopPropagation();
     emit("close");
     return;
@@ -141,9 +159,36 @@ defineExpose({ titleId, panel });
 </script>
 
 <script>
-// Module-level scroll lock shared by every mounted AppDialog.
+// Module-level state shared by every mounted AppDialog: scroll lock counter
+// and a stack of open dialogs (topmost handles Escape/Tab/focus containment).
 let openCount = 0;
 let previousOverflow = "";
+const stack = [];
+
+function topmost() {
+  return stack[stack.length - 1];
+}
+function documentKeydown(event) {
+  topmost()?.onKeydown(event);
+}
+function documentFocusin(event) {
+  topmost()?.onFocusin(event);
+}
+function pushDialog(inst) {
+  if (stack.length === 0) {
+    document.addEventListener("keydown", documentKeydown, true);
+    document.addEventListener("focusin", documentFocusin, true);
+  }
+  stack.push(inst);
+}
+function popDialog(inst) {
+  const i = stack.indexOf(inst);
+  if (i !== -1) stack.splice(i, 1);
+  if (stack.length === 0) {
+    document.removeEventListener("keydown", documentKeydown, true);
+    document.removeEventListener("focusin", documentFocusin, true);
+  }
+}
 
 function lockScroll() {
   if (openCount === 0) {
@@ -171,8 +216,8 @@ function unlockScroll() {
         :class="zClass"
         role="dialog"
         aria-modal="true"
-        :aria-labelledby="titleId"
-        @keydown="onKeydown"
+        :aria-label="ariaLabel || undefined"
+        :aria-labelledby="ariaLabel ? undefined : titleId"
       >
         <div
           class="app-dialog__overlay fixed inset-0"

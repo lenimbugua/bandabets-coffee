@@ -41,6 +41,7 @@ const button = ref(null);
 const list = ref(null);
 const open = ref(false);
 const listId = useId();
+const buttonId = useId();
 
 const selected = computed(() => props.modelValue);
 
@@ -165,6 +166,7 @@ defineExpose({ open, openList, close, select });
 <template>
   <div ref="root">
     <button
+      :id="buttonId"
       ref="button"
       type="button"
       :class="buttonClass"
@@ -184,6 +186,7 @@ defineExpose({ open, openList, close, select });
         ref="list"
         role="listbox"
         tabindex="-1"
+        :aria-labelledby="buttonId"
         :class="optionsClass"
         @keydown="onListKeydown"
       >

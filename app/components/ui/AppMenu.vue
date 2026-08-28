@@ -37,6 +37,7 @@ const button = ref(null);
 const items = ref(null);
 const open = ref(false);
 const menuId = useId();
+const buttonId = useId();
 
 function itemEls() {
   const list = Array.from(items.value?.querySelectorAll('[role="menuitem"]') ?? []);
@@ -150,6 +151,7 @@ defineExpose({ open, openMenu, close, toggle });
 <template>
   <div ref="root">
     <button
+      :id="buttonId"
       ref="button"
       type="button"
       :class="buttonClass"
@@ -169,6 +171,7 @@ defineExpose({ open, openMenu, close, toggle });
         ref="items"
         role="menu"
         tabindex="-1"
+        :aria-labelledby="buttonId"
         :class="itemsClass"
         @keydown="onMenuKeydown"
         @click="onMenuClick"
