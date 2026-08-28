@@ -88,3 +88,21 @@ Headless-browser details are in the shared context file next to the briefs. **Mo
 - Coverage: four asks → Tasks 1–4; user's icon-scope decision encoded in Task 3's scope rule.
 - Placeholders: none — each batch names its files, transformation and verification; the only judgement calls (generic vs brand glyph; custom-root tabs) have explicit rules.
 - Consistency: `AppDialog`'s `@close` maps to the existing `closeModal` handlers; modal gating logic untouched; Tabs keep `@change`.
+
+## Results (2026-08-29)
+
+| Task | Commits | Outcome |
+|---|---|---|
+| 1 Patch bumps | `dd3b9f2` | tailwindcss 4.3.1→4.3.3, @tailwindcss/vite →4.3.3, nuxt 4.5.1→4.5.2 |
+| 2 `cn()` removal | `e3bba35`, `d046336` | 15 call sites → native `:class` arrays; `clsx` + `tailwind-merge` removed (two BottomNav bindings made mutually exclusive after review) |
+| 3 Icons (A/B/C) | `c4995be`, `16dc1a6`, `0c1bf62`, `6887dba`, `4e8fa6f`, `21ef657` | **172 generic inline SVGs → `<Icon name="tabler:…">`**; 188 inline tags remain — the sport/casino/category pictogram sets and brand art the user chose to keep |
+| 4.0 Primitives | `189efd0`, `cfa059f`, `2ac3d0d` (+ round 3) | `app/components/ui/`: `AppDialog`, `AppTabs`/`AppTab`/`AppTabPanel`, `AppMenu`, `AppListbox` — focus trap, scroll-lock counter, document-level Escape/Tab with a dialog stack, roving tabindex, clamp on shrink, `useId`-based labelling |
+| 4.1–4.2 Dialogs | `08650c5`, `ec3a236` | 28 modals; first-open focus now works (it never did with the lazy-mounted modals); body scroll lock added (the app never had one) |
+| 4.3 Tabs | `0d55bcb` | 25 files, 26 groups; arrow/Home/End keyboard navigation verified on 14 tablists |
+| 4.4 Menus/listboxes + removal | `052c378`, `d8ff7a7` | 7 files; `@headlessui/vue` removed |
+
+Measured on the built server (live data via the proxy, devtools throttling): critical JS **232 → 218 KB gzip**, `modulepreload` 71 → 68; Lighthouse **perf 88 / a11y 100** (one run; a11y was 95 at the start of the round).
+
+Runtime dependencies now: `@iconify-json/tabler @nuxt/fonts @nuxt/icon @pinia/nuxt dompurify mixpanel-browser nuxt pinia pinia-plugin-persistedstate sweetalert2 swiper vue`.
+
+Review-driven fixes worth knowing about: primitives got three fix rounds (document-level key handling + focusable filter + tab clamp + consumer ids; open-on-mount focus; nested-tablist scoping + Enter/Space activation); `SearchModal` deliberately does not pass `static` (Headless UI's `static` was only a render flag and the original closed on backdrop click); `MarketSort`/`TheLeagues` bound `v-model` to a setter-less computed before — they now hold a local selection (the store has no selection state to mirror).
