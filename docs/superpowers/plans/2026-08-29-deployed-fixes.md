@@ -73,3 +73,15 @@ Task 2 matched the skeleton to the cards, but CLS stayed at 0.059: the real sour
 
 ### Task 2c (added after Task 2b's measurement): reserve the casino hero's height
 After 2b, CLS is 0.016; the residual is the mobile hero (`HotSection`/`mobile/HotTabsSection` area) growing 118.8 → 200.8 px when casino games load (SSR renders a "No games available" state). Same rule as 2b: occupy the final height from first paint with skeleton tiles; verify CLS ≤ 0.01 and no hero entry in `layout-shifts`. Commit `fix(cls): reserve the casino hero's height while games load`.
+
+## Results (2026-08-29)
+
+| Task | Commits | Outcome |
+|---|---|---|
+| 1 Stylesheet strip on Vercel | `b8461e7` | Hook now reads CSS from `nuxt.options.buildDir` (captured in a `ready` hook) instead of a guessed `./.nuxt` path. Vercel-preset build: chunks still linking `useFlyToBetslip.css` 15 → 0; node build serves one stylesheet with `./.nuxt` absent. Nuance: `@nuxt/kit` relocates `buildDir` to `node_modules/.cache/nuxt/.nuxt` only when `./.nuxt` already exists, so the fix reads whichever Nuxt chose. |
+| 2 Skeleton height | `fc8782a` | `AnimatePulse` rows 117 → 90.6 px vs card 90.6 px. Necessary but not sufficient — CLS unchanged. |
+| 2b Filter bar height | `f8c2e1b`, `22db886` | `MatchFilters` 44/102/161 → 161/161/161 px (SSR/pending/loaded); rows collapse cleanly on empty or failed fetch (`settled` flag set in `finally`). CLS 0.0586 → 0.0162. |
+| 2c Casino hero height | `eaf4e8e` | Hero 118.8/158.8/200.8 → 200.8 px in all states (skeleton chips + tiles from SSR; `categoriesFetched` in `finally`). **CLS 0.0162 → 0.0027.** |
+| 3 Vercel region | — | Not applied — awaiting the user's decision (see Task 3). |
+
+Local Lighthouse (devtools throttling, live data) after the round: CLS **0.059 → 0.003**, perf ~85, LCP unchanged (~2.2 s locally). Deployed re-measure after push: see the follow-up note below.
