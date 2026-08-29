@@ -60,6 +60,10 @@ export const useCasinoStore = defineStore("casino-store", {
 
       categoriesWithGames: [],
       categoriesLoading: false,
+      // True once fetchCategoriesWithGames has answered (success or failure).
+      // False on the server and until the first response, so views can show
+      // a skeleton instead of an empty state before the data is known.
+      categoriesFetched: false,
 
       activeCategoryGames: [],
       activeCategoryLoading: false,
@@ -168,6 +172,7 @@ export const useCasinoStore = defineStore("casino-store", {
           console.log(err);
         } finally {
           this.categoriesLoading = false;
+          this.categoriesFetched = true;
           categoriesRequest = null;
         }
       })();

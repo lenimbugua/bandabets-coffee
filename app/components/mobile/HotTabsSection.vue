@@ -121,7 +121,7 @@ function loadCode(code) {
 
 // --- Top Games tab ---
 const casinoStore = useCasinoStore();
-const { categoriesWithGames, categoriesLoading } = storeToRefs(casinoStore);
+const { categoriesWithGames, categoriesFetched } = storeToRefs(casinoStore);
 const { launchCasino } = useCasino();
 const selectedGameCategoryId = ref(null);
 
@@ -151,6 +151,14 @@ const activeGameCategory = computed(() => {
 const gameCards = computed(
   () => activeGameCategory.value?.games?.slice(0, 12) || []
 );
+
+// Skeleton until a fetch has answered (SSR, pre-mount, in flight) so the hero
+// occupies its final height from first paint; "No games available" only when
+// a completed fetch genuinely returned nothing.
+const gamesPending = computed(
+  () => !gameCards.value.length && !categoriesFetched.value
+);
+const skeletonChipWidths = ["w-24", "w-28", "w-20", "w-24"];
 
 function gameRouteName(categoryName = "") {
   const lower = categoryName.toLowerCase();
@@ -428,9 +436,24 @@ onMounted(() => {
         </button>
       </div>
 
-      <div v-if="categoriesLoading && !gameCards.length" class="flex gap-2 px-3 pb-2 overflow-hidden">
-        <div v-for="i in 4" :key="i" class="aspect-square w-24 shrink-0 animate-pulse rounded-lg bg-foreground/5"></div>
-      </div>
+      <template v-if="gamesPending">
+        <!-- Skeleton: same row heights as the chips row (42px) + tile row (104px) -->
+        <div class="hero-skeleton flex gap-2 px-3 pt-1 pb-2.5 overflow-hidden" aria-hidden="true">
+          <div
+            v-for="(w, i) in skeletonChipWidths"
+            :key="i"
+            class="h-7 shrink-0 rounded-full bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 dark:from-white/8 dark:via-white/5 dark:to-white/8 bg-size-[200%_100%] animate-shimmer"
+            :class="w"
+          ></div>
+        </div>
+        <div class="flex gap-2 px-3 pb-2 overflow-hidden" aria-hidden="true">
+          <div
+            v-for="i in 4"
+            :key="i"
+            class="aspect-square w-24 shrink-0 rounded-lg bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 dark:from-white/8 dark:via-white/5 dark:to-white/8 bg-size-[200%_100%] animate-shimmer"
+          ></div>
+        </div>
+      </template>
 
       <div
         v-else-if="gameCards.length"
