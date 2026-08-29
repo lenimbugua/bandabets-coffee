@@ -85,3 +85,6 @@ After 2b, CLS is 0.016; the residual is the mobile hero (`HotSection`/`mobile/Ho
 | 3 Vercel region | — | Not applied — awaiting the user's decision (see Task 3). |
 
 Local Lighthouse (devtools throttling, live data) after the round: CLS **0.059 → 0.003**, perf ~85, LCP unchanged (~2.2 s locally). Deployed re-measure after push: see the follow-up note below.
+
+### Deployed re-measure (2026-08-29 10:41 EAT, build `cc62b949`, my vantage Kenya → iad1)
+`stylesheets=1` (Vercel strip now works), `market-placeholder` and `hero-skeleton` present in SSR HTML. Lighthouse simulated: perf 74 / a11y 100, FCP 2.9 s, LCP 3.8 s, TBT 195 ms, **CLS 0.003** (was 0.061), SI 7.0 s; devtools: perf 60, FCP/LCP 4.3 s, TBT 478 ms, CLS 0.003. From this vantage the remaining gap is almost entirely network: TTFB 0.6–0.8 s to the US-East function plus the CSS round-trip — the reason Task 3 (Vercel region `cpt1`) is the next lever, pending the user's decision.
