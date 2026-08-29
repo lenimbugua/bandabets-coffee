@@ -1,4 +1,5 @@
 import { fileURLToPath } from "node:url";
+import { basename, join, sep } from "node:path";
 import { readdirSync, existsSync, readFileSync } from "node:fs";
 import tailwindcss from "@tailwindcss/vite";
 
@@ -8,11 +9,15 @@ const phase2PlaceholderFile = fileURLToPath(
 
 // Lighthouse round 6: directory the client build writes its CSS chunks to,
 // used by the build:manifest hook's content-based scoped-CSS check below.
-// nuxt.options.buildDir isn't in scope inside the hook, so this is resolved
-// relative to this config file instead (same pattern as phase2PlaceholderFile).
-const clientCssDir = fileURLToPath(
-  new URL("./.nuxt/dist/client/_nuxt/", import.meta.url),
-);
+// Deployed-fixes round 1: this used to be hard-coded to ./.nuxt/dist/client/
+// _nuxt relative to this file, but Nuxt 4.5's kit moves a production build
+// into node_modules/.cache/nuxt/.nuxt whenever ./.nuxt already exists (which
+// it always does after `postinstall: nuxt prepare`), and buildDir is an
+// option anyway — so capture the real value in the `ready` hook below
+// instead of guessing. build:manifest runs after the client build has
+// written <buildDir>/dist/client/_nuxt/*.css. Until `ready` has run this is
+// null and the disk-read branch of the hook declines to strip anything.
+let clientCssDir = null;
 
 // Lighthouse round 6: a chunk's CSS can be 100% component-scoped rules
 // (Vue SFC `<style scoped>` output — `[data-v-xxxxxxxx]` selectors, plus
@@ -252,6 +257,10 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
 
   hooks: {
+    ready(nuxt) {
+      clientCssDir =
+        join(nuxt.options.buildDir, "dist", "client", "_nuxt") + sep;
+    },
     "pages:extend"(pages) {
       // Batch E: match-details' real path
       // (/sports/:sport/:country/:league/:matchSlug(.*)-:id) fuses two
@@ -338,7 +347,8 @@ export default defineNuxtConfig({
         // above). Files that aren't on disk yet just fail the check below.
         if (hasCss) {
           const allScopedOnly = chunk.css.every((file) => {
-            const abs = `${clientCssDir}${file.split("/").pop()}`;
+            if (!clientCssDir) return false;
+            const abs = join(clientCssDir, basename(file));
             if (!existsSync(abs)) return false;
             return isScopedOnlyCss(readFileSync(abs, "utf8"));
           });
