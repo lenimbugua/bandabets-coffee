@@ -23,7 +23,25 @@ onBeforeMount(() => {
        "1x2" to "Both Teams To Score", and forcing them to equal widths
        squeezed the long ones. Each chip sizes to its text and the row
        scrolls. -->
+  <!-- Before the first response there are no markets yet; three shimmer pills
+       stand in at the chips' exact height (h-[22px] + py-0.5) so the row is
+       36 px from the SSR render onward instead of collapsing to 14 px and
+       shifting the match list when the chips arrive. -->
+  <div
+    v-if="!markets?.length"
+    class="market-placeholder flex w-full items-center gap-2 py-0.5"
+    aria-hidden="true"
+  >
+    <div
+      v-for="n in 3"
+      :key="n"
+      class="h-[22px] shrink-0 rounded-full bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 dark:from-white/8 dark:via-white/5 dark:to-white/8 bg-size-[200%_100%] animate-shimmer"
+      :class="n === 1 ? 'w-14' : n === 2 ? 'w-20' : 'w-24'"
+      :style="{ animationDelay: `${n * 0.1}s` }"
+    ></div>
+  </div>
   <AppTabs
+    v-else
     role="tablist"
     aria-label="Betting markets"
     class="flex w-full items-center gap-2 overflow-x-auto scrollbar-hide py-0.5"

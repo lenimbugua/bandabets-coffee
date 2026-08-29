@@ -26,8 +26,17 @@ defineProps({
    than sitting above an empty state.
 
    Kept visible while pending: the filters shouldn't flicker out and back on
-   every fetch, only when a fetch genuinely returns nothing. */
-const { matches, pending } = storeToRefs(useMatches2Store());
+   every fetch, only when a fetch genuinely returns nothing.
+
+   Also kept before the first fetch has answered (`responseOK` is false on the
+   server and until the first response lands): the strip must occupy its final
+   height from the SSR HTML onward, otherwise it grows twice during load
+   (44 → 102 → 161 px on mobile) and pushes the match list — the home page's
+   only real layout shift. */
+const { matches, pending, responseOK } = storeToRefs(useMatches2Store());
+const hasResults = computed(
+  () => pending.value || !responseOK.value || matches.value?.length > 0
+);
 /* In the grid (Popular) layout the result set is competitions, not matches —
    matches may legitimately be empty there, and hiding the strip would also
    hide the tabs needed to leave the layout. */
@@ -76,7 +85,7 @@ const outcomeLabels = computed(() => {
       <SportsTabs />
     </div>
 
-    <template v-if="pending || matches?.length || layout === 'grid'">
+    <template v-if="hasResults || layout === 'grid'">
     <div class="flex items-center justify-between gap-1.5 sm:gap-2 px-2 sm:px-3 pt-1">
       <div class="flex items-center gap-1 sm:gap-2 min-w-0">
         <HighlitsTab class="min-w-0" />
@@ -88,9 +97,12 @@ const outcomeLabels = computed(() => {
       <MarketSection />
     </div>
 
-    <!-- Column header: search + outcome labels over the odds columns -->
+    <!-- Column header: search + outcome labels over the odds columns. Rendered
+         as soon as the layout is a list (not once matches exist) so its 37 px
+         are reserved from first paint; the labels fall back to 1 X 2 until
+         the selected market's outcomes are known. -->
     <ColumnHeaderSearch
-      v-if="layout !== 'grid' && matches?.length"
+      v-if="layout !== 'grid'"
       :matches="matches"
       :outcome-labels="outcomeLabels"
     />
