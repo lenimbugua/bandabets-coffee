@@ -67,3 +67,9 @@ and in `hooks`: `ready(nuxt) { clientCssDir = join(nuxt.options.buildDir, "dist"
 `x-vercel-id: cpt1::iad1` shows the serverless function in US-East while the edge and users are in Africa; TTFB from Kenya is 0.6–0.8 s. Nitro's Vercel preset honours `nitro: { vercel: { regions: ["cpt1"] } }` (`presets/vercel/utils.mjs` reads `nitro.options.vercel?.regions`). This only affects the Vercel deployment (the Docker/GKE infra owned by the other team is untouched), but it is a deployment decision: SSR pages that call the APIs during render (`/match-details` via `useAsyncData`) would then call them from Cape Town instead of Virginia — fine if the APIs are in Africa/Europe, worse if they are US-hosted. **Do not implement until the user confirms.**
 
 ### Task 4 (controller): results, push, deployed re-measure.
+
+### Task 2b (added after Task 2's measurement): reserve `MatchFilters`' height
+Task 2 matched the skeleton to the cards, but CLS stayed at 0.059: the real source is `app/components/mobile/MatchFilters.vue` growing 44 px (SSR) → 102 px (pending) → 161 px (loaded). Brief: the filter bar must occupy its final height from first paint (render chips/search structure on the server with skeleton placeholders, or reserve `min-h` on the wrapper); verify with a local Lighthouse `cumulative-layout-shift` ≤ 0.02. Commit `fix(cls): reserve the match filter bar's height from first paint`.
+
+### Task 2c (added after Task 2b's measurement): reserve the casino hero's height
+After 2b, CLS is 0.016; the residual is the mobile hero (`HotSection`/`mobile/HotTabsSection` area) growing 118.8 → 200.8 px when casino games load (SSR renders a "No games available" state). Same rule as 2b: occupy the final height from first paint with skeleton tiles; verify CLS ≤ 0.01 and no hero entry in `layout-shifts`. Commit `fix(cls): reserve the casino hero's height while games load`.
