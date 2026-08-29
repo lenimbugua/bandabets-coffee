@@ -866,7 +866,7 @@ const DROP = new Set([
 const SAFE_URL = /^(?:https?:|mailto:|tel:|\/(?!\/)|#|\.{1,2}\/)/i;
 // ASCII control characters and whitespace that browsers ignore inside a
 // scheme ("java\tscript:"), plus C1 controls.
-const URL_NOISE = /[ - -]/g;
+const URL_NOISE = /[\u0000-\u0020\u007f-\u009f]/g;
 
 function isSafeUrl(value) {
   const cleaned = value.replace(URL_NOISE, "");
