@@ -19,6 +19,10 @@ const phase2PlaceholderFile = fileURLToPath(
 // null and the disk-read branch of the hook declines to strip anything.
 let clientCssDir = null;
 
+// Vercel function region (see nitro.vercel / nitro.hooks.compiled below and
+// vercel.json). Cape Town: nearest region to the Kenyan audience.
+const VERCEL_REGIONS = ["cpt1"];
+
 // Lighthouse round 6: a chunk's CSS can be 100% component-scoped rules
 // (Vue SFC `<style scoped>` output — `[data-v-xxxxxxxx]` selectors, plus
 // `@keyframes <name>-<8-hex>` for scoped keyframe animations) even when the
@@ -721,6 +725,15 @@ export default defineNuxtConfig({
     // so this still matters for the entry stylesheet and JS chunks alike.
     // Works with any front proxy.
     compressPublicAssets: { gzip: true, brotli: true },
+    // Vercel only (ignored by the node-server/Docker deployment): run the
+    // serverless function in Cape Town instead of the default US-East. The
+    // edge already terminates in cpt1 for this market, but every HTML
+    // response was doing a Cape Town -> Virginia round trip (TTFB 0.6-0.8 s
+    // from Kenya, measured 2026-08-29). Decision by the product owner.
+    // Nitro's serverless preset spreads `vercel.functions` into the function's
+    // .vc-config.json (`vercel.regions` alone only applies to the edge
+    // preset); vercel.json carries the same value as the project default.
+    vercel: { functions: { regions: VERCEL_REGIONS } },
   },
 
   runtimeConfig: {
