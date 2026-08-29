@@ -28,14 +28,17 @@ defineProps({
    Kept visible while pending: the filters shouldn't flicker out and back on
    every fetch, only when a fetch genuinely returns nothing.
 
-   Also kept before the first fetch has answered (`responseOK` is false on the
-   server and until the first response lands): the strip must occupy its final
-   height from the SSR HTML onward, otherwise it grows twice during load
-   (44 → 102 → 161 px on mobile) and pushes the match list — the home page's
-   only real layout shift. */
-const { matches, pending, responseOK } = storeToRefs(useMatches2Store());
+   Also kept before the first fetch has settled (`settled` is false on the
+   server and until the first request finishes, success or error): the strip
+   must occupy its final height from the SSR HTML onward, otherwise it grows
+   twice during load (44 → 102 → 161 px on mobile) and pushes the match list —
+   the home page's only real layout shift. Once a fetch has settled with no
+   matches (empty response or API error) the strip collapses so the empty
+   state stands alone. A sport switch re-fetches with pending=true, which
+   brings the placeholders back for the duration of that fetch. */
+const { matches, pending, settled } = storeToRefs(useMatches2Store());
 const hasResults = computed(
-  () => pending.value || !responseOK.value || matches.value?.length > 0
+  () => pending.value || !settled.value || matches.value?.length > 0
 );
 /* In the grid (Popular) layout the result set is competitions, not matches —
    matches may legitimately be empty there, and hiding the strip would also

@@ -8,6 +8,11 @@ export const useMatches2Store = defineStore("matches2-store", {
     sportIsPending: false,
     calendarIsPending: false,
     responseOK: false,
+    // True once the first getMatches() call has finished, success or error.
+    // responseOK only flips on success, so anything that must react to "the
+    // fetch is over" (e.g. MatchFilters collapsing its reserved rows) reads
+    // this instead.
+    settled: false,
     matches: [],
     markets: [],
     selectedMarket: null,
@@ -76,6 +81,8 @@ export const useMatches2Store = defineStore("matches2-store", {
         this.responseOK = true;
       } catch (error) {
         this.pending = false;
+      } finally {
+        this.settled = true;
       }
     },
     async emptyMatches() {
