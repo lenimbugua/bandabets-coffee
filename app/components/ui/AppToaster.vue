@@ -3,7 +3,9 @@
  * AppToaster — renders the shared toast queue from useToast.js. Mounted once
  * in app.vue. One fixed stack per position; each stack is a polite live
  * region so screen readers announce new toasts without focus moving. During
- * SSR it renders only the (empty) live regions.
+ * SSR it renders only the (empty) live regions. Stack is z-[1100] so toasts
+ * stay above app modals (AppDialog/LoginModal/DepositModal/BetslipModal sit
+ * at z-999/z-1000) but below BrandSplash's z-9999.
  */
 import { computed } from "vue";
 import { toasts, dismissToast } from "@/composables/useToast";
@@ -29,7 +31,7 @@ const groups = computed(() =>
     <div
       v-for="group in groups"
       :key="group.position"
-      class="pointer-events-none fixed z-[100] flex w-[calc(100vw-1.5rem)] max-w-sm flex-col gap-2"
+      class="pointer-events-none fixed z-[1100] flex w-[calc(100vw-1.5rem)] max-w-sm flex-col gap-2"
       :class="POSITION_CLASS[group.position]"
       role="status"
       aria-live="polite"

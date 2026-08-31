@@ -8,10 +8,14 @@
  * <AppCarouselSlide>. The `controls` slot (and inject("app-carousel"))
  * receive { index, count, isFirst, isLast, prev, next, goTo }.
  *
- * Keyboard: the track is focusable; ArrowLeft/ArrowRight move one slide.
+ * Keyboard: the track is focusable; ArrowLeft/ArrowRight move one slide and
+ * stop propagation so a nested carousel's keydown doesn't also advance an
+ * outer carousel wrapping it.
  * Autoplay respects prefers-reduced-motion and pauses while the tab is
  * hidden. It is not paused on hover, matching Swiper's
  * `disableOnInteraction: false` behaviour the affiliate slider relied on.
+ * Manual navigation (swipe, arrow keys, goTo) resets the autoplay delay so
+ * the next tick is a full interval away.
  */
 import { computed, onBeforeUnmount, onMounted, provide, reactive, ref, watch } from "vue";
 
@@ -58,10 +62,11 @@ function onScroll() {
     raf = null;
     const el = track.value;
     const s = stride(el);
-    const i = s > 0 ? Math.round(el.scrollLeft / s) : 0;
+    const i = s > 0 ? Math.min(Math.max(Math.round(el.scrollLeft / s), 0), props.count - 1) : 0;
     if (i !== index.value) {
       index.value = i;
       emit("change", i);
+      startAutoplay();
     }
   });
 }
@@ -84,9 +89,11 @@ function onVisibility() {
 function onKeydown(e) {
   if (e.key === "ArrowRight") {
     e.preventDefault();
+    e.stopPropagation();
     next();
   } else if (e.key === "ArrowLeft") {
     e.preventDefault();
+    e.stopPropagation();
     prev();
   }
 }
