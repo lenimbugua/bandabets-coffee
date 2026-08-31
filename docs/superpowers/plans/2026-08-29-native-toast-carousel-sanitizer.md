@@ -1015,3 +1015,71 @@ git commit -m "docs: results for the native toast/carousel/sanitizer plan
 
 Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 ```
+
+---
+
+## Results
+
+### Commits
+
+- `a81fda2` — feat(ui): native toast stack, drop sweetalert2
+- `3d69747` — fix(ui): resume toast timer only when neither hovered nor focused
+- `1169777` — feat(ui): scroll-snap AppCarousel, drop swiper
+- `972ae69` — feat: isomorphic allow-list HTML sanitizer on ultrahtml, drop dompurify
+- `8d4a62b` — fix(security): decode entities before URL scheme check in sanitizeHtml
+
+### Step 1: Dependency and bundle audit
+
+`git diff e42fc69 -- package.json` matches expectation exactly: three dependency lines removed (`dompurify: "^3.4.10"`, `sweetalert2: "^11.26.25"`, `swiper: "^14.0.7"`), one added (`ultrahtml: "^1.7.0"`). No other `dependencies`/`devDependencies` entries touched. (Two docs-only commits, `3998363` and `d7ce391`, sit between `e42fc69` and the code work; they don't affect this diff.)
+
+`pnpm install --frozen-lockfile` succeeded — lockfile is consistent with `package.json`.
+
+`pnpm build` succeeded (`✨ Build complete!`, `Σ Total size: 45.3 MB (10.4 MB gzip)`).
+
+Home-page critical-path bytes (`node scripts/critical-bytes.mjs http://localhost:3131/`):
+
+```
+modulepreload=67 js_gzip=219KB stylesheets=1 css_gzip=36KB html_gzip=39KB
+```
+
+Bundle footprint: `.output/public/_nuxt` = **4.6M**, **187** JS files.
+
+Package sizes removed/added:
+- `sweetalert2` ≈ 27 KB gzip (removed, per the earlier round-6-era measurement)
+- `swiper` ≈ 26 KB gzip (removed, per the earlier measurement)
+- `dompurify` (removed; no earlier gzip figure recorded for it in this plan)
+- `ultrahtml` added — `du -sh node_modules/ultrahtml/dist` = **168K** on disk (uncompressed dist folder, not a gzip bundle-contribution figure)
+
+### Step 2: Lighthouse, local (built server, port 3131)
+
+Home page (`/`), performance + accessibility, run twice to gauge noise:
+
+| Run | Perf | A11y | FCP | LCP | TBT | CLS |
+|-----|------|------|-----|-----|-----|-----|
+| 1 | 60 | 95 | 4.4 s | 6.0 s | 330 ms | 0.031 |
+| 2 | 60 | 95 | 4.5 s | 6.0 s | 300 ms | 0.034 |
+
+Perf and a11y scores were identical across both runs; only TBT and CLS show typical run-to-run noise. No regression signal versus prior rounds — this task did not touch anything on the home page's critical rendering path (toast/carousel/sanitizer code is not loaded/executed on `/` by default).
+
+Accessibility-only, other pages:
+
+| Page | A11y |
+|------|------|
+| `/share-bets` | 95 |
+| `/join-affiliate` | 85 |
+
+`/join-affiliate` scores lower because, per Task 2's browser verification, direct unauthenticated navigation to that `ssr:false` + auth-gated route falls through to the app's client-side 404 shell rather than rendering the real page — a pre-existing routing/auth-guard behavior unrelated to the carousel migration (confirmed via `curl`: HTTP 200, default SPA-shell title, no SSR content). The 404 shell itself is what Lighthouse audited, not the migrated `AffiliateSwiper`/`AppCarousel` content.
+
+### Browser observations (from Tasks 1–2, not re-run here)
+
+- **Toast (Task 1):** headless-Chrome screenshots confirmed an `.app-toast` element renders top-right with the correct icon/text/close button, and fully auto-dismisses within its ~4000ms window. The independent hover/focus timer-restart bug found in review was fixed in `3d69747` (module-scoped `hovered`/`focused` booleans, `resumeIfIdle()`). SSR check: `data-app-toaster` present in the initial HTML on port 3131.
+- **Carousel (Task 2):** `/share-bets` rendered its `EmptyState` locally (no booked-bets data in this dev environment), so `BookedBetsCategory`/`SelectionsCard` carousel paths were verified by code-match + clean build/bundle/eslint rather than live interaction. `/join-affiliate`, reached via a synthetic local session cookie (fabricated, not a real credential) to get past the auth gate, showed the `AppCarousel` autoplay correctly advancing between `AffiliateCall` and `TopEarners` slides (~10s interval) with the progress bar resetting on each `@change`, matching the old Swiper `@slide-change` behavior. No console errors attributable to any of the migrated components.
+- **Sanitizer (Task 3):** `scripts/test-sanitize-html.mjs` — all 41 cases pass (27 original/adjusted + 14 CRITICAL entity-decoding regressions + 1 deep-nesting fail-closed case + 1 quote-escaping case, added in the `8d4a62b` security-review fix round). SSR check: `/promotion-details/test` returns `200` with `sanitizeHtml` running identically on server and client (unlike the old client-only DOMPurify).
+
+### Deferred / worth a second look
+
+- `app/app.vue` carries 10 pre-existing `import/first` ESLint errors (9 before Task 1, +1 from `AppToaster`'s import landing in the same disordered import block); not fixed, as it's out of this plan's scope (`app.vue` was only meant to receive two lines) and pre-exists the migration.
+- `sanitizeHtml.js`'s `decodeEntities` runs its hex/decimal/named regex passes sequentially over the same string rather than as one non-chaining scan, so a contrived chained encoding (e.g. `&#x26;#106;`) could in principle double-decode. No known payload in the current test suite exercises this; flagged in the Task 3 report for a future review.
+- `isSafeUrl`'s allow-list (`http`, `https`, `mailto`, `tel` schemes; anything with no scheme prefix at all treated as relative/safe) is slightly broader than the brief's original one-line description — correct against the test suite and DOMPurify's baseline, but worth a second look if promo HTML content policy needs tightening further (e.g. constraining query-string-only or fragment-only hrefs).
+- No earlier gzip measurement for `dompurify` was available in this plan's history, so only sweetalert2 (~27 KB gzip) and swiper (~26 KB gzip) removals are quantified above; the `ultrahtml` addition is reported as an on-disk dist size (168K), not a directly comparable gzip figure.
+- Both local Lighthouse runs on `/` scored perf 60, consistent with pre-existing baseline performance issues on this page (unrelated to this plan, which targeted no perf-affecting code on the home page) — not a regression introduced by this work, but not improved by it either since none of the removed libraries loaded on `/`.
