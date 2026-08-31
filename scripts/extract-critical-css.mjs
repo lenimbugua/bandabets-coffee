@@ -14,8 +14,19 @@
 //   4. Fetch the SSR HTML for a handful of representative routes.
 //   5. Run Beasties per route to compute which rules from the page's own
 //      <link rel="stylesheet"> are actually used above the fold.
-//   6. Union + dedupe the extracted rules across routes, write the artifact,
-//      print a byte-budget summary, and enforce a 15 KB gzip ceiling.
+//   6. Union + dedupe the extracted rules across routes. `@layer utilities`
+//      and `@layer base` get special handling: each route's copy of these
+//      is a *whole* top-level unit that differs slightly route to route (a
+//      different subset of Tailwind utilities/element resets is used per
+//      page), so a naive whole-block dedup keeps every route's copy
+//      whole — most of the artifact's bytes. Instead their INNER rules are
+//      deduped individually and re-assembled into one `@layer utilities`
+//      and one `@layer base` block, ordered to match entry.*.css's own
+//      intra-layer rule order (Tailwind utilities are order-dependent —
+//      see buildOrderedDedupedLayerBlock's comment). Everything else is
+//      deduped as a whole top-level unit, first-seen order, as before.
+//      Finally write the artifact, print a byte-budget summary, and
+//      enforce a 15 KB gzip ceiling.
 //
 // Usage: pnpm critical:extract (requires a fresh `pnpm build` first)
 import {
@@ -195,7 +206,204 @@ function extractLightThemeBlocks(css) {
   return splitTopLevelRules(css).flatMap(filterChunk);
 }
 
+// --- intra-layer dedup for @layer utilities / @layer base ------------------
+// A given route's `@layer utilities{...}` (and `@layer base{...}`) is one
+// *whole* top-level unit as far as splitTopLevelRules is concerned. Which
+// Tailwind utilities/element resets a page actually uses differs slightly
+// route to route, so that whole unit's text differs slightly route to
+// route too — meaning a plain whole-unit dedup (comparing each route's
+// entire `@layer utilities{...}` string against the others) essentially
+// never finds an exact match, and every route's copy survives into the
+// union intact. That was the bulk of this artifact's bytes before this
+// fix. The rules below split those two layers' bodies into their own
+// inner rules (with the same brace-aware splitTopLevelRules used
+// everywhere else) and dedup *those*, then reassemble a single
+// `@layer utilities{...}` / `@layer base{...}` block per layer.
+//
+// Rule text is compared via normalizeForComparison (whitespace-insensitive)
+// rather than exact string equality: the KEPT rule text always comes from
+// entry.*.css itself (see buildOrderedDedupedLayerBlock), never from
+// Beasties' regenerated output, so the two sides of the comparison (a rule
+// harvested from a route's Beasties output vs. that same rule as it
+// appears in entry.*.css) only need to match on content, not on
+// Beasties' own re-stringification whitespace — sidestepping any risk of
+// Beasties' internal CSS printer reformatting a rule just enough that an
+// exact-string comparison would miss it.
+function normalizeForComparison(rule) {
+  return rule.replace(/\s+/g, "");
+}
+
+// Splits a selector list on top-level commas — i.e. NOT commas nested
+// inside `:is(...)`, `:where(...)`, `:not(...)`, attribute-selector
+// brackets, or quoted attribute values (`[data-x="a,b"]`) — the same
+// depth-tracking approach as splitTopLevelRules, just over `(`/`[` instead
+// of `{`.
+function splitSelectorList(selectorText) {
+  const selectors = [];
+  let buf = "";
+  let depth = 0;
+  let i = 0;
+  const n = selectorText.length;
+  while (i < n) {
+    const ch = selectorText[i];
+    if (ch === '"' || ch === "'") {
+      const quote = ch;
+      let j = i + 1;
+      while (j < n && selectorText[j] !== quote) {
+        if (selectorText[j] === "\\") j++;
+        j++;
+      }
+      j = Math.min(j + 1, n);
+      buf += selectorText.slice(i, j);
+      i = j;
+      continue;
+    }
+    if (ch === "(" || ch === "[") {
+      depth++;
+      buf += ch;
+      i++;
+      continue;
+    }
+    if (ch === ")" || ch === "]") {
+      depth = Math.max(0, depth - 1);
+      buf += ch;
+      i++;
+      continue;
+    }
+    if (ch === "," && depth === 0) {
+      const trimmed = buf.trim();
+      if (trimmed) selectors.push(trimmed);
+      buf = "";
+      i++;
+      continue;
+    }
+    buf += ch;
+    i++;
+  }
+  const rest = buf.trim();
+  if (rest) selectors.push(rest);
+  return selectors;
+}
+
+// Recursively flattens an array of top-level chunks (as splitTopLevelRules
+// produces them) all the way down to leaf (single-selector){declarations}
+// units, each individually re-wrapped in the exact chain of at-rule
+// headers (`@media`/`@supports`/etc.) it was nested under. Comparing at
+// any coarser granularity than this is unsafe, for two independent
+// reasons Beasties' output can restructure relative to entry.*.css's own
+// text:
+//   1. Beasties' CSS printer (`compress: true` is the default) can
+//      coalesce originally-*separate* same-condition at-rules — e.g. two
+//      distinct `@media (hover:hover){...}` blocks placed at different
+//      points in entry.*.css — into one combined block in its output.
+//      Treating "one @media chunk" as one comparable unit (an earlier
+//      version of this script did) meant a merged block from Beasties'
+//      output would then match *neither* of entry.*.css's two separate
+//      blocks, byte for byte or normalized — silently dropping every rule
+//      inside both from the final artifact.
+//   2. Beasties trims comma-separated selector *lists* down to only the
+//      selectors that matched something in a given route's DOM. E.g.
+//      entry.*.css has one combined rule
+//      `.border,.border-0{border-style:var(--tw-border-style)}`; a route
+//      that only uses `.border` gets Beasties output containing
+//      `.border{border-style:var(--tw-border-style)}` alone — which never
+//      matches the combined selector text on the entry.*.css side either
+//      (verified: this was silently dropping ~45 genuinely-critical
+//      utility rules, including plain ones like `.border` itself).
+// Flattening every rule down to one-selector-per-unit, on both sides of
+// the comparison (see getEntryLayerInnerRulesInOrder and the per-route
+// harvest loop), sidesteps both regardless of how either side happens to
+// group sibling rules or selectors. Splitting a `.a,.b{decl}` rule into
+// adjacent `.a{decl}` / `.b{decl}` units is behaviorally identical per the
+// CSS cascade (same specificity, same source position for each), so this
+// only costs a little compactness (repeated declaration blocks / at-rule
+// conditions), never correctness.
+function flattenToLeafUnits(chunks) {
+  const out = [];
+  for (const chunk of chunks) {
+    const braceIndex = chunk.indexOf("{");
+    if (braceIndex === -1) {
+      out.push(chunk); // bare statement, e.g. "@layer components;"
+      continue;
+    }
+    const head = chunk.slice(0, braceIndex).trim();
+    const body = chunk.slice(braceIndex + 1, chunk.lastIndexOf("}"));
+    if (head.startsWith("@")) {
+      for (const leaf of flattenToLeafUnits(splitTopLevelRules(body))) {
+        out.push(`${head}{${leaf}}`);
+      }
+      continue;
+    }
+    const declBlock = `{${body}}`;
+    for (const selector of splitSelectorList(head)) {
+      out.push(`${selector}${declBlock}`);
+    }
+  }
+  return out;
+}
+
+// Pulls the leaf rules (see flattenToLeafUnits) of every top-level
+// `@layer <layerName>{...}` block in `css` (there's normally exactly one
+// per name in entry.*.css, but this concatenates all of them, in source
+// order, just in case) as an ordered array of raw rule strings straight
+// from `css` — i.e. entry.*.css's own text, not anything Beasties touched.
+function getEntryLayerInnerRulesInOrder(css, layerName) {
+  const layerHeadRe = new RegExp(`^@layer\\s+${layerName}\\b`, "i");
+  const innerRules = [];
+  for (const chunk of splitTopLevelRules(css)) {
+    const braceIndex = chunk.indexOf("{");
+    if (braceIndex === -1) continue; // e.g. a bare "@layer components;" statement
+    const head = chunk.slice(0, braceIndex).trim();
+    if (!layerHeadRe.test(head)) continue;
+    const body = chunk.slice(braceIndex + 1, chunk.lastIndexOf("}"));
+    innerRules.push(...flattenToLeafUnits(splitTopLevelRules(body)));
+  }
+  return innerRules;
+}
+
+// Tailwind's utility layer (and, to a lesser extent, base) is intra-layer
+// source-order dependent — e.g. a later `.px-2{padding-inline:...}` can
+// override an earlier `.p-4{padding:...}`'s inline padding at equal
+// specificity purely because it comes later in the layer. Ordering the
+// deduped union by first-seen-across-routes would scramble that (route 2's
+// first new utility could easily be one that comes *before* one of route
+// 1's utilities in entry.*.css). Instead: walk entry.*.css's OWN rule
+// order for this layer once, and keep each of its rules that showed up in
+// `harvestedNormalized` (the union of every route's harvested inner rules
+// for this layer, keyed by normalizeForComparison) — this reproduces
+// entry.*.css's exact intra-layer cascade order, filtered down to only the
+// rules some route actually needed. Returns null if nothing was harvested.
+function buildOrderedDedupedLayerBlock(
+  layerName,
+  entryCss,
+  harvestedNormalized,
+) {
+  const entryInner = getEntryLayerInnerRulesInOrder(entryCss, layerName);
+  const seenKeys = new Set();
+  const kept = [];
+  for (const rule of entryInner) {
+    const key = normalizeForComparison(rule);
+    if (seenKeys.has(key)) continue; // entry.*.css itself had an exact dup
+    if (!harvestedNormalized.has(key)) continue; // no route needed this rule
+    seenKeys.add(key);
+    kept.push(rule);
+  }
+  return kept.length === 0 ? null : `@layer ${layerName}{${kept.join("")}}`;
+}
+
 // --- Step 3: boot the built server on port 3131 ------------------------------
+// Port-3131 collision failure modes: if something else already holds 3131
+// when Nitro's server tries to listen, Nitro/Node's own EADDRINUSE
+// generally kills the child process almost immediately — that surfaces
+// here via waitForServer's childProcess.exitCode/signalCode check below
+// (fast, explicit failure) rather than the 30s timeout path. What this
+// does NOT detect: a *stale foreign* server that's already listening on
+// 3131 and happens to answer HTTP requests (e.g. a leftover process from
+// an unrelated tool) — waitForServer would treat its response as "ready"
+// and this script would silently harvest critical CSS from whatever that
+// other server serves instead of failing loudly. Nothing else in this repo
+// uses 3131 (dev is 5079, preview/build defaults elsewhere), so this is an
+// accepted risk rather than something worth guarding against here.
 async function waitForServer(url, timeoutMs, childProcess, getOutput) {
   const deadline = Date.now() + timeoutMs;
   while (Date.now() < deadline) {
@@ -258,6 +466,22 @@ try {
   const routeResults = [];
   const seenRuleStrings = new Set();
   const unionRules = [];
+  // `@layer utilities` / `@layer base` get pulled out of the normal
+  // whole-top-level-unit dedup above and deduped at the inner-rule level
+  // instead — see buildOrderedDedupedLayerBlock's comment for why. Each
+  // set holds normalizeForComparison(rule) keys, unioned across every
+  // route. UTILITIES_PLACEHOLDER/BASE_PLACEHOLDER get spliced into
+  // unionRules (once, at the position the layer first appears — i.e.
+  // matching entry.*.css's own top-level layer order relative to
+  // `@layer properties`/`@layer theme`, which stay in the plain "other"
+  // bucket since their content doesn't vary by route) and are swapped for
+  // the real, ordered, deduped block once every route has been processed.
+  const UTILITIES_PLACEHOLDER = " __CRITICAL_CSS_UTILITIES__ ";
+  const BASE_PLACEHOLDER = " __CRITICAL_CSS_BASE__ ";
+  const utilitiesHarvestedNormalized = new Set();
+  const baseHarvestedNormalized = new Set();
+  let utilitiesPlaceholderAdded = false;
+  let basePlaceholderAdded = false;
 
   for (const route of ROUTES) {
     const res = await fetch(`http://localhost:${PORT}${route}`);
@@ -326,33 +550,105 @@ try {
       .join("\n");
 
     const routeRules = splitTopLevelRules(newStyleContent);
-    let addedForRoute = 0;
+    let addedOtherForRoute = 0;
+    let newUtilitiesInnerForRoute = 0;
+    let newBaseInnerForRoute = 0;
     for (const rule of routeRules) {
+      const braceIndex = rule.indexOf("{");
+      const head = braceIndex === -1 ? rule : rule.slice(0, braceIndex).trim();
+
+      if (/^@layer\s+utilities\b/i.test(head)) {
+        const body = rule.slice(braceIndex + 1, rule.lastIndexOf("}"));
+        for (const inner of flattenToLeafUnits(splitTopLevelRules(body))) {
+          const key = normalizeForComparison(inner);
+          if (utilitiesHarvestedNormalized.has(key)) continue;
+          utilitiesHarvestedNormalized.add(key);
+          newUtilitiesInnerForRoute++;
+        }
+        if (!utilitiesPlaceholderAdded) {
+          unionRules.push(UTILITIES_PLACEHOLDER);
+          utilitiesPlaceholderAdded = true;
+        }
+        continue;
+      }
+
+      if (/^@layer\s+base\b/i.test(head)) {
+        const body = rule.slice(braceIndex + 1, rule.lastIndexOf("}"));
+        for (const inner of flattenToLeafUnits(splitTopLevelRules(body))) {
+          const key = normalizeForComparison(inner);
+          if (baseHarvestedNormalized.has(key)) continue;
+          baseHarvestedNormalized.add(key);
+          newBaseInnerForRoute++;
+        }
+        if (!basePlaceholderAdded) {
+          unionRules.push(BASE_PLACEHOLDER);
+          basePlaceholderAdded = true;
+        }
+        continue;
+      }
+
       if (seenRuleStrings.has(rule)) continue;
       seenRuleStrings.add(rule);
       unionRules.push(rule);
-      addedForRoute++;
+      addedOtherForRoute++;
     }
 
     const routeBytes = Buffer.byteLength(newStyleContent, "utf8");
-    routeResults.push({ route, routeBytes, newRuleCount: addedForRoute });
+    routeResults.push({
+      route,
+      routeBytes,
+      addedOtherForRoute,
+      newUtilitiesInnerForRoute,
+      newBaseInnerForRoute,
+    });
   }
 
-  // --- Step 5 fallback: [data-theme="light"] blocks Beasties dropped --------
+  // --- Step 5 fallback: [data-theme="light"] blocks not already harvested ---
+  // Defense-in-depth only (see extractLightThemeBlocks' comment above) —
+  // checked against everything harvested so far, across all three buckets
+  // (the "other" bucket plus both layer buckets), since these rules live
+  // inside `@layer utilities` in entry.*.css and are expected to already
+  // be captured there via allowRules (verified: this normally adds 0).
   const entryCss = readFileSync(entryCssPath, "utf8");
+  const allHarvestedNormalized = new Set([
+    ...utilitiesHarvestedNormalized,
+    ...baseHarvestedNormalized,
+    ...[...seenRuleStrings].map(normalizeForComparison),
+  ]);
   const lightThemeBlocks = extractLightThemeBlocks(entryCss);
   let lightThemeAdded = 0;
   for (const block of lightThemeBlocks) {
-    if (seenRuleStrings.has(block)) continue;
+    const key = normalizeForComparison(block);
+    if (allHarvestedNormalized.has(key)) continue;
+    allHarvestedNormalized.add(key);
     seenRuleStrings.add(block);
     unionRules.push(block);
     lightThemeAdded++;
   }
 
-  // --- Step 6: write the artifact ---------------------------------------------
+  // --- Step 6: assemble the deduped @layer utilities/@layer base blocks -----
+  // and write the artifact -----------------------------------------------
+  const utilitiesBlock = buildOrderedDedupedLayerBlock(
+    "utilities",
+    entryCss,
+    utilitiesHarvestedNormalized,
+  );
+  const baseBlock = buildOrderedDedupedLayerBlock(
+    "base",
+    entryCss,
+    baseHarvestedNormalized,
+  );
+  const assembledRules = unionRules
+    .map((rule) => {
+      if (rule === UTILITIES_PLACEHOLDER) return utilitiesBlock;
+      if (rule === BASE_PLACEHOLDER) return baseBlock;
+      return rule;
+    })
+    .filter((rule) => rule);
+
   const generatedAt = new Date().toISOString();
   const header = `/* generated by scripts/extract-critical-css.mjs from ${entryCssBasename} on ${generatedAt}; regenerate with: pnpm critical:extract (requires a fresh pnpm build) */\n`;
-  const body = unionRules.join("\n");
+  const body = assembledRules.join("\n");
   const artifact = header + body + "\n";
 
   if (/<\/style/i.test(artifact)) {
@@ -367,14 +663,20 @@ try {
   console.log("[critical:extract] per-route critical bytes:");
   for (const r of routeResults) {
     console.log(
-      `  ${r.route.padEnd(14)} ${String(r.routeBytes).padStart(7)} B raw   (+${r.newRuleCount} new rules)`,
+      `  ${r.route.padEnd(14)} ${String(r.routeBytes).padStart(7)} B raw   (+${r.addedOtherForRoute} other, +${r.newUtilitiesInnerForRoute} utilities-inner, +${r.newBaseInnerForRoute} base-inner)`,
     );
   }
   console.log(
     `  [data-theme=light] fallback (from ${entryCssBasename}): +${lightThemeAdded} rules`,
   );
   console.log(
-    `[critical:extract] union: ${rawBytes} B raw, ${gzipBytes} B gzip (${unionRules.length} deduped rules)`,
+    `[critical:extract] deduped: ${assembledRules.length} top-level units ` +
+      `(${utilitiesHarvestedNormalized.size} unique utilities-layer rules, ` +
+      `${baseHarvestedNormalized.size} unique base-layer rules, ` +
+      `${seenRuleStrings.size} other)`,
+  );
+  console.log(
+    `[critical:extract] union: ${rawBytes} B raw, ${gzipBytes} B gzip`,
   );
 
   if (gzipBytes > GZIP_BUDGET_BYTES) {
