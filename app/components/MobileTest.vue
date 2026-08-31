@@ -58,14 +58,12 @@ const otherCategories = computed(() => {
 
       <!-- Below the fold at 412x915 (measured): remaining casino category
            strips, deferred until scrolled into view.
-           NB: this file lives at app/components/mobile/GamesRow.vue, so
-           Nuxt's directory-based auto-naming registers it as
-           MobileGamesRow / LazyMobileGamesRow — a bare <LazyGamesRow> tag
-           resolves to nothing and the strip silently renders empty. -->
+           NB: The Lazy prefix splits GamesRow out of the entry chunk (code-splitting
+           win). Hydration strategies do not apply because these rows are client-only
+           (casino data from client-side fetch, no SSR markup). -->
       <LazyMobileGamesRow
         v-for="cat in otherCategories"
         :key="cat.id"
-        hydrate-on-visible
         :title="cat.name"
         :games="cat.games"
         :view-all-route="casinoHomeRoute(cat.slug)"
