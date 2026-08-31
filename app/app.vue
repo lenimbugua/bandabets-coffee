@@ -2,6 +2,7 @@
 import { defineAsyncComponent } from "vue";
 const CasinoSidebar = defineAsyncComponent(() => import("@/components/CasinoSidebar.vue"));
 import CollectAllModals from "@/components/CollectAllModals.vue";
+import AppToaster from "@/components/ui/AppToaster.vue";
 import OddsBar from "@/components/mobile/OddsBar.vue";
 import BrandSplash from "@/components/BrandSplash.vue";
 import { useAppMode } from "@/composables/useAppMode";
@@ -66,5 +67,6 @@ onBeforeUnmount(() => {
     </div>
     <OddsBar class="xl:hidden" />
     <CollectAllModals />
+    <AppToaster />
   </div>
 </template>

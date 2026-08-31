@@ -1372,36 +1372,34 @@
   width: 100%;
 }
 
-/* SweetAlert2 toast theming */
-.colored-toast.swal2-icon-success {
-  background-color: var(--card) !important;
-  color: var(--card-foreground);
+/* Native toast (AppToast.vue / AppToaster.vue) */
+.app-toast-progress {
+  transform-origin: left;
+  animation: app-toast-shrink linear forwards;
+  animation-play-state: paused;
+  opacity: 0.6;
 }
-.colored-toast.swal2-icon-error {
-  background-color: var(--destructive) !important;
-  color: var(--destructive-foreground);
+.app-toast-progress--running {
+  animation-play-state: running;
 }
-.colored-toast.swal2-icon-warning {
-  background-color: var(--card) !important;
-  color: var(--destructive);
+@keyframes app-toast-shrink {
+  from { transform: scaleX(1); }
+  to { transform: scaleX(0); }
 }
-.colored-toast.swal2-icon-info {
-  background-color: var(--card) !important;
-  color: var(--card-foreground);
+.app-toast-enter-active,
+.app-toast-leave-active {
+  transition: opacity 0.2s ease, transform 0.2s ease;
 }
-.colored-toast.swal2-icon-question {
-  background-color: var(--card) !important;
+.app-toast-enter-from,
+.app-toast-leave-to {
+  opacity: 0;
+  transform: translateY(-0.5rem);
 }
-.colored-toast .swal2-close {
-  color: var(--card-foreground);
-}
-.colored-toast .swal2-html-container {
-  color: var(--card-foreground);
-}
-.colored-toast {
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  box-shadow: 0 12px 32px rgb(var(--elevation-umbra) / var(--elevation-alpha-3));
+@media (prefers-reduced-motion: reduce) {
+  .app-toast-enter-active,
+  .app-toast-leave-active {
+    transition: none;
+  }
 }
 
 /* Border utility classes */
