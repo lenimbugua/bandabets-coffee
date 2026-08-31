@@ -24,9 +24,15 @@ const PLACEHOLDER =
   "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==";
 
 const props = defineProps({
+  // Mobile: the visible slide is (container − 0.75rem gap) / 1.1 wide
+  // (see .banner-slide below) inside a 1rem-padded page — telling the
+  // browser 100vw made it fetch the 960w rendition on ~400px phones;
+  // the true ~85vw resolves to the 640w file (−46 KiB on the LCP path,
+  // per the 2026-08-31 PSI report).
   sizes: {
     type: String,
-    default: "(min-width: 1024px) min(1000px, calc(100vw - 664px)), 100vw",
+    default:
+      "(min-width: 1024px) min(1000px, calc(100vw - 664px)), calc((100vw - 1.75rem) / 1.1)",
   },
 });
 
