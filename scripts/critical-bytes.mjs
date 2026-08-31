@@ -1,8 +1,16 @@
 // scripts/critical-bytes.mjs
 // Sums the gzip size of everything the home page HTML preloads before first
 // paint: every <link rel="modulepreload"> chunk, the entry <script type="module">,
-// and every <link rel="stylesheet">. Sizes come from the .gz siblings that
-// nitro.compressPublicAssets writes next to each file in .output/public.
+// and every actually render-blocking <link rel="stylesheet">. Sizes come
+// from the .gz siblings that nitro.compressPublicAssets writes next to each
+// file in .output/public.
+// Lighthouse round 7, Task 2: a stylesheet <link> whose media attribute
+// doesn't match the current viewport (media="print" being the deliberate
+// case here — see nuxt.config.js's app.head.link defer-noncritical entry)
+// is fetched but does NOT block rendering, same as Lighthouse's own
+// render-blocking-resources audit treats it. A bare href-matching regex
+// can't tell the difference, so this only counts <link rel="stylesheet">
+// tags with no media attribute (the common case) or media="all"/"screen".
 // Usage: node scripts/critical-bytes.mjs http://localhost:3123/
 import { readFileSync, statSync } from "node:fs";
 import { gzipSync } from "node:zlib";
@@ -22,7 +30,21 @@ const js = new Set([
   ...hrefs(/<link[^>]+rel="modulepreload"[^>]+href="([^"]+)"/g),
   ...hrefs(/<script[^>]+type="module"[^>]+src="([^"]+)"/g),
 ]);
-const css = new Set(hrefs(/<link[^>]+rel="stylesheet"[^>]+href="([^"]+)"/g));
+// <noscript> fallback links (the defer-noncritical <noscript> in
+// nuxt.config.js's app.head) only apply with JS disabled — Lighthouse and
+// real users here always have JS on, so strip <noscript> content before
+// counting, or its fallback <link> would double as a phantom blocking tag.
+const htmlScriptingEnabled = html.replace(/<noscript>[\s\S]*?<\/noscript>/g, "");
+const isBlockingMedia = (tag) => {
+  const m = tag.match(/media="([^"]*)"/);
+  return !m || m[1] === "all" || m[1] === "screen";
+};
+const css = new Set(
+  [...htmlScriptingEnabled.matchAll(/<link\s+[^>]*rel="stylesheet"[^>]*>/g)]
+    .map((m) => m[0])
+    .filter(isBlockingMedia)
+    .flatMap((tag) => [...tag.matchAll(/href="([^"]+)"/g)].map((h) => h[1])),
+);
 
 const gz = (href) => {
   const p = join(root, href.replace(/^\//, ""));

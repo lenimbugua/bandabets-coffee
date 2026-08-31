@@ -1,0 +1,262 @@
+/* ============================================================================
+   NON-CRITICAL GLOBAL STYLES (Lighthouse round 7, Task 2 — defer-noncritical)
+
+   Loaded async via a media="print" -> onload swap (app.head.link in
+   nuxt.config.js), with a <noscript> fallback. Everything below is plain CSS
+   (no @utility/@theme Tailwind directives — those must stay in the
+   Tailwind-processed, render-blocking entry stylesheet, app/assets/css/
+   style.css, since @utility needs the Tailwind compiler and this file is
+   served byte-for-byte from public/ with no build step).
+
+   Selection criterion: every rule here is decorative/interactive-state CSS
+   (hover/active transitions, background patterns, keyframe animations,
+   iframe-embed sizing, toast/carousel chrome) that (a) does not affect
+   static layout — nothing here sets display/position/width/height needed
+   for the initial box model except iframe-container/the-iframe, which are
+   casino/virtual/aviator-embed-only and never rendered on the four gated
+   routes (/, /share-bets, /join-affiliate, /casino-home's SSR shell) — and
+   (b) was verified absent from the server-rendered HTML of all four gated
+   routes (curl + grep, Lighthouse round 7 Task 2 measurement). Moving it
+   here cannot cause FOUC on those routes; any other route using these
+   classes gets them within one async stylesheet fetch after first paint,
+   the same tradeoff round 4's single-stylesheet consolidation already
+   accepted for component CSS.
+
+   Never moved: @theme/@utility Tailwind directives, the `highlight` keyframe
+   (referenced by the --animate-highlight-fade theme token) and the
+   `shimmer` keyframe (referenced by the animate-shimmer @utility) — both
+   are design-system layer 2/3 and stay in style.css per the brief's "never
+   token layers" rule.
+   ========================================================================= */
+
+/* Glass surfaces */
+.glass-card {
+  backdrop-filter: blur(12px) saturate(140%);
+  -webkit-backdrop-filter: blur(12px) saturate(140%);
+}
+[data-theme="dark"] .glass-card {
+  background: color-mix(in srgb, var(--surface-elevated) 72%, transparent) !important;
+  border-color: var(--border);
+}
+[data-theme="light"] .glass-card {
+  background: color-mix(in srgb, var(--palette-white) 88%, transparent) !important;
+  border-color: var(--border);
+  box-shadow: 0 4px 12px rgb(var(--elevation-umbra) / var(--elevation-alpha-2));
+}
+
+.animate-border-glow {
+  animation: border-glow 3s ease-in-out infinite;
+}
+
+/* Card hover — Level 1 rises to Level 2 */
+.card-hover-lift {
+  transition:
+    transform 0.2s cubic-bezier(0.33, 1, 0.68, 1),
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+.card-hover-lift:hover {
+  transform: translateY(-2px);
+  border-color: var(--border-strong);
+  box-shadow: 0 4px 12px rgb(var(--elevation-umbra) / var(--elevation-alpha-2));
+}
+
+/* CTA hover — restrained, no scale-up */
+.cta-premium {
+  transition:
+    transform 0.16s ease,
+    box-shadow 0.16s ease,
+    filter 0.16s ease;
+}
+.cta-premium:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.06);
+  box-shadow: 0 4px 12px rgb(var(--elevation-umbra) / var(--elevation-alpha-2));
+}
+.cta-premium:active {
+  transform: translateY(0);
+  filter: brightness(0.96);
+}
+
+.animate-progress {
+  animation: progress-fill 1s cubic-bezier(0.33, 1, 0.68, 1) forwards;
+}
+
+/* Gaming-themed background pattern. Assets live in public/bonus/ (moved
+   from app/assets/bonus/ — this was their only reference in the codebase,
+   verified via grep) because this stylesheet is served byte-for-byte from
+   public/ with no Vite asset-URL rewriting, so it needs a stable absolute
+   path rather than Vite's hashed _nuxt/ output. */
+.bonus-gaming-bg {
+  background-image: url("/bonus/gaming-pattern-light.svg");
+  background-repeat: repeat;
+  background-size: 400px 360px;
+  background-attachment: fixed;
+}
+[data-theme="dark"] .bonus-gaming-bg {
+  background-image: url("/bonus/gaming-pattern-dark.svg");
+}
+
+.gaming-float {
+  animation: float-slow 6s ease-in-out infinite;
+}
+.gaming-float-reverse {
+  animation: float-slow-reverse 7s ease-in-out infinite;
+}
+.gaming-glow-pulse {
+  animation: glow-pulse 4s ease-in-out infinite;
+}
+
+:root {
+  --viewport-height: 100vh;
+}
+
+@supports (height: 100dvh) {
+  :root {
+    --viewport-height: 100dvh;
+  }
+}
+
+.iframe-container {
+  height: var(--viewport-height);
+  overflow-y: scroll;
+  position: relative;
+}
+
+.the-iframe {
+  height: calc(var(--viewport-height) - 5rem);
+  width: 100%;
+}
+
+/* Native toast (AppToast.vue / AppToaster.vue) */
+.app-toast-progress {
+  transform-origin: left;
+  animation: app-toast-shrink linear forwards;
+  animation-play-state: paused;
+  opacity: 0.6;
+}
+.app-toast-progress--running {
+  animation-play-state: running;
+}
+@keyframes app-toast-shrink {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
+}
+.app-toast-enter-active,
+.app-toast-leave-active {
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.app-toast-enter-from,
+.app-toast-leave-to {
+  opacity: 0;
+  transform: translateY(-0.5rem);
+}
+@media (prefers-reduced-motion: reduce) {
+  .app-toast-enter-active,
+  .app-toast-leave-active {
+    transition: none;
+  }
+}
+
+/* Native carousel (AppCarousel.vue) — 30 px gap matches the old Swiper spaceBetween */
+.app-carousel-track {
+  display: flex;
+  column-gap: 1.875rem;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  outline: none;
+}
+.app-carousel-track::-webkit-scrollbar {
+  display: none;
+}
+.app-carousel-track:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+.app-carousel-slide {
+  flex: 0 0 100%;
+  min-width: 0;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
+
+/* Border utility classes */
+.custom-border {
+  border: 1px solid var(--border);
+}
+.dark-border {
+  border: 1px solid var(--border-strong);
+}
+
+#egamings_container {
+  width: 100%;
+  height: 100%;
+}
+
+.pulse {
+  animation: pulse-animation 2s infinite cubic-bezier(0.4, 0, 0.6, 1);
+}
+
+@keyframes border-glow {
+  0%,
+  100% {
+    border-color: color-mix(in srgb, var(--primary) 45%, transparent);
+  }
+  50% {
+    border-color: color-mix(in srgb, var(--gold) 45%, transparent);
+  }
+}
+
+@keyframes progress-fill {
+  from {
+    width: 0%;
+  }
+}
+
+@keyframes float-slow {
+  0%,
+  100% {
+    transform: translateY(0) rotate(45deg);
+  }
+  50% {
+    transform: translateY(-20px) rotate(45deg);
+  }
+}
+
+@keyframes float-slow-reverse {
+  0%,
+  100% {
+    transform: translateY(0) rotate(45deg);
+  }
+  50% {
+    transform: translateY(20px) rotate(45deg);
+  }
+}
+
+@keyframes glow-pulse {
+  0%,
+  100% {
+    opacity: 0.4;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.15);
+  }
+}
+
+@keyframes pulse-animation {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--primary) 30%, transparent);
+  }
+  100% {
+    box-shadow: 0 0 0 16px transparent;
+  }
+}

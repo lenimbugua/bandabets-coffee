@@ -691,6 +691,31 @@ export default defineNuxtConfig({
         // (CasinoGameCard.vue), not the home page. storage.googleapis.com
         // is only the BRAND_LOGO string embedded in JSON-LD structured data
         // (useOrganizationSchema.js), which the browser never fetches.
+
+        // Lighthouse round 7, Task 2 (defer-noncritical): the decorative,
+        // interactive-state-only rules moved out of app/assets/css/
+        // style.css into public/css/noncritical.css (glass-card, CTA/card
+        // hover, bonus-page background pattern + float/glow animations,
+        // iframe-embed sizing, native toast, native carousel, .pulse — see
+        // that file's header comment for the full list and why each one is
+        // safe to defer). media="print" makes the browser fetch it without
+        // blocking render; the onload swap applies it once loaded. Served
+        // as a plain, unhashed static file (not run through the css:[...]
+        // array, which would merge it straight back into the render-
+        // blocking entry bundle this task exists to shrink) — it has no
+        // @utility/@theme Tailwind directives, only plain CSS referencing
+        // custom properties already defined by the critical stylesheet.
+        {
+          rel: "stylesheet",
+          href: "/css/noncritical.css",
+          media: "print",
+          onload: "this.media='all'",
+        },
+      ],
+      noscript: [
+        {
+          innerHTML: '<link rel="stylesheet" href="/css/noncritical.css">',
+        },
       ],
     },
   },
