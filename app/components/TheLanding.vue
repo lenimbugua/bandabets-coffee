@@ -81,8 +81,12 @@ const otherCategories = computed(() => {
         <TopGames />
 
         <!-- Remaining API categories: below the fold on desktop, deferred
-             until scrolled into view. -->
-        <LazyGamesRow
+             until scrolled into view.
+             NB: this file lives at app/components/mobile/GamesRow.vue, so
+             Nuxt's directory-based auto-naming registers it as
+             MobileGamesRow / LazyMobileGamesRow — a bare <LazyGamesRow> tag
+             resolves to nothing and the strip silently renders empty. -->
+        <LazyMobileGamesRow
           v-for="cat in otherCategories"
           :key="cat.id"
           hydrate-on-visible
