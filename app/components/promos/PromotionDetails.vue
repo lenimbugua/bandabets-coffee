@@ -2,7 +2,7 @@
 import MobileFooterV2 from "../components/mobile/MobileFooterV2.vue";
 import { usePromoStore } from "@/stores/promos";
 import { computed, onBeforeUnmount, toRefs } from "vue";
-import DOMPurify from "dompurify";
+import { sanitizeHtml } from "@/utils/sanitizeHtml";
 
 import { useCasino } from "@/composables/useCasino";
 import { useDefaultSport } from "@/composables/useDefaultSport";
@@ -10,11 +10,7 @@ import { useRouter } from "vue-router";
 const { selectedPromo } = toRefs(usePromoStore());
 
 const sanitizedDescription = computed(() =>
-  selectedPromo.value?.description
-    ? DOMPurify.sanitize(selectedPromo.value.description, {
-        ADD_ATTR: ["target", "rel"],
-      })
-    : ""
+  sanitizeHtml(selectedPromo.value?.description)
 );
 
 const { launchCasino } = useCasino();
@@ -125,7 +121,7 @@ onBeforeUnmount(() => {
             loading="lazy"
           />
         </div>
-        <!-- sanitized via DOMPurify in sanitizedDescription computed -->
+        <!-- sanitized via sanitizeHtml (ultrahtml allow-list, runs on server and client) -->
         <div
           class="prose dark:prose-invert max-w-none text-gray-700 dark:text-slate-400"
           v-html="sanitizedDescription"
