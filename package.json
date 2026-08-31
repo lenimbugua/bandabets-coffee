@@ -9,7 +9,8 @@
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "banners:optimize": "node scripts/optimize-banners.mjs",
-    "perf:critical": "node scripts/critical-bytes.mjs http://localhost:3123/"
+    "perf:critical": "node scripts/critical-bytes.mjs http://localhost:3123/",
+    "critical:extract": "node scripts/extract-critical-css.mjs"
   },
   "dependencies": {
     "@iconify-json/tabler": "^1.2.38",
@@ -28,6 +29,7 @@
     "@nuxt/eslint": "^1.16.0",
     "@tailwindcss/typography": "^0.5.20",
     "@tailwindcss/vite": "^4.3.3",
+    "beasties": "^0.4.3",
     "eslint": "^10.5.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-import": "^2.32.0",

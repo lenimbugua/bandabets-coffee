@@ -51,6 +51,9 @@ importers:
       '@tailwindcss/vite':
         specifier: ^4.3.3
         version: 4.3.3(vite@8.2.2(@types/node@25.2.3)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.51.2)(yaml@2.9.0))
+      beasties:
+        specifier: ^0.4.3
+        version: 0.4.3
       eslint:
         specifier: ^10.5.0
         version: 10.5.0(jiti@2.7.0)
@@ -2083,6 +2086,10 @@ packages:
     engines: {node: '>=6.0.0'}
     hasBin: true
 
+  beasties@0.4.3:
+    resolution: {integrity: sha512-fIIeLOcbAB/K1kb1HBVJoiq1alHL4RCYBSo5e7HzrNkkgMggXR1Vqt/Z9JWnkfe/qdCo66Ux3QRwZioAIBdWRA==}
+    engines: {node: '>=18.0.0'}
+
   bindings@1.5.0:
     resolution: {integrity: sha512-p2q/t/mhvuOj/UeLlV6566GD/guowlr0hHxClI0W9m7MWYkL1F0hLo+0Aexs9HSPCtR1SXQ0TD3MMKrXZajbiQ==}
 
@@ -3122,6 +3129,9 @@ packages:
   html-entities@2.6.0:
     resolution: {integrity: sha512-kig+rMn/QOVRvr7c86gQ8lWXq+Hkv6CbAH1hLu+RG338StTpE8Z0b44SDVaqVu7HGKf27frdmUYEs9hTUX/cLQ==}
 
+  htmlparser2@10.1.0:
+    resolution: {integrity: sha512-VTZkM9GWRAtEpveh7MSF6SjjrpNVNNVJfFup7xTY3UpFtm67foy9HDVXneLtFVt4pMz5kZtgNcvCniNFb1hlEQ==}
+
   http-errors@2.0.1:
     resolution: {integrity: sha512-4FbRdAX+bSdmo4AUFuS0WNiPz8NgFt+r8ThgNWmlrjQjt1Q7ZR9+zTlce2859x4KSXrwIsaeTqDoKQmtP8pLmQ==}
     engines: {node: '>= 0.8'}
@@ -4077,6 +4087,9 @@ packages:
     peerDependencies:
       postcss: ^8.5.26
 
+  postcss-media-query-parser@0.2.3:
+    resolution: {integrity: sha512-3sOlxmbKcSHMjlUXQZKQ06jOswE7oVkXPxmZdoB1r5l0q6gTFTQSHxNxOrCccElbW7dxNytifNEo8qidX2Vsig==}
+
   postcss-merge-longhand@8.0.4:
     resolution: {integrity: sha512-ammolHhMvuTz/L9YN/ge1SWbUDcD3Y9o2gXlo3S6H4MCJHheyVPwcI/LAnSuNT4gcUmSF9pNTXo7+3M/2MFPAQ==}
     engines: {node: ^22.11.0 || ^24.11.0 || >=26.0}
@@ -4184,6 +4197,12 @@ packages:
     engines: {node: ^22.11.0 || ^24.11.0 || >=26.0}
     peerDependencies:
       postcss: ^8.5.26
+
+  postcss-safe-parser@7.0.1:
+    resolution: {integrity: sha512-0AioNCJZ2DPYz5ABT6bddIqlhgwhpHZ/l65YAYo0BCIn0xiDpsnTHz0gnoTGk0OXZW0JRs+cDwL8u/teRdz+8A==}
+    engines: {node: '>=18.0'}
+    peerDependencies:
+      postcss: ^8.4.31
 
   postcss-selector-parser@6.0.10:
     resolution: {integrity: sha512-IQ7TZdoaqbT+LCpShg46jnZVlhWD2w6iQYAcYXfHARZ7X1t/UGhhceQDs5X0cGqKvYlHNOuv7Oa1xmb0oQuA3w==}
@@ -7605,6 +7624,18 @@ snapshots:
 
   baseline-browser-mapping@2.11.20: {}
 
+  beasties@0.4.3:
+    dependencies:
+      css-select: 6.0.0
+      css-what: 7.0.0
+      dom-serializer: 2.0.0
+      domhandler: 5.0.3
+      htmlparser2: 10.1.0
+      picocolors: 1.1.1
+      postcss: 8.5.26
+      postcss-media-query-parser: 0.2.3
+      postcss-safe-parser: 7.0.1(postcss@8.5.26)
+
   bindings@1.5.0:
     dependencies:
       file-uri-to-path: 1.0.0
@@ -8811,6 +8842,13 @@ snapshots:
 
   html-entities@2.6.0: {}
 
+  htmlparser2@10.1.0:
+    dependencies:
+      domelementtype: 2.3.0
+      domhandler: 5.0.3
+      domutils: 3.2.2
+      entities: 7.0.1
+
   http-errors@2.0.1:
     dependencies:
       depd: 2.0.0
@@ -9892,6 +9930,8 @@ snapshots:
     dependencies:
       postcss: 8.5.26
 
+  postcss-media-query-parser@0.2.3: {}
+
   postcss-merge-longhand@8.0.4(postcss@8.5.26):
     dependencies:
       postcss: 8.5.26
@@ -9994,6 +10034,10 @@ snapshots:
     dependencies:
       postcss: 8.5.26
       postcss-value-parser: 4.2.0
+
+  postcss-safe-parser@7.0.1(postcss@8.5.26):
+    dependencies:
+      postcss: 8.5.26
 
   postcss-selector-parser@6.0.10:
     dependencies:
