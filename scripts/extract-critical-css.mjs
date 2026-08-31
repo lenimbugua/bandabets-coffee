@@ -285,6 +285,40 @@ function splitSelectorList(selectorText) {
   return selectors;
 }
 
+// Fix round 2: interaction-gated rules — `:hover`/`:active` and their
+// Tailwind `group-hover:`/`peer-hover:` variant forms — can only ever take
+// effect after a user starts interacting with the page, so they can never
+// affect first paint/LCP. Task 2's review measured keeping them as a
+// local LCP +220 ms / TBT +150 ms parse-cost regression (67 hover/
+// group-hover rule occurrences, inside a `@layer utilities` that was 84%
+// of the artifact's bytes) — pure dead weight the browser has to parse
+// before the deferred stylesheet even lands. `:focus`/`:focus-visible` are
+// deliberately NOT matched here: a keyboard user can tab into an
+// interactive element and needs its focus styling before the deferred
+// stylesheet arrives, unlike a mouse hover/click which can't happen until
+// the page is already interactive.
+//
+// Tailwind v4 compiles a hover/active/group-hover/peer-hover variant class
+// name with the variant's colon escaped in the class name itself (e.g.
+// `.hover\:bg-accent`, `.group-hover\:translate-x-0\.5`), followed by the
+// actual (unescaped) `:hover`/`:active` pseudo-class that gates it —
+// group-hover/peer-hover specifically compile to something like
+// `.group-hover\:X:is(:where(.group):hover *)`, which still contains a
+// literal, unescaped `:hover`. Checking for both the escaped
+// variant-prefix marker AND the bare pseudo-class (rather than either
+// alone) is redundant by construction against today's Tailwind output,
+// but keeps this robust to either shape changing independently in a
+// future Tailwind version.
+const INTERACTIVE_VARIANT_PREFIX_RE =
+  /\b(?:hover|active|group-hover|peer-hover)\\:/;
+const INTERACTIVE_PSEUDO_RE = /(?<!\\):(?:hover|active)\b/;
+function isInteractionOnlySelector(selector) {
+  return (
+    INTERACTIVE_VARIANT_PREFIX_RE.test(selector) ||
+    INTERACTIVE_PSEUDO_RE.test(selector)
+  );
+}
+
 // Recursively flattens an array of top-level chunks (as splitTopLevelRules
 // produces them) all the way down to leaf (single-selector){declarations}
 // units, each individually re-wrapped in the exact chain of at-rule
@@ -336,6 +370,13 @@ function flattenToLeafUnits(chunks) {
     }
     const declBlock = `{${body}}`;
     for (const selector of splitSelectorList(head)) {
+      // Fix round 2: drop hover/active-only selectors here — see the
+      // comment above isInteractionOnlySelector. Filtering at this single
+      // point (rather than after the union is built) automatically keeps
+      // both sides of every comparison in this file in sync: neither the
+      // per-route harvest nor entry.*.css's own ordering ever sees these
+      // selectors, so there's nothing to separately reconcile afterward.
+      if (isInteractionOnlySelector(selector)) continue;
       out.push(`${selector}${declBlock}`);
     }
   }
