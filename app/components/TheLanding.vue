@@ -6,7 +6,6 @@ import { useScrollToViewedMatch } from "@/composables/useScrollToViewedMatch";
 import { useCasinoStore } from "@/stores/casino";
 import { storeToRefs } from "pinia";
 import TopGames from "@/components/mobile/TopGames.vue";
-import GamesRow from "@/components/mobile/GamesRow.vue";
 // Must be imported explicitly. `Lazy` is a reserved Nuxt prefix, so a bare
 // <LazyInfinityScroll> tag is parsed as "lazy-load a component named
 // InfinityScroll" — which does not exist — and Vue renders nothing. That
@@ -81,10 +80,12 @@ const otherCategories = computed(() => {
         <!-- Hot Games headline (mirrors mobile) -->
         <TopGames />
 
-        <!-- Remaining API categories -->
-        <GamesRow
+        <!-- Remaining API categories: below the fold on desktop, deferred
+             until scrolled into view. -->
+        <LazyGamesRow
           v-for="cat in otherCategories"
           :key="cat.id"
+          hydrate-on-visible
           :title="cat.name"
           :games="cat.games"
           :view-all-route="casinoHomeRoute(cat.slug)"

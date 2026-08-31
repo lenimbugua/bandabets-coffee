@@ -21,6 +21,21 @@ export function useScrollToSelected(selectedId, options = {}) {
     const el = elementRefs.value[id];
     if (!el) return;
 
+    // scrollIntoView() always forces a synchronous layout pass, even when the
+    // element is already fully in view (the common case: the default/first
+    // tab on initial mount). A single batched read of el + its scroll
+    // container lets us skip that call entirely in the no-op case — this is
+    // the forced-reflow source at el.scrollIntoView() called from mount,
+    // traced via Lighthouse's forced-reflow-insight to this composable.
+    const container = el.parentElement;
+    if (container) {
+      const elRect = el.getBoundingClientRect();
+      const containerRect = container.getBoundingClientRect();
+      const alreadyVisible =
+        elRect.left >= containerRect.left && elRect.right <= containerRect.right;
+      if (alreadyVisible) return;
+    }
+
     el.scrollIntoView({
       behavior,
       inline,

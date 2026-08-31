@@ -2,7 +2,6 @@
 import { computed, onMounted } from "vue";
 import { storeToRefs } from "pinia";
 import { useCasinoStore } from "@/stores/casino";
-import GamesRow from "@/components/mobile/GamesRow.vue";
 import QuickAccessBar from "@/components/mobile/QuickAccessBar.vue";
 import HotTabsSection from "@/components/mobile/HotTabsSection.vue";
 // FREEBET DISABLED — restore later
@@ -57,9 +56,12 @@ const otherCategories = computed(() => {
       <!-- Hot tabs: Live / Codes / Top Games (absorbs the old TopGames strip) -->
       <HotTabsSection />
 
-      <GamesRow
+      <!-- Below the fold at 412x915 (measured): remaining casino category
+           strips, deferred until scrolled into view. -->
+      <LazyGamesRow
         v-for="cat in otherCategories"
         :key="cat.id"
+        hydrate-on-visible
         :title="cat.name"
         :games="cat.games"
         :view-all-route="casinoHomeRoute(cat.slug)"
