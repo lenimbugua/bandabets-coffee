@@ -1332,27 +1332,8 @@
   animation: glow-pulse 4s ease-in-out infinite;
 }
 
-/* Swiper pagination overrides */
 :root {
   --viewport-height: 100vh;
-
-  --swiper-theme-color: var(--primary);
-  --swiper-pagination-color: var(--primary);
-  --swiper-pagination-left: auto;
-  --swiper-pagination-right: 8px;
-  --swiper-pagination-bottom: -3px;
-  --swiper-pagination-top: auto;
-  --swiper-pagination-fraction-color: inherit;
-  --swiper-pagination-progressbar-bg-color: var(--surface-interactive);
-  --swiper-pagination-progressbar-size: 4px;
-  --swiper-pagination-bullet-size: 8px;
-  --swiper-pagination-bullet-width: 8px;
-  --swiper-pagination-bullet-height: 8px;
-  --swiper-pagination-bullet-inactive-color: var(--muted-foreground);
-  --swiper-pagination-bullet-inactive-opacity: 0.25;
-  --swiper-pagination-bullet-opacity: 1;
-  --swiper-pagination-bullet-horizontal-gap: 4px;
-  --swiper-pagination-bullet-vertical-gap: 6px;
 }
 
 @supports (height: 100dvh) {
@@ -1400,6 +1381,31 @@
   .app-toast-leave-active {
     transition: none;
   }
+}
+
+/* Native carousel (AppCarousel.vue) — 30 px gap matches the old Swiper spaceBetween */
+.app-carousel-track {
+  display: flex;
+  column-gap: 1.875rem;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  outline: none;
+}
+.app-carousel-track::-webkit-scrollbar {
+  display: none;
+}
+.app-carousel-track:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+.app-carousel-slide {
+  flex: 0 0 100%;
+  min-width: 0;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
 }
 
 /* Border utility classes */

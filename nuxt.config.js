@@ -712,7 +712,7 @@ export default defineNuxtConfig({
       // the CSS files of every shared chunk (measured: 12 component
       // <link>s present in the document after hydration on /, and modal
       // components opened client-side have their scoped rules). Non-.vue
-      // CSS (swiper-vue, useFlyToBetslip) is not inlined and keeps its
+      // CSS (useFlyToBetslip) is not inlined and keeps its
       // link, so it is never unstyled before hydration either.
       cssCodeSplit: true,
     },

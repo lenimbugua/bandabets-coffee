@@ -1,11 +1,9 @@
 <script setup>
-import "swiper/css";
-import { Autoplay, EffectFade, Navigation, Pagination } from "swiper/modules";
-import { Swiper, SwiperSlide } from "swiper/vue";
 import { onMounted, ref } from "vue";
+import AppCarousel from "../ui/AppCarousel.vue";
+import AppCarouselSlide from "../ui/AppCarouselSlide.vue";
 import TopEarners from "./TopEarners.vue";
 
-const modules = [Autoplay, EffectFade, Pagination, Navigation];
 const autoplayDelay = 10000;
 
 const loaderStyle = ref({
@@ -33,22 +31,21 @@ onMounted(() => {
 <template>
   <div class="w-full overflow-hidden mb-4">
     <div class="relative w-full h-32 md:h-48 rounded-xl overflow-hidden bg-card">
-      <swiper
-        :space-between="30"
-        :centered-slides="true"
-        :autoplay="{ delay: autoplayDelay, disableOnInteraction: false }"
-        :navigation="false"
-        :modules="modules"
+      <AppCarousel
+        :count="2"
+        :autoplay="autoplayDelay"
+        aria-label="Affiliate highlights"
         class="h-full"
-        @slide-change="startLoader"
+        track-class="h-full"
+        @change="startLoader"
       >
-        <swiper-slide>
+        <AppCarouselSlide class="h-full">
           <AffiliateCall />
-        </swiper-slide>
-        <swiper-slide>
+        </AppCarouselSlide>
+        <AppCarouselSlide class="h-full">
           <TopEarners />
-        </swiper-slide>
-      </swiper>
+        </AppCarouselSlide>
+      </AppCarousel>
 
       <!-- Progress bar -->
       <div class="absolute z-10 bottom-0 w-full">

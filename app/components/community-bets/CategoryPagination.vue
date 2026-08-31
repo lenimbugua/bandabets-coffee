@@ -1,34 +1,39 @@
 <script setup>
-import { useSwiper } from "swiper/vue";
-import { computed } from "vue";
+// Prev / counter / Next for an AppCarousel; must be rendered inside the
+// carousel's `controls` slot so inject() finds it.
+import { inject } from "vue";
 
-const swiper = useSwiper();
-const totalPages = computed(() => swiper?.value?.slides?.length || 0);
-const itsLastPage = computed(() => swiper.value.isEnd);
-const itsFirstPage = computed(() => swiper.value.isBeginning);
+const carousel = inject("app-carousel", null);
+if (!carousel) {
+  throw new Error("CategoryPagination must be used inside <AppCarousel>");
+}
 </script>
 
 <template>
   <div class="flex items-center justify-between pt-3">
     <button
-      :disabled="itsFirstPage"
-      :class="itsFirstPage ? 'opacity-30 cursor-not-allowed' : 'hover:text-brand-bright/80'"
+      type="button"
+      :disabled="carousel.isFirst"
+      :class="carousel.isFirst ? 'opacity-30 cursor-not-allowed' : 'hover:text-brand-bright/80'"
       class="flex items-center gap-0.5 text-xs font-medium text-brand-bright transition-colors"
-      @click="swiper.slidePrev()"
+      aria-label="Previous bet"
+      @click="carousel.prev()"
     >
       <Icon name="tabler:chevron-left" class="w-4 h-4" />
       Prev
     </button>
 
     <span class="text-xs text-muted-foreground tabular-nums">
-      {{ swiper.realIndex + 1 }} / {{ totalPages }}
+      {{ carousel.index + 1 }} / {{ carousel.count }}
     </span>
 
     <button
-      :disabled="itsLastPage"
-      :class="itsLastPage ? 'opacity-30 cursor-not-allowed' : 'hover:text-brand-bright/80'"
+      type="button"
+      :disabled="carousel.isLast"
+      :class="carousel.isLast ? 'opacity-30 cursor-not-allowed' : 'hover:text-brand-bright/80'"
       class="flex items-center gap-0.5 text-xs font-medium text-brand-bright transition-colors"
-      @click="swiper.slideNext()"
+      aria-label="Next bet"
+      @click="carousel.next()"
     >
       Next
       <Icon name="tabler:chevron-right" class="w-4 h-4" />

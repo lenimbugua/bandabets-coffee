@@ -1,14 +1,12 @@
 <script setup>
 import { useBookedBetsStore } from "@/stores/booked-bets";
 import { storeToRefs } from "pinia";
-import "swiper/css";
-import { Autoplay, Navigation } from "swiper/modules";
-import { Swiper, SwiperSlide } from "swiper/vue";
 import EmptyState from "../EmptyState.vue";
 import CategoryPagination from "./CategoryPagination.vue";
 import SelectionsCard from "./SelectionsCard.vue";
+import AppCarousel from "../ui/AppCarousel.vue";
+import AppCarouselSlide from "../ui/AppCarouselSlide.vue";
 
-const modules = [Autoplay, Navigation];
 const { bethub, pending } = storeToRefs(useBookedBetsStore());
 </script>
 
@@ -44,18 +42,14 @@ const { bethub, pending } = storeToRefs(useBookedBetsStore());
 
       <!-- Bet carousel -->
       <div class="p-3">
-        <swiper
-          :space-between="30"
-          :centered-slides="true"
-          :navigation="false"
-          :modules="modules"
-          class="mySwiper"
-        >
-          <swiper-slide v-for="bet in hub.bets" :key="bet.shareBet">
+        <AppCarousel :count="hub.bets.length" :aria-label="`${hub.categoryName} bets`">
+          <AppCarouselSlide v-for="bet in hub.bets" :key="bet.shareBet">
             <SelectionsCard :booking-code="bet.shareBet" :selections="bet.slip" />
-          </swiper-slide>
-          <CategoryPagination />
-        </swiper>
+          </AppCarouselSlide>
+          <template #controls>
+            <CategoryPagination />
+          </template>
+        </AppCarousel>
       </div>
     </div>
   </div>

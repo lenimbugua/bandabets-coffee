@@ -2,17 +2,14 @@
 import { useModalTypes } from "@/composables/useModalTypes";
 import { useModalStore } from "@/stores/modal";
 import { computed } from "vue";
-import "swiper/css";
-import "swiper/css/pagination";
-import { Autoplay, Navigation, Pagination } from "swiper/modules";
-import { Swiper, SwiperSlide } from "swiper/vue";
 import { useLoadCode } from "@/composables/useLoadCode";
 import { useBetslip } from "@/composables/useBetslip";
 import { useShareBetStore } from "@/stores/sharebet.js";
 import BookedSelection from "./BookedSelection.vue";
+import AppCarousel from "../ui/AppCarousel.vue";
+import AppCarouselSlide from "../ui/AppCarouselSlide.vue";
 
 const { setBookingCode } = useShareBetStore();
-const modules = [Autoplay, Navigation, Pagination];
 
 const props = defineProps({
   selections: { type: Array, required: true },
@@ -76,15 +73,8 @@ function openShare() {
       </div>
 
       <!-- Selections carousel -->
-      <swiper
-        :space-between="30"
-        :centered-slides="true"
-        :navigation="true"
-        :pagination="{ clickable: true }"
-        :modules="modules"
-        class="mySwiper"
-      >
-        <SwiperSlide v-for="(pair, index) in chunkedItems" :key="index">
+      <AppCarousel :count="chunkedItems.length" aria-label="Selections">
+        <AppCarouselSlide v-for="(pair, index) in chunkedItems" :key="index">
           <div
             class="bg-card cursor-pointer rounded-lg p-2.5 pb-4 space-y-2 border border-border/30"
             @click="addToBetslip"
@@ -96,8 +86,42 @@ function openShare() {
               :index="index * chunkSize + index2"
             />
           </div>
-        </SwiperSlide>
-      </swiper>
+        </AppCarouselSlide>
+        <template #controls="{ index: active, count, isFirst, isLast, prev, next, goTo }">
+          <template v-if="count > 1">
+            <button
+              type="button"
+              class="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1 rounded-full bg-card/90 border border-border p-1 text-foreground hover:text-brand-bright disabled:opacity-30 disabled:cursor-not-allowed"
+              :disabled="isFirst"
+              aria-label="Previous selections"
+              @click="prev()"
+            >
+              <Icon name="tabler:chevron-left" class="w-4 h-4" />
+            </button>
+            <button
+              type="button"
+              class="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1 rounded-full bg-card/90 border border-border p-1 text-foreground hover:text-brand-bright disabled:opacity-30 disabled:cursor-not-allowed"
+              :disabled="isLast"
+              aria-label="Next selections"
+              @click="next()"
+            >
+              <Icon name="tabler:chevron-right" class="w-4 h-4" />
+            </button>
+            <div class="flex justify-center gap-1.5 pt-2">
+              <button
+                v-for="i in count"
+                :key="i"
+                type="button"
+                class="h-1.5 rounded-full transition-all"
+                :class="i - 1 === active ? 'w-4 bg-brand-bright' : 'w-1.5 bg-muted-foreground/40 hover:bg-muted-foreground'"
+                :aria-label="`Go to selections ${i} of ${count}`"
+                :aria-current="i - 1 === active ? 'true' : undefined"
+                @click="goTo(i - 1)"
+              ></button>
+            </div>
+          </template>
+        </template>
+      </AppCarousel>
 
       <!-- Actions: Share + Add -->
       <div class="flex items-center justify-between py-2.5">
