@@ -32,12 +32,39 @@ const cases = [
   // loss on adversarial malformed input, not a sanitizer bug. See
   // task-3-report.md for the stress-test cases.
   ["escapes quotes in attribute values", `<a href="https://x" title='"><img src=x onerror=1>'>l</a>`, '<a href="https://x" title=""><img src="">\'>l</a>'],
+  ["escapes a literal quote inside a quoted attribute", `<a href='https://x' title='a"b'>l</a>`, '<a href="https://x" title="a&quot;b">l</a>'],
   ["lowercases tags and drops unknown attrs", '<P CLASS="x" ID="y">t</P>', "<p>t</p>"],
   ["keeps table structure", '<table><tr><td colspan="2">c</td></tr></table>', '<table><tr><td colspan="2">c</td></tr></table>'],
   ["drops comments", "<!-- hi --><p>t</p>", "<p>t</p>"],
   ["empty string", "", ""],
   ["null", null, ""],
   ["undefined", undefined, ""],
+  // Fails closed on pathological input: 5000 levels of nesting overflows
+  // ultrahtml's recursive parse/walk/render call stack (RangeError).
+  // sanitizeHtml must catch that and return "" rather than let it 500 the
+  // SSR render.
+  ["fails closed on deeply nested input", "<div>".repeat(5000) + "x" + "</div>".repeat(5000), ""],
+
+  // --- CRITICAL security regression: entity-encoded/obfuscated URL
+  // schemes must be decoded before the safety check, not after. ultrahtml
+  // stores attribute values verbatim (no entity decoding) and escapeAttr
+  // never touched "&", so a naive check on the raw text was fail-open -
+  // the browser decodes what the sanitizer never looked at. Every case
+  // below must drop the href entirely.
+  ["rejects decimal-encoded javascript: (semicolon)", '<a href="&#106;avascript:alert(1)">x</a>', "<a>x</a>"],
+  ["rejects hex-encoded javascript: (semicolon)", '<a href="&#x6A;avascript:alert(1)">x</a>', "<a>x</a>"],
+  ["rejects zero-padded decimal javascript:", '<a href="&#0000106;avascript:alert(1)">x</a>', "<a>x</a>"],
+  ["rejects decimal-encoded javascript: (no semicolon)", '<a href="&#106avascript:alert(1)">x</a>', "<a>x</a>"],
+  ["rejects decimal-encoded colon in javascript:", '<a href="javascript&#58;alert(1)">x</a>', "<a>x</a>"],
+  ["rejects named colon entity in javascript:", '<a href="javascript&colon;alert(1)">x</a>', "<a>x</a>"],
+  ["rejects &Tab; hidden in javascript:", '<a href="java&Tab;script:alert(1)">x</a>', "<a>x</a>"],
+  ["rejects &NewLine; hidden in javascript:", '<a href="java&NewLine;script:alert(1)">x</a>', "<a>x</a>"],
+  ["rejects decimal tab hidden in javascript:", '<a href="java&#9;script:alert(1)">x</a>', "<a>x</a>"],
+  ["rejects decimal-encoded vbscript:", '<a href="&#118;bscript:msgbox(1)">x</a>', "<a>x</a>"],
+  ["rejects decimal-encoded data:", '<a href="&#100;ata:text/html;base64,x">x</a>', "<a>x</a>"],
+  ["rejects decimal-encoded protocol-relative", '<a href="&#47;/evil.example/x">x</a>', "<a>x</a>"],
+  ["rejects backslash-backslash protocol-relative", '<a href="\\\\evil.example/x">x</a>', "<a>x</a>"],
+  ["rejects slash-backslash protocol-relative", '<a href="/\\evil.example/x">x</a>', "<a>x</a>"],
 ];
 
 let failed = 0;
