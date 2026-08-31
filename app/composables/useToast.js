@@ -5,6 +5,7 @@
 import { reactive } from "vue";
 
 export const TOAST_DURATION_MS = 4000;
+// SSR-safe only because pushToast() never mutates this on the server (the import.meta.server guard lives there).
 export const toasts = reactive([]);
 let seq = 0;
 

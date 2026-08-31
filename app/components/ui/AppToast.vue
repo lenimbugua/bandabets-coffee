@@ -26,6 +26,11 @@ let timer = null;
 let startedAt = 0;
 let remaining = props.toast.duration;
 const running = ref(false);
+// Hover and focus are independent input sources that can overlap (e.g. tab
+// to the dismiss button while the pointer is still over the toast); only
+// resume the timer once neither is engaging the toast.
+let hovered = false;
+let focused = false;
 
 function start() {
   if (timer || remaining <= 0) return;
@@ -40,6 +45,25 @@ function pause() {
   remaining -= performance.now() - startedAt;
   running.value = false;
 }
+function resumeIfIdle() {
+  if (!hovered && !focused) start();
+}
+function onHoverStart() {
+  hovered = true;
+  pause();
+}
+function onHoverEnd() {
+  hovered = false;
+  resumeIfIdle();
+}
+function onFocusStart() {
+  focused = true;
+  pause();
+}
+function onFocusEnd() {
+  focused = false;
+  resumeIfIdle();
+}
 
 onMounted(start);
 onBeforeUnmount(() => {
@@ -51,10 +75,10 @@ onBeforeUnmount(() => {
   <div
     class="app-toast pointer-events-auto relative flex w-full items-start gap-2.5 overflow-hidden rounded-lg border border-border-strong bg-card px-3 py-2.5 text-card-foreground elevation-3"
     :class="toast.kind === 'error' ? 'text-destructive' : ''"
-    @mouseenter="pause"
-    @mouseleave="start"
-    @focusin="pause"
-    @focusout="start"
+    @mouseenter="onHoverStart"
+    @mouseleave="onHoverEnd"
+    @focusin="onFocusStart"
+    @focusout="onFocusEnd"
   >
     <Icon
       :name="ICONS[toast.kind] ?? ICONS.info"
