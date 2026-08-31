@@ -1,11 +1,31 @@
 import { fileURLToPath } from "node:url";
 import { basename, join, sep } from "node:path";
 import { readdirSync, existsSync, readFileSync } from "node:fs";
+import { createHash } from "node:crypto";
 import tailwindcss from "@tailwindcss/vite";
 
 const phase2PlaceholderFile = fileURLToPath(
   new URL("./app/components/PhaseTwoPlaceholder.vue", import.meta.url),
 );
+
+// Lighthouse round 7, Task 2 fix round 1: public/css/noncritical.css (the
+// defer-noncritical stylesheet — see the app.head.link entry below) is
+// served as a plain, unhashed static file, so an edit to its bytes with no
+// filename change would otherwise serve stale cached content indefinitely.
+// A short content hash, computed once here at config-evaluation time and
+// appended as `?v=<hash>` to every href referencing the file, changes
+// whenever the file's bytes change — busting any browser/CDN cache pinned
+// to the old query string. Guarded so a missing file (a from-scratch
+// checkout before the first build, or the file being deleted) can't crash
+// config evaluation; falls back to a fixed string so the link still works,
+// just without cache-busting until the file exists.
+const noncriticalCssPath = fileURLToPath(
+  new URL("./public/css/noncritical.css", import.meta.url),
+);
+const noncriticalCssHash = existsSync(noncriticalCssPath)
+  ? createHash("md5").update(readFileSync(noncriticalCssPath)).digest("hex").slice(0, 8)
+  : "dev";
+const noncriticalCssHref = `/css/noncritical.css?v=${noncriticalCssHash}`;
 
 // Lighthouse round 6: directory the client build writes its CSS chunks to,
 // used by the build:manifest hook's content-based scoped-CSS check below.
@@ -707,14 +727,14 @@ export default defineNuxtConfig({
         // custom properties already defined by the critical stylesheet.
         {
           rel: "stylesheet",
-          href: "/css/noncritical.css",
+          href: noncriticalCssHref,
           media: "print",
           onload: "this.media='all'",
         },
       ],
       noscript: [
         {
-          innerHTML: '<link rel="stylesheet" href="/css/noncritical.css">',
+          innerHTML: `<link rel="stylesheet" href="${noncriticalCssHref}">`,
         },
       ],
     },

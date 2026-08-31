@@ -1236,9 +1236,50 @@
   border: 1px solid var(--border);
 }
 
+/* Native carousel (AppCarousel.vue) — 30 px gap matches the old Swiper
+   spaceBetween. Fix round 1 (Lighthouse round 7, Task 2 review): this is
+   STRUCTURAL layout CSS, not decorative — .app-carousel-track sets
+   display:flex and .app-carousel-slide sets flex-basis, and both render at
+   load on two of the four gated routes (BookedBetsCategory's AppCarousel
+   on /share-bets' default happy path — bethub seeds from hardcoded
+   categories, the local check only saw the empty state; AffiliateSwiper on
+   authenticated /join-affiliate, unconditional). Deferring these caused a
+   real layout flash (slides stack full-width until the deferred sheet
+   swaps in), so they stay render-blocking here instead of in
+   public/css/noncritical.css. */
+.app-carousel-track {
+  display: flex;
+  column-gap: 1.875rem;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  outline: none;
+}
+.app-carousel-track::-webkit-scrollbar {
+  display: none;
+}
+.app-carousel-track:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+.app-carousel-slide {
+  flex: 0 0 100%;
+  min-width: 0;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+}
+
 /* Everything below this rule through the end of the file (glass surfaces,
    card/CTA hover states, bonus-page background pattern + float/glow
-   animations, iframe-embed sizing tokens, native toast, native carousel,
-   border utilities, #egamings_container, .pulse, and their keyframes) moved
-   to public/css/noncritical.css — see nuxt.config.js's app.head.link for
-   the media="print" defer swap. Lighthouse round 7, Task 2. */
+   animations, iframe-embed sizing tokens, native toast, border utilities,
+   #egamings_container, .pulse, and their keyframes) is deferred to
+   public/css/noncritical.css — see nuxt.config.js's app.head.link for the
+   media="print" defer swap. Lighthouse round 7, Task 2. Toast CSS
+   (.app-toast-*) stays deferred deliberately even though it's also
+   interactive-state CSS like the moved hover/glow rules: toasts are
+   user/event-triggered (never present at first paint), so any flash there
+   is invisible in practice — reviewed and accepted as a Minor tradeoff in
+   the round-7 Task 2 fix-round-1 review, unlike the carousel's load-time
+   layout flash above. */

@@ -10,23 +10,41 @@
 
    Selection criterion: every rule here is decorative/interactive-state CSS
    (hover/active transitions, background patterns, keyframe animations,
-   iframe-embed sizing, toast/carousel chrome) that (a) does not affect
-   static layout — nothing here sets display/position/width/height needed
-   for the initial box model except iframe-container/the-iframe, which are
-   casino/virtual/aviator-embed-only and never rendered on the four gated
-   routes (/, /share-bets, /join-affiliate, /casino-home's SSR shell) — and
-   (b) was verified absent from the server-rendered HTML of all four gated
-   routes (curl + grep, Lighthouse round 7 Task 2 measurement). Moving it
-   here cannot cause FOUC on those routes; any other route using these
-   classes gets them within one async stylesheet fetch after first paint,
-   the same tradeoff round 4's single-stylesheet consolidation already
-   accepted for component CSS.
+   iframe-embed sizing, toast chrome) that (a) does not affect static
+   layout — nothing here sets display/flex-basis/width/height needed for
+   the INITIAL box model of any element present at first paint on the four
+   gated routes (/, /share-bets, /join-affiliate, /casino-home). (b) was
+   verified absent from the server-rendered HTML of all four gated routes
+   (curl + grep, Lighthouse round 7 Task 2 measurement), or — for
+   iframe-container/the-iframe — is casino/virtual/aviator-embed-only and
+   never rendered on any of the four. Moving it here cannot cause FOUC on
+   those routes; any other route using these classes gets them within one
+   async stylesheet fetch after first paint, the same tradeoff round 4's
+   single-stylesheet consolidation already accepted for component CSS.
+
+   Fix round 1 (review): .app-carousel-track/.app-carousel-slide were
+   pulled BACK OUT of this file into the render-blocking app/assets/css/
+   style.css — they set display:flex/flex-basis (structural layout, not
+   decoration) and render at load on /share-bets (BookedBetsCategory's
+   AppCarousel, default happy path) and authenticated /join-affiliate
+   (AffiliateSwiper, unconditional), so deferring them caused a real
+   layout flash (slides stacking full-width pre-swap). .app-toast-* stays
+   here deliberately — also interactive-state CSS, but toasts are
+   user/event-triggered and never present at first paint, so any flash
+   there is invisible in practice (reviewed and accepted as Minor).
 
    Never moved: @theme/@utility Tailwind directives, the `highlight` keyframe
    (referenced by the --animate-highlight-fade theme token) and the
    `shimmer` keyframe (referenced by the animate-shimmer @utility) — both
    are design-system layer 2/3 and stay in style.css per the brief's "never
    token layers" rule.
+
+   Cache-busting: served as a static, unhashed public/ file with no build
+   step, so nuxt.config.js appends a `?v=<content-hash>` query string
+   (computed from this file's own bytes at config-evaluation time) to every
+   href that references it — a future edit to this file changes the hash,
+   which changes the URL, which busts any cache (browser or CDN) that
+   pinned the old bytes under the old, otherwise-unchanging filename.
    ========================================================================= */
 
 /* Glass surfaces */
@@ -160,31 +178,6 @@
   .app-toast-leave-active {
     transition: none;
   }
-}
-
-/* Native carousel (AppCarousel.vue) — 30 px gap matches the old Swiper spaceBetween */
-.app-carousel-track {
-  display: flex;
-  column-gap: 1.875rem;
-  overflow-x: auto;
-  overscroll-behavior-x: contain;
-  scroll-snap-type: x mandatory;
-  scrollbar-width: none;
-  -webkit-overflow-scrolling: touch;
-  outline: none;
-}
-.app-carousel-track::-webkit-scrollbar {
-  display: none;
-}
-.app-carousel-track:focus-visible {
-  outline: 2px solid var(--ring);
-  outline-offset: 2px;
-}
-.app-carousel-slide {
-  flex: 0 0 100%;
-  min-width: 0;
-  scroll-snap-align: start;
-  scroll-snap-stop: always;
 }
 
 /* Border utility classes */
