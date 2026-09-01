@@ -150,7 +150,7 @@ const isOpened = ref(false);
             /> -->
             <TheButton
               v-for="outcome in filterBySubTypeId(match?.markets).matchOutcomes"
-              :key="outcome.id"
+              :key="`${outcome.marketId}-${outcome.outcomeId}`"
               :outcome="outcome"
               :season-id="match.homeTeam"
               :home-team="match.homeTeam"

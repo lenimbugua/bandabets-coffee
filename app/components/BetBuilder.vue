@@ -315,11 +315,11 @@ function getSpecifier(outcome) {
 
 <style scoped>
 .market-module {
-  border: 0.5px solid oklch(50% 0.03 258 / 0.12);
+  border: 0.5px solid color-mix(in oklch, var(--muted-foreground) 12%, transparent);
   box-shadow: 0 1px 2px oklch(0% 0 0 / 0.03);
 }
 [data-theme="dark"] .market-module {
-  border-color: oklch(60% 0.03 258 / 0.06);
+  border-color: color-mix(in oklch, var(--muted-foreground) 6%, transparent);
   box-shadow: none;
 }
 </style>

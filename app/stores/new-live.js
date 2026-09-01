@@ -64,21 +64,46 @@ export const useNewLiveStore = defineStore("new-live-store", {
 
     // Assume 'oldData' is what you currently have stored in your UI state
     // Assume 'newData' is the fresh JSON response from your polling request
-
+    //
+    // Polls must not reorder what the user is already looking at: rows that
+    // shuffle every refresh make the page jump around. Competitions (and the
+    // matches inside them) keep their current position and only get fresh
+    // data; genuinely new ones append at the bottom. Server ordering is
+    // adopted only on explicit loads (getLiveMatches), not on polls.
     updateDataAndMaintainState(oldData, newData) {
-      return newData.map((newComp) => {
-        // 1. Find the matching competition in your existing state
-        const existingComp = oldData.find(
-          (c) => c.competitionId === newComp.competitionId
-        );
+      const freshById = new Map(
+        newData.map((comp) => [comp.competitionId, comp])
+      );
+      const merged = [];
+      for (const oldComp of oldData) {
+        const fresh = freshById.get(oldComp.competitionId);
+        if (!fresh) continue; // competition no longer live
+        freshById.delete(oldComp.competitionId);
+        merged.push({
+          ...fresh,
+          matches: this.maintainMatchOrder(oldComp.matches, fresh.matches),
+          isOpened: oldComp.isOpened,
+        });
+      }
+      for (const fresh of freshById.values()) {
+        merged.push({ ...fresh, isOpened: false });
+      }
+      return merged;
+    },
 
-        // 2. Return the new data, but inject the 'isOpened' value from the old state
-        return {
-          ...newComp,
-          // If it existed before, keep its state. Otherwise, default to false.
-          isOpened: existingComp ? existingComp.isOpened : false,
-        };
-      });
+    maintainMatchOrder(oldMatches, newMatches) {
+      const freshById = new Map(
+        (newMatches || []).map((match) => [match.parentMatchId, match])
+      );
+      const ordered = [];
+      for (const oldMatch of oldMatches || []) {
+        const fresh = freshById.get(oldMatch.parentMatchId);
+        if (!fresh) continue; // match ended
+        freshById.delete(oldMatch.parentMatchId);
+        ordered.push(fresh);
+      }
+      ordered.push(...freshById.values());
+      return ordered;
     },
 
     setSport(sport) {

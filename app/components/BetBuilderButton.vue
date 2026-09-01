@@ -244,19 +244,19 @@ function outcomeIsLocked() {
 
 <style scoped>
 .odds-btn {
-  background: oklch(94% 0.01 255 / 0.5);
-  border: 0.5px solid oklch(50% 0.03 258 / 0.08);
+  background: color-mix(in oklch, var(--surface-sunken) 50%, transparent);
+  border: 0.5px solid color-mix(in oklch, var(--muted-foreground) 8%, transparent);
 }
 [data-theme="dark"] .odds-btn {
-  background: oklch(30% 0.045 258 / 0.6);
-  border-color: oklch(45% 0.04 258 / 0.3);
+  background: color-mix(in oklch, var(--surface-interactive) 60%, transparent);
+  border-color: color-mix(in oklch, var(--border) 30%, transparent);
 }
 .odds-btn:hover {
-  background: oklch(92% 0.01 255 / 0.6);
+  background: color-mix(in oklch, var(--surface-sunken) 70%, transparent);
   box-shadow: 0 1px 4px oklch(0% 0 0 / 0.04);
 }
 [data-theme="dark"] .odds-btn:hover {
-  background: oklch(33% 0.045 258 / 0.7);
+  background: color-mix(in oklch, var(--surface-interactive) 70%, transparent);
   box-shadow: 0 2px 8px oklch(0% 0 0 / 0.15);
 }
 

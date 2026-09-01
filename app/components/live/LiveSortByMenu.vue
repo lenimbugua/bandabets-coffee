@@ -60,16 +60,16 @@ const getMatches = (sortBy) => {
    elements inside the child: `:deep()` for the light rules, `:global()` for the
    `[data-theme="dark"]` ancestor rules (the html element carries no scope id). */
 :deep(.sort-btn) {
-  background: oklch(96% 0.005 258 / 0.6);
+  background: color-mix(in oklch, var(--surface-sunken) 60%, transparent);
 }
 :global([data-theme="dark"] .sort-btn) {
-  background: oklch(26% 0.04 258 / 0.5);
+  background: color-mix(in oklch, var(--surface-interactive) 50%, transparent);
 }
 :deep(.sort-btn:hover) {
-  background: oklch(93% 0.005 258 / 0.7);
+  background: color-mix(in oklch, var(--surface-sunken) 80%, transparent);
 }
 :global([data-theme="dark"] .sort-btn:hover) {
-  background: oklch(29% 0.04 258 / 0.6);
+  background: color-mix(in oklch, var(--surface-interactive) 60%, transparent);
 }
 
 :deep(.sort-dropdown) {

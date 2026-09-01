@@ -172,10 +172,10 @@ function teamAbbr(name) {
 }
 
 .score-frame {
-  background: oklch(97% 0.005 258 / 0.6);
+  background: color-mix(in oklch, var(--surface-sunken) 60%, transparent);
 }
 [data-theme="dark"] .score-frame {
-  background: oklch(20% 0.04 258 / 0.5);
+  background: color-mix(in oklch, var(--surface-sunken) 50%, transparent);
 }
 
 .team-badge {

@@ -4,7 +4,7 @@ import AppTabs from "@/components/ui/AppTabs.vue";
 import AppTab from "@/components/ui/AppTab.vue";
 import AppTabPanel from "@/components/ui/AppTabPanel.vue";
 import { useHead } from "@unhead/vue";
-import { computed, ref, toRefs } from "vue";
+import { computed, onUnmounted, ref, toRefs, watch } from "vue";
 import { onBeforeRouteLeave, useRoute } from "vue-router";
 import { useGeniusGameTracker } from "../composables/useGeniusGameTracker";
 import { useIconNames } from "../composables/useIconNames";
@@ -18,7 +18,12 @@ import MatchDetailsMatch from "./MatchDetailsMatch.vue";
 
 const route = useRoute();
 
-const matchId = route.params.id;
+// Reactive, not a one-shot read: navigating from one match's details to
+// another (betslip panel, search) stays on the same route record, so this
+// component is REUSED — setup does not re-run. A frozen matchId left the
+// old match's poll interval overwriting the store every tick, flipping the
+// page back to the previous match.
+const matchId = computed(() => route.params.id);
 
 // Batch E SSR-hazard fix (docs/superpowers/plans/2026-08-04-nuxt-migration-phase-2.md
 // §9): useRuntimeConfig() must sit at the top of setup, not below the
@@ -33,7 +38,7 @@ const pollFrequency = parseInt(config.livePollInterval)
 
 const { setMatchId } = useSportsQueryParamsStore();
 const { selectCompetitions } = useCompetionsStore();
-const { isGeniusGameTrackerSport } = useGeniusGameTracker(matchId);
+const { isGeniusGameTrackerSport } = useGeniusGameTracker(matchId.value);
 
 const { betBuilderIcon, solarDocumentTextBroken, statsIcon } = useIconNames();
 
@@ -118,14 +123,25 @@ useHead({
 // render never sees, so the markup serialised the empty `pending` state —
 // ssr:true bought nothing. Awaiting useAsyncData makes Nuxt wait for the
 // real fetch before finishing the server render.
-await useAsyncData(`match-details-${matchId}`, async () => {
+await useAsyncData(`match-details-${matchId.value}`, async () => {
   if (matchDetailIsLive.value) {
-    await pollMatchDetails(matchId);
+    await pollMatchDetails(matchId.value);
   } else {
-    console.log(matchId);
-    await fetchMatchDetails(matchId);
+    await fetchMatchDetails(matchId.value);
   }
   return true;
+});
+
+// Same-route navigation (details → details) reuses this component, so the
+// param change is the only signal a different match was requested. Covers
+// back/forward between two match URLs too, where goToMatchDetails never runs.
+watch(matchId, (id) => {
+  if (!id) return;
+  if (matchDetailIsLive.value) {
+    pollMatchDetails(id);
+  } else {
+    fetchMatchDetails(id);
+  }
 });
 
 // SSR-hazard fix: this setInterval used to run unconditionally at setup —
@@ -138,7 +154,7 @@ let intervalId = null;
 if (import.meta.client) {
   intervalId = setInterval(() => {
     if (matchDetails?.value?.isLiveCoverage) {
-      pollMatchDetails(matchId);
+      pollMatchDetails(matchId.value);
     }
   }, pollFrequency);
 }
@@ -147,6 +163,13 @@ onBeforeRouteLeave(() => {
   setMatchId("");
   clearInterval(intervalId);
   selectCompetitions([]);
+});
+
+// onBeforeRouteLeave never fires when only params change, and a keyed
+// remount would skip it entirely — clear on unmount too so no poll
+// interval can outlive the component.
+onUnmounted(() => {
+  clearInterval(intervalId);
 });
 </script>
 <template>
@@ -240,7 +263,7 @@ onBeforeRouteLeave(() => {
 }
 
 .header-bar {
-  background: oklch(99% 0.002 258 / 0.95);
+  background: color-mix(in oklch, var(--surface-elevated) 95%, transparent);
   backdrop-filter: blur(12px);
 }
 [data-theme="dark"] .header-bar {
@@ -249,7 +272,7 @@ onBeforeRouteLeave(() => {
 }
 
 .tab-idle {
-  background: oklch(96% 0.005 258 / 0.6);
+  background: color-mix(in oklch, var(--surface-sunken) 60%, transparent);
   box-shadow: 0 1px 2px oklch(0% 0 0 / 0.04);
 }
 [data-theme="dark"] .tab-idle {
@@ -257,7 +280,7 @@ onBeforeRouteLeave(() => {
   box-shadow: 0 1px 2px oklch(0% 0 0 / 0.12);
 }
 .tab-idle:hover {
-  background: oklch(93% 0.005 258 / 0.7);
+  background: color-mix(in oklch, var(--surface-sunken) 80%, transparent);
 }
 [data-theme="dark"] .tab-idle:hover {
   background: oklch(100% 0 0 / 0.1);

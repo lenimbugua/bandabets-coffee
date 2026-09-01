@@ -266,7 +266,7 @@ const getSportById = computed(() => {
     <div v-else-if="competitions" class="space-y-2.5">
       <div
         v-for="competition in competitions"
-        :key="competition.id"
+        :key="competition.competitionId"
         class="live-card rounded-xl overflow-hidden"
       >
         <!-- Competition header -->
@@ -454,7 +454,7 @@ const getSportById = computed(() => {
                 >
                   <TheButton2
                     v-for="outcome in match?.markets[0].matchOutcomes"
-                    :key="outcome.id"
+                    :key="`${outcome.marketId}-${outcome.outcomeId}`"
                     :outcome="outcome"
                     :season-id="match.homeTeam"
                     :home-team="match.homeTeam"
@@ -587,7 +587,7 @@ const getSportById = computed(() => {
 }
 
 .comp-header {
-  background: oklch(97% 0.005 258 / 0.8);
+  background: color-mix(in oklch, var(--surface-sunken) 80%, transparent);
 }
 [data-theme="dark"] .comp-header {
   background: oklch(100% 0 0 / 0.03);

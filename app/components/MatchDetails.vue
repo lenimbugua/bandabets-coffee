@@ -233,11 +233,8 @@ function marketHasSelection(market) {
 
 <style scoped>
 .filter-bar {
-  background: oklch(98% 0.005 258 / 0.9);
+  background: color-mix(in oklch, var(--card) 90%, transparent);
   backdrop-filter: blur(12px);
-}
-[data-theme="dark"] .filter-bar {
-  background: oklch(19% 0.055 258 / 0.9);
 }
 
 .market-card {
