@@ -77,15 +77,52 @@ const scrollLocked = ref(true);
 let lockTimer = null;
 
 function forceScrollTop() {
-  if (listEl.value) listEl.value.scrollTop = 0;
+  // Forced-reflow source (Lighthouse forced-reflow-insight, traced via
+  // sourcemap to this line): `el.scrollTop` read/write is a layout-forcing
+  // pair (the browser must resolve current layout to answer the read /
+  // clamp the write). Called at a point where the ~6,000-node desktop
+  // tree is mid-hydration, this used to force a full-tree synchronous
+  // layout every time — measured 700-980 dirty layout objects per call in
+  // a Lighthouse trace. Skipping the write once already pinned at 0 (same
+  // guard-before-write idiom as useScrollToSelectedSport's scrollIntoView
+  // guard) avoids the write's own layout invalidation carrying into the
+  // next call; scheduleForceScrollTop below is what caps how often this
+  // read/write pair runs at all and moves it off the synchronous
+  // mount/scroll-event call stack.
+  const el = listEl.value;
+  if (el && el.scrollTop !== 0) el.scrollTop = 0;
+}
+
+// Both the initial mount-time correction and every native 'scroll' event
+// during the lock window (a scroll gesture can fire many per animation
+// frame) used to call forceScrollTop() synchronously, mid-hydration —
+// each call a forced reflow of the still-mounting tree. Routing every
+// call through one rAF-scheduled slot per frame (a) coalesces N scroll
+// events down to at most 1 check per frame, and (b) moves the read/write
+// to a rAF boundary, a point the browser has already settled layout for
+// the frame rather than a random point mid-script during active DOM
+// mutation — both still run well before the next paint, so there is no
+// visible scroll jump.
+let scrollRafId = null;
+
+function scheduleForceScrollTop() {
+  if (scrollRafId !== null) return;
+  scrollRafId = requestAnimationFrame(() => {
+    scrollRafId = null;
+    if (scrollLocked.value) forceScrollTop();
+  });
 }
 
 function onScrollWhileLocked() {
-  if (scrollLocked.value) forceScrollTop();
+  if (scrollLocked.value) scheduleForceScrollTop();
 }
 
 function unlock() {
   scrollLocked.value = false;
+  if (scrollRafId !== null) {
+    cancelAnimationFrame(scrollRafId);
+    scrollRafId = null;
+  }
   if (listEl.value) listEl.value.removeEventListener("scroll", onScrollWhileLocked);
 }
 
@@ -95,7 +132,7 @@ function lockScroll(duration = 1200) {
 
   scrollLocked.value = true;
   clearTimeout(lockTimer);
-  forceScrollTop();
+  scheduleForceScrollTop();
 
   if (listEl.value) {
     listEl.value.addEventListener("scroll", onScrollWhileLocked);
