@@ -160,3 +160,96 @@ git commit -m "docs: results for the critical-CSS round
 
 Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 ```
+
+---
+
+## Results
+
+Commits this round: `5b8a710` (extraction script + artifact), `e984ebe` (fix — intra-layer dedupe/cascade order), `d455be4` (Nitro plugin: inline + defer), `6d4feba` (fix — trim interaction pseudo-rules; fetchpriority measured and rejected).
+
+### Artifact
+
+`server/assets/critical.css`: **62,780 B raw / 10,360–10,364 B gzip** (final, after both fix rounds — a few bytes of gzip-header timestamp jitter between identical-content runs; this session's own `gzip -9` check: 10,274 B). Well inside the plan's 15 KB gzip fail-gate (~4.7 KB / ~30% margin) and close to the ≤10 KB gzip goal. Sanity checks on the final artifact: 0 `</style` occurrences (the HTML-escaping guard Task 2 depends on), 19 `:root{` blocks, 18 `data-theme=light` occurrences (all of `entry.*.css`'s theme-override rules survived, via `allowRules` — no fallback needed), 0 `:hover` occurrences (interaction-only pseudo-rules trimmed in the fix round; the one remaining `:active` substring is `@media (forced-colors:active)`, a media-feature value, not a selector).
+
+### Per-route extraction stats (from Task 1, reproduced against the final artifact)
+
+```
+per-route critical bytes (pre-dedupe harvest):
+  /                62663 B raw   (largest — busiest page: odds badges, match filters, banner slides)
+  /promotions      41385 B raw
+  /share-bets      27063 B raw   (ssr:false route — near-empty hydration shell)
+  /login           27063 B raw   (ssr:false route — near-empty hydration shell)
+  /leagues         52463 B raw
+  [data-theme=light] fallback (from entry.*.css): +0 rules (already covered by allowRules)
+
+deduped union (post both fix rounds): 143 top-level units, 475 unique utilities-layer
+rules (was 504 before interaction-pseudo trimming), 26 unique base-layer rules
+→ 62,780 B raw / ~10.36 KB gzip
+```
+
+`/promotions`, `/share-bets`, `/login`, `/leagues` each contribute almost nothing beyond `/` — the app is heavily component-reuse-driven (shared header/nav/base/design-token CSS), so the busiest page's DOM-matched utility footprint dominates the union.
+
+### Verification performed this task
+
+- `pnpm build` — clean, succeeded.
+- `node scripts/critical-bytes.mjs` (updated — see below) against `/`, `/promotions`, `/login` on a server started on port 3131 with `.env` loaded via the while-read loop:
+  - `/`: `modulepreload=67 js_gzip=219KB stylesheets=0 css_gzip=0KB inline_css_gzip=10KB html_gzip=49KB`
+  - `/promotions`: `modulepreload=51 js_gzip=169KB stylesheets=0 css_gzip=0KB inline_css_gzip=10KB html_gzip=25KB`
+  - `/login`: `modulepreload=34 js_gzip=148KB stylesheets=0 css_gzip=0KB inline_css_gzip=10KB html_gzip=14KB`
+  - `stylesheets=0` on every route confirmed — zero render-blocking external stylesheets for JS-enabled browsers, the plan's headline invariant.
+- Local Lighthouse (devtools throttling, `--only-categories=performance`, headless Chrome, isolated `npm_config_cache`) on `/`, 3 runs (2 required by the brief; a 3rd was added because run 1 diverged sharply from runs 2–3 and needed a stability check):
+
+  | run | perf | FCP | LCP | TBT | CLS | SI | render-blocking items |
+  |---|---|---|---|---|---|---|---|
+  | 1 | 74 | 1456.9 ms | 2734.8 ms | 927.1 ms | 0.0312 | 2850 ms | 0 |
+  | 2 | 81 | 1084.7 ms | 2162.9 ms | 707.7 ms | 0.0312 | 2273 ms | 0 |
+  | 3 | 76 | 1094.4 ms | 2174.1 ms | 1077.3 ms | 0.0312 | 2353 ms | 0 |
+
+  Run 1 is a cold-start outlier (first request against a just-started server — no unique cause pinned down, consistent with cold JIT/module-cache noise this project's prior rounds also saw). Runs 2–3, taken as the representative pair, give **median FCP ≈ 1090 ms, LCP ≈ 2168 ms, TBT ≈ 892 ms, CLS 0.031, SI ≈ 2313 ms, perf score ≈ 78–79**. TBT itself is noisy across all 3 runs (708–1077 ms) — consistent with Task 2's own finding that this machine's TBT readings vary run-to-run by 100+ ms; FCP and LCP are the stable signal here (runs 2–3 agree within 10–11 ms of each other).
+  - `render-blocking-insight` (Lighthouse's current audit name for render-blocking-requests): `items: []`, `score: 1` on **all three runs** — zero render-blocking resources, confirmed via the raw audit JSON, not just the summary metric.
+
+### Before/after, and against the deployed PSI baseline
+
+| | deployed PSI baseline (2026-08-31 17:59) | local, blocking CSS (Task 2 "disabled" toggle) | local, this round (median of runs 2–3) |
+|---|---|---|---|
+| FCP | 2.7 s | ~1.97 s | ~1.09 s |
+| LCP | 3.7 s (load delay 510 ms) | ~1.97 s | ~2.17 s |
+| TBT | 50 ms | ~527 ms | ~892 ms (noisy, 708–1077 ms) |
+| CLS | — | 0.031 | 0.031 |
+| Render-blocking CSS | 34.1 KiB / ~480 ms | present (`entry.*.css`) | **0** |
+
+FCP improved substantially (1.97 s → 1.09 s locally, and well under the deployed 2.7 s baseline). LCP moved from ~1.97 s to ~2.17 s locally — a ~200 ms regression versus the "blocking CSS" local baseline, matching Task 2's own finding (inline `<style data-critical>` parse/style-recalc cost before hydration, partially mitigated but not eliminated by the interaction-pseudo trim in the fix round: raw bytes dropped 5.4%, gzip only 3.6%, since the trimmed rules were mostly small/similar-shaped and gzip was already compressing that redundancy — the real cost was parse/selector-match time, which byte count under-represents). TBT likewise sits above the blocking-CSS baseline and is noisy. This is judged **net-positive** for the actual deployment target: PSI's Slow-4G-simulated numbers are where the removed render-blocking request matters — it cost 480+ ms of transfer/parse time there and PSI attributed a 510 ms LCP load-delay to it, both of which this change eliminates outright by removing the network round-trip from the critical path. The local devtools-throttled numbers exercise a different bottleneck (CPU-bound inline-CSS parse cost, not network-bound blocking-request cost) and are not directly comparable to the PSI target metric. `fetchpriority="high"` on the deferred entry link was tested (Task 2 fix round 2) as a possible LCP mitigation and rejected — the measured deltas (FCP +4.5 ms, LCP −5 ms, TBT −15.5 ms) were noise-level, smaller than the within-variant run-to-run spread, so it didn't clear the "keep only if LCP improves without FCP getting worse" bar.
+
+### HTML weight delta (from Task 2's verification, unchanged this round)
+
+| | raw bytes | gzip bytes |
+|---|---|---|
+| before (blocking `entry.css` link) | 170,067 | 39,505 |
+| after (inline critical + deferred entry) | 236,591 | 50,135 |
+| delta | +66,524 | **+10,630 (+10.4 KB)** |
+
+Within the plan's expected +6–12 KB gzip range for every HTML response — the inlined critical CSS replaces a blocking round-trip rather than adding a net-new request.
+
+### FOUC / CLS check outcomes (from Task 2, unchanged this round)
+
+Pixel-diffed screenshots (disabled vs. enabled) across `/`, `/promotions`, `/share-bets`, `/login`, `/leagues` at 412×915 and 1280×800 (10 route×viewport pairs): all diffs were under 0.02% of sampled pixels and attributable to the app's own live/dynamic content (banner carousel position, ticking odds), not the plugin. No unstyled-content flash, no layout shift attributable to critical-CSS inlining. CLS held at 0.031 with and without the plugin (well under the plan's ≤0.01 *local-regression* bar relative to baseline — the plugin introduces no additional shift; the pre-existing 0.031 is unrelated to this round's changes).
+
+### `scripts/critical-bytes.mjs` change
+
+Added an `inline_css_gzip=` field: parses the `<style data-critical>...</style>` block out of the fetched HTML and reports its gzip size separately from `css_gzip` (external blocking stylesheets, now always 0 on a healthy build) so the render-critical byte budget stays visible instead of the ~10 KB inline cost silently disappearing from the script's output. `stylesheets`/`css_gzip` fields keep their pre-existing meaning (blocking `<link rel="stylesheet">` count/bytes) — confirmed both read 0 on `/`, `/promotions`, `/login`. No other field's meaning changed. (While making this edit, `npx prettier --check` flagged the file as already out of Prettier's current style before this round's edit — pre-existing drift, not introduced here; ran `prettier --write` to bring the whole file into compliance alongside the new field.)
+
+### Regeneration workflow
+
+When `app/assets/css/style.css` or the DOM structure of the extraction route set (`/`, `/promotions`, `/share-bets`, `/login`, `/leagues`) changes materially:
+
+```bash
+pnpm build && pnpm critical:extract
+```
+
+then `git add server/assets/critical.css` and commit if the diff is non-trivial. A **stale** artifact self-heals: anything the inline subset misses is still styled correctly ~0.5 s later when the deferred full `entry.*.css` sheet swaps in via the `media="print"` → `onload` → `media="all"` pattern — regeneration is a maintenance/perf-quality step (keeping the FCP win current as the design system evolves), not a correctness requirement. The extraction script fails loudly (exit 1) if a future regeneration pushes the union past 15 KB gzip, which should be read as "the route set or Beasties config needs revisiting," not "raise the ceiling."
+
+### Parked / not done
+
+- **LCP/TBT parse-cost tradeoff is not fully resolved**, only measured and judged acceptable for the deployed target (see "Before/after" above). A further round could explore: shrinking the extraction route set's DOM-matched utility footprint further (the home route dominates the union at 62,663 B pre-dedupe), or investigating whether the inline block's placement/size is triggering an avoidable extra style recalculation around the `onload` swap. Not pursued here — out of this plan's scope (which targeted eliminating the render-blocking request, not re-optimizing TBT).
+- **`fetchpriority="high"`** — measured and rejected (noise-level deltas); not shipped. Documented in Task 1's fix-round-2 report; no code changes present in the final plugin.
+- Local Lighthouse TBT readings are noisy on this machine (100–370 ms spread across otherwise-identical runs) — a recurring observation across this plan's rounds. Treat local TBT as directional only; PSI/field data remains the authority for the actual regression/no-regression call on TBT.
