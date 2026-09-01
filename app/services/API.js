@@ -16,8 +16,7 @@ export const affiliateApiBaseURL = "affiliateApiUrl";
 // Backend path prefixes. Base hosts come from runtime config above; these
 // are the fixed path segments appended to them. Change here, not per call.
 export const MATCHES_PATH = "/sportsbook/api/v3/matches";
-export const BET_PATH = "/api/lsport/bets";
-
+export const BET_PATH = "/api/v3/bets";
 // Round 7 (native Nuxt): the previous axios instance duplicated the ofetch
 // client Nuxt already ships. This adapter keeps axios's call shape —
 // `.get(url, { params, headers })`, `.post(url, body, { headers, auth })`,
@@ -33,10 +32,17 @@ function toAxiosLikeError(error) {
   // Callers also read err.status (axios mirrored the HTTP status onto the
   // error itself), so we mirror it here too.
   const response = error?.response
-    ? { data: error.data, status: error.status ?? error.response.status, headers: error.response.headers }
+    ? {
+        data: error.data,
+        status: error.status ?? error.response.status,
+        headers: error.response.headers,
+      }
     : undefined;
   const wrapped = new Error(
-    error?.data?.statusMessage || error?.data?.message || error?.message || "Request failed",
+    error?.data?.statusMessage ||
+      error?.data?.message ||
+      error?.message ||
+      "Request failed",
   );
   wrapped.response = response;
   wrapped.status = response?.status;

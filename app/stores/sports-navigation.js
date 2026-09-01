@@ -15,5 +15,15 @@ export const useSportsNavigationStore = defineStore("sports-navigation-store", {
     },
   },
 
-  persist: true,
+  // Cookie, not localStorage: selectedSportId decides which sport tab and
+  // quick-access icon render as active, so SSR must see it too or every
+  // hydration mismatches against the restored client state.
+  persist: {
+    storage: piniaPluginPersistedstate.cookies({
+      maxAge: 60 * 60 * 24 * 30,
+      sameSite: "lax",
+      secure: true,
+      path: "/",
+    }),
+  },
 });

@@ -19,9 +19,7 @@ function showIcon(name) {
   <div v-if="showIcon('soccer')">
     <svg
       xmlns="http://www.w3.org/2000/svg"
-      :class="iconCss"
-      class=""
-      viewBox="0 0 64 64"
+      :class="iconCss"      viewBox="0 0 64 64"
     >
       <!-- Icon from Emoji One (Colored) by Emoji One - https://creativecommons.org/licenses/by/4.0/ -->
       <circle cx="32" cy="32" r="29.3" fill="#fff" />
@@ -61,9 +59,7 @@ function showIcon(name) {
       :class="iconCss"
       viewBox="0 0 20 20"
       fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      class="sc-cQYgkQ hpKNgq"
-    >
+      xmlns="http://www.w3.org/2000/svg"    >
       <path
         fill-rule="evenodd"
         clip-rule="evenodd"
@@ -114,9 +110,7 @@ function showIcon(name) {
       :class="iconCss"
       viewBox="0 0 20 20"
       fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      class="sc-cnHmbd kIXIHH"
-    >
+      xmlns="http://www.w3.org/2000/svg"    >
       <path
         fill-rule="evenodd"
         clip-rule="evenodd"
@@ -133,9 +127,7 @@ function showIcon(name) {
       :class="iconCss"
       viewBox="0 0 20 20"
       fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      class="sc-jWULZn fqFwyG"
-    >
+      xmlns="http://www.w3.org/2000/svg"    >
       <path
         fill-rule="evenodd"
         clip-rule="evenodd"
@@ -152,9 +144,7 @@ function showIcon(name) {
       :class="iconCss"
       viewBox="0 0 20 20"
       fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      class="sc-erFXsz dnqszC"
-    >
+      xmlns="http://www.w3.org/2000/svg"    >
       <path
         fill-rule="evenodd"
         clip-rule="evenodd"
@@ -218,9 +208,7 @@ function showIcon(name) {
       viewBox="0 0 20 20"
       fill="none"
       :class="iconCss"
-      xmlns="http://www.w3.org/2000/svg"
-      class=""
-    >
+      xmlns="http://www.w3.org/2000/svg"    >
       <path
         fill-rule="evenodd"
         clip-rule="evenodd"
@@ -235,9 +223,7 @@ function showIcon(name) {
   <div v-if="showIcon('waterpolo')">
     <svg
       id="Capa_1"
-      :class="iconCss"
-      class=""
-      xmlns="http://www.w3.org/2000/svg"
+      :class="iconCss"      xmlns="http://www.w3.org/2000/svg"
       xmlns:xlink="http://www.w3.org/1999/xlink"
       version="1.1"
       viewBox="0 0 439.088 439.088"
@@ -328,9 +314,7 @@ function showIcon(name) {
       :class="iconCss"
       viewBox="0 0 20 20"
       fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-      class="sc-fBNLhH lmAPgl"
-    >
+      xmlns="http://www.w3.org/2000/svg"    >
       <path
         fill-rule="evenodd"
         clip-rule="evenodd"
@@ -346,9 +330,7 @@ function showIcon(name) {
     <svg
       xmlns="http://www.w3.org/2000/svg"
       fill="none"
-      viewBox="0 0 32 32"
-      class=""
-      :class="iconCss"
+      viewBox="0 0 32 32"      :class="iconCss"
     >
       <path
         stroke="currentColor"

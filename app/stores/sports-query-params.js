@@ -109,6 +109,15 @@ export const useSportsQueryParamsStore = defineStore(
       /** ---!  End set params section ---! */
     },
     persist: {
+      // Cookie, not localStorage: these values decide what the homepage
+      // renders (active layout tab, sport), so SSR must see them too or
+      // every hydration mismatches against the restored client state.
+      storage: piniaPluginPersistedstate.cookies({
+        maxAge: 60 * 60 * 24 * 30,
+        sameSite: "lax",
+        secure: true,
+        path: "/",
+      }),
       pick: ["sport", "layout", "liveSportId"],
     },
   }
