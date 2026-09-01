@@ -82,3 +82,22 @@
 - [ ] **Step 1:** Full build; local Lighthouse: desktop ×2 AND mobile ×2 on `/` (devtools throttling; desktop runs with `--preset=desktop`). Record per profile: perf, FCP/LCP/TBT/CLS/SI, layout-shift culprits (should exclude `sports-filter-card`), forced-reflow entries, and the banner rendition requested per profile (desktop `…-800.webp`, mobile `…-640.webp`). `node scripts/critical-bytes.mjs` line.
 - [ ] **Step 2:** Append `## Results`: PSI desktop baseline (CLS 0.145, TBT 1,210 ms, banner 960w/21 KiB) vs after; per-task outcomes incl. the actual CLS culprit found; parked items.
 - [ ] **Step 3:** Commit — `docs: results for the desktop CLS/TBT round` + trailer.
+
+## Results (2026-09-01, commits 586b141 · 0206669 · 4400138; measured locally, API unreachable — relative deltas are the signal)
+
+| Profile | perf | FCP | LCP | TBT | CLS | SI | banner |
+|---|---|---|---|---|---|---|---|
+| Desktop run 1 | 94 | 294 ms | 294 ms | 194 ms | **0.018** | 1124 ms | **-800.webp** |
+| Desktop run 2 | 93 | 263 ms | 263 ms | 206 ms | **0.014** | 1081 ms | **-800.webp** |
+| Mobile run 1 | 78 | 1165 ms | 2211 ms | 884 ms | 0.031 | 2360 ms | -640.webp |
+| Mobile run 2 | 78 | 1175 ms | 2199 ms | 896 ms | 0.031 | 2303 ms | -640.webp |
+
+Versus the driving PSI desktop report (2026-09-01 10:42): CLS **0.145 → 0.014–0.018** (target < 0.05 met with margin), banner 960w → 800w (the 21 KiB insight closed), TBT locally 194–206 ms (PSI's 1,210 ms is not locally reproducible — sandbox noise documented in the Task 2 report; the attributed forced-reflow site dropped 96 %, deployed PSI is the arbiter). Mobile is unchanged from its pre-round band (perf 74–81, CLS 0.031, 640w) — the mobile-invariant constraint held. `critical-bytes`: `modulepreload=65 js_gzip=219KB stylesheets=0 css_gzip=0KB inline_css_gzip=11KB html_gzip=49KB`.
+
+Per-task outcomes:
+- **Task 1 (586b141):** the PSI-blamed `sports-filter-card` shifts were NOT the skeleton-height hypothesis (falsified against compiled CSS). Actual culprits, all fixed by reserving space: the `hydrate-on-idle` banner popping in (~229 px — now an `aspect-[3/1]` reserved wrapper matching TheBanner's own slide ratio at every breakpoint), the TopGames casino hero (~210 px — skeleton gated on `gamesPending`, collapsing correctly on empty/error via the store's `finally`), and a duplicated 17-row skeleton in InfiniteScroll (desktop-only prop guard; mobile provably byte-identical).
+- **Task 2 (0206669):** sourcemapped attribution found one fixable app-code reflow — LazyInfinityScroll's scroll-lock writing `scrollTop` synchronously on every scroll event during the ~6,000-node desktop hydration window; now guard-before-write + rAF-batched (spec ordering keeps the lock airtight). Attributed reflow 36.8 → 1.48 ms (−96 %). The hydration-deferral audit found nothing left to defer (footer/SEO already lazy; hero content above the fold; GamesRow client-only).
+- **Task 3 (4400138):** 800w rendition added to the optimizer + srcset (9 committed WebPs); desktop slot 686 px → picks 800w, mobile 611 px → still 640w.
+
+Parked: LazyMobileGamesRow pop-in (data-dependent height, unrenderable locally — re-check desktop CLS on post-deploy PSI); Nuxt-internal hydrate-on-visible reflow (BWrfnNKR); PSI's 385 ms unattributed reflow bucket (trace sampling limitation); aggregate local TBT noise (API-unreachable sandbox).
+Note: Task 4's measurement agent was interrupted twice by machine sleep; the controller finished the Results from the agent's saved Lighthouse JSONs (scratchpad lh-out/).
