@@ -56,6 +56,7 @@ onBeforeUnmount(() => {
 
 <template>
   <div class="bg-white dark:bg-background">
+    <NuxtLoadingIndicator color="var(--primary)" :height="3" />
     <BrandSplash />
     <div :class="currentMode === 'casino' ? 'lg:flex' : ''">
       <CasinoSidebar v-if="currentMode === 'casino'" />

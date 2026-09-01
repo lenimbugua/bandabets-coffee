@@ -2,22 +2,11 @@ import { useMatchesStore } from "@/stores/matches";
 import { useModalStore } from "@/stores/modal";
 import { useSportsQueryParamsStore } from "@/stores/sports-query-params";
 import formatStuff from "@/utilities/format-stuff";
-import { storeToRefs } from "pinia";
 import { useScrollToViewedMatch } from "./useScrollToViewedMatch";
 
 const { slugify } = formatStuff();
 
 export function useMatchDetails() {
-  const { matchDetailIsLive } = storeToRefs(useMatchesStore());
-  const { fetchMatchDetails, pollMatchDetails } = useMatchesStore();
-  function performInitialFetch(matchId) {
-    if (matchDetailIsLive.value) {
-      pollMatchDetails(matchId);
-      return;
-    }
-    fetchMatchDetails(matchId);
-  }
-
   function goToMatchDetails(match, router, isLive) {
     const { saveScrolledPosition } = useScrollToViewedMatch();
     const { setMatchDetailIsLive } = useMatchesStore();
@@ -37,6 +26,10 @@ export function useMatchDetails() {
       setMatchDetailIsLive(false);
     }
     saveScrolledPosition();
+    // No fetch here: ViewMatch owns the data. Its useAsyncData covers a
+    // fresh mount and its matchId watcher covers same-route navigation, so
+    // fetching before the push only duplicated the request — and, for live
+    // matches, did it through the silent poll path with no pending state.
     router.push({
       name: "match-details",
       params: {
@@ -47,11 +40,9 @@ export function useMatchDetails() {
         id: match.parentMatchId,
       },
     });
-    performInitialFetch(match.parentMatchId);
   }
 
   return {
     goToMatchDetails,
-    performInitialFetch,
   };
 }

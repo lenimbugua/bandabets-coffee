@@ -78,7 +78,7 @@ const liveTabs = ref([
   },
 ]);
 
-const { matchDetails, matchDetailIsLive, pending } = toRefs(useMatchesStore());
+const { matchDetails, pending } = toRefs(useMatchesStore());
 
 const { pollMatchDetails, fetchMatchDetails } = useMatchesStore();
 
@@ -123,25 +123,30 @@ useHead({
 // render never sees, so the markup serialised the empty `pending` state —
 // ssr:true bought nothing. Awaiting useAsyncData makes Nuxt wait for the
 // real fetch before finishing the server render.
-await useAsyncData(`match-details-${matchId.value}`, async () => {
-  if (matchDetailIsLive.value) {
-    await pollMatchDetails(matchId.value);
-  } else {
+// lazy: on client-side navigation the route changes immediately and the
+// pending skeleton shows while the fetch runs — without it, Vue Router
+// suspends navigation on this await and the OLD page sits frozen until the
+// API responds, which reads as the app being slow. SSR is unaffected: the
+// server still fetches before rendering, so direct visits stay fully
+// rendered for SEO.
+// fetchMatchDetails (not pollMatchDetails) even for live matches: it sets
+// `pending`, which drives the skeleton; the poll variant is silent by design
+// and belongs only to the background interval below.
+await useAsyncData(
+  `match-details-${matchId.value}`,
+  async () => {
     await fetchMatchDetails(matchId.value);
-  }
-  return true;
-});
+    return true;
+  },
+  { lazy: true }
+);
 
 // Same-route navigation (details → details) reuses this component, so the
 // param change is the only signal a different match was requested. Covers
 // back/forward between two match URLs too, where goToMatchDetails never runs.
 watch(matchId, (id) => {
   if (!id) return;
-  if (matchDetailIsLive.value) {
-    pollMatchDetails(id);
-  } else {
-    fetchMatchDetails(id);
-  }
+  fetchMatchDetails(id);
 });
 
 // SSR-hazard fix: this setInterval used to run unconditionally at setup —
