@@ -22,8 +22,18 @@ defineProps({
       <main class="flex-1 min-w-0 max-w-[800px] 2xl:max-w-[1000px]">
         <!-- Main category nav now lives in the header (HeaderNavLinks) at lg+ -->
 
-        <!-- Banner (always shown on sports desktop) -->
-        <div class="my-3 rounded-xl overflow-hidden">
+        <!-- Banner (always shown on sports desktop). aspect-[3/1] matches
+             TheBanner's own slide ratio (its .banner-slide is 100% wide at
+             lg+, with an aspect-[3/1] button inside) so this box reserves
+             the banner's real height before the hydrate-on-idle component
+             mounts. Without it, the wrapper is 0px until idle fires,
+             pushing the secondary nav / hero / sports-filter-card down by
+             the banner's full height in one shot — confirmed via a
+             Lighthouse trace: a fixed ~210px-tall node (the hero's
+             TopGames section) and .sports-filter-card both moved down by
+             ~229px, matching the banner's measured ~229px rendered height,
+             at the exact moment it would have finished loading. -->
+        <div class="my-3 rounded-xl overflow-hidden aspect-[3/1]">
           <LazyTheBanner hydrate-on-idle />
         </div>
 
@@ -49,7 +59,7 @@ defineProps({
             />
 
             <!-- Match list -->
-            <InfiniteScroll />
+            <InfiniteScroll desktop />
           </div>
 
           <LazySEOMarkupContent hydrate-on-visible />
