@@ -428,7 +428,7 @@ const getSportById = computed(() => {
               <div class="w-[45%] shrink-0">
                 <div
                   v-if="
-                    !match?.markets[0].matchOutcomes?.length ||
+                    !match?.markets?.[0]?.matchOutcomes?.length ||
                     outcomeIsLocked(match?.markets[0]?.status)
                   "
                   :class="`grid-cols-${getMarketGridCols(match)}`"
@@ -453,7 +453,7 @@ const getSportById = computed(() => {
                   class="grid text-center items-center gap-1.5"
                 >
                   <TheButton2
-                    v-for="outcome in match?.markets[0].matchOutcomes"
+                    v-for="outcome in match?.markets?.[0]?.matchOutcomes"
                     :key="`${outcome.marketId}-${outcome.outcomeId}`"
                     :outcome="outcome"
                     :season-id="match.homeTeam"
