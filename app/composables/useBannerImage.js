@@ -12,7 +12,7 @@ export function useBannerImage() {
     }
 
     const base = jpgPath.replace(/\.jpg$/, "");
-    const srcset = [640, 960, 1280, 1600]
+    const srcset = [640, 800, 960, 1280, 1600]
       .map((width) => `${base}-${width}.webp ${width}w`)
       .join(", ");
 
