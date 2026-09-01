@@ -24,7 +24,7 @@ export const useCompetionsStore = defineStore("competions-store", {
         const { sport, day } = storeToRefs(useSportsQueryParamsStore());
 
         const response = await API().get(
-          `/sportsbook/api/v2/matches-grouped?sport=${
+          `/sportsbook/api/v3/matches-grouped?sport=${
             sport.value
           }&competition=${this.selectedCompetitions.join(",")}&day=${day.value}`
         );

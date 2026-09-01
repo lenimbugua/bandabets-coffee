@@ -437,15 +437,14 @@ const getSportById = computed(() => {
                   <button
                     v-for="i in getMarketGridCols(match)"
                     :key="'lock-' + i"
-                    class="flex flex-col justify-center items-center p-1 py-2 h-full rounded-md opacity-50 cursor-pointer"
-                    style="background: oklch(0% 0 0 / 0.05)"
+                    class="flex flex-col justify-center items-center p-1 py-2 h-full rounded-md shadow-md cursor-pointer bg-gray-300/70 dark:bg-surface-interactive"
                     @click="goToDetail(match)"
                   >
                     <span
-                      class="text-[0.6rem] leading-none mb-0.5 text-gray-400 dark:text-white/25"
+                      class="text-[0.6rem] leading-none mb-0.5 text-gray-500 dark:text-gray-50/40"
                       >—</span
                     >
-                    <Icon name="tabler:lock" class="w-3.5 h-3.5 text-gray-400 dark:text-white/30" aria-hidden="true" />
+                    <Icon name="tabler:lock" class="w-3.5 h-3.5 text-gray-500 dark:text-gray-50/50" aria-hidden="true" />
                   </button>
                 </div>
                 <div

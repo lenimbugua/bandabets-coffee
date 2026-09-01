@@ -94,7 +94,7 @@ export const useLiveMatchesStore = defineStore("live-matches-store", {
       try {
         this.previewPending = true;
         const response = await API().get(
-          `/sportsbook/api/v2/matches-grouped?sport=${sport}&competition=&sortBy=&day=&resource=live`
+          `/sportsbook/api/v3/matches-grouped?sport=${sport}&competition=&sortBy=&day=&resource=live`
         );
         this.previewMatches = response.data.data.competitions || [];
         this.previewPending = false;
@@ -107,7 +107,7 @@ export const useLiveMatchesStore = defineStore("live-matches-store", {
       try {
         this.highlightPending = true;
         const response = await API().get(
-          `/sportsbook/api/v2/matches-grouped?sport=${sport || SOCCER_SPORT_ID}&competition=&sortBy=&day=&resource=highlight`
+          `/sportsbook/api/v3/matches-grouped?sport=${sport || SOCCER_SPORT_ID}&competition=&sortBy=&day=&resource=highlight`
         );
         this.highlightMatches = response.data.data.competitions || [];
         this.highlightPending = false;

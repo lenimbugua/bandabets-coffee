@@ -25,7 +25,7 @@ export const useNewLiveStore = defineStore("new-live-store", {
         this.pending = true;
         this.responseOK = false;
         const response = await API().get(
-          `/sportsbook/api/v2/matches-grouped?sport=${this.sport}&competition=${this.competition}&sortBy=${this.sortBy}&day=&resource=live`
+          `/sportsbook/api/v3/matches-grouped?sport=${this.sport}&competition=${this.competition}&sortBy=${this.sortBy}&day=&resource=live`
         );
 
         this.competitions = response.data.data.competitions;
@@ -43,7 +43,7 @@ export const useNewLiveStore = defineStore("new-live-store", {
       try {
         this.responseOK = false;
         const response = await API().get(
-          `/sportsbook/api/v2/matches-grouped?sport=${this.sport}&competition=${this.competition}&sortBy=${this.sortBy}&day=&resource=live`
+          `/sportsbook/api/v3/matches-grouped?sport=${this.sport}&competition=${this.competition}&sortBy=${this.sortBy}&day=&resource=live`
         );
 
         const newCompetitions = response.data.data.competitions;
