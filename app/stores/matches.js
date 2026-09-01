@@ -15,6 +15,9 @@ export const useMatchesStore = defineStore("matches-store", {
     competitionIsPending: false,
 
     subtypePending: false,
+    // subTypeId currently being lazy-loaded, so only that market's row shows
+    // its loading state.
+    subtypeLoadingId: null,
 
     error: {
       hasError: false,
@@ -361,8 +364,8 @@ export const useMatchesStore = defineStore("matches-store", {
     },
 
     async fetchMatchDetails(id) {
-      const { resetToDefaults, setMatchId } = useSportsQueryParamsStore();
-      //   const { getParams } = storeToRefs(useSportsQueryParamsStore());
+      const queryParamsStore = useSportsQueryParamsStore();
+      const { resetToDefaults, setMatchId } = queryParamsStore;
 
       const endPoint = `${MATCHES_PATH}?sport=&page=0&pageSize=10&competition=&day=&sortBy=&hour=&country=&matchId=${id}&subTypeId=&resource=`;
       try {
@@ -370,10 +373,10 @@ export const useMatchesStore = defineStore("matches-store", {
         setMatchId(id);
         this.beforeAPICallState();
 
-        // const response = await API().get(MATCHES_PATH, {
-        //   params: getParams.value,
-        // });
         const response = await API().get(endPoint);
+
+        // Stale-response guard: a later navigation wins over this response.
+        if (String(queryParamsStore.matchId) !== String(id)) return;
 
         this.matchDetails = response.data.data.matchInfo;
         this.marketGroups = response.data.data.marketGroups;
@@ -399,8 +402,9 @@ export const useMatchesStore = defineStore("matches-store", {
       }
     },
     async pollMatchDetails(id) {
-      const { resetToDefaults, setMatchId } = useSportsQueryParamsStore();
-      const { getParams } = storeToRefs(useSportsQueryParamsStore());
+      const queryParamsStore = useSportsQueryParamsStore();
+      const { resetToDefaults, setMatchId } = queryParamsStore;
+      const { getParams } = storeToRefs(queryParamsStore);
       try {
         resetToDefaults();
         setMatchId(id);
@@ -409,19 +413,64 @@ export const useMatchesStore = defineStore("matches-store", {
           params: getParams.value,
         });
 
-        this.matchDetails = response.data.data.matchInfo;
+        // Stale-response guard: the user may have navigated to a different
+        // match (or left the page, which blanks matchId) while this request
+        // was in flight. Committing it would flash the previous match.
+        if (String(queryParamsStore.matchId) !== String(id)) return;
+
+        this.matchDetails = this.mergeMatchDetails(
+          this.matchDetails,
+          response.data.data.matchInfo
+        );
         this.marketGroups = response.data.data.marketGroups;
         this.afterAPICallSuccessState();
       } catch (err) {
         this.afterAPICallErrorState(err);
       }
     },
-    async fetchMatchDetailsSubtype(subTypeId, index) {
-      const { resetToDefaults, setSubTypeId } = useSportsQueryParamsStore();
-      const { getParams } = storeToRefs(useSportsQueryParamsStore());
+
+    // A poll must not reset what the user has expanded or collapsed: the
+    // response replaces odds/scores, but each market's isOpened flag is
+    // carried over (matched by subTypeId) so the accordion doesn't snap
+    // back every refresh.
+    mergeMatchDetails(oldDetails, freshDetails) {
+      if (!freshDetails) return freshDetails;
+      if (
+        !oldDetails ||
+        String(oldDetails.parentMatchId) !== String(freshDetails.parentMatchId)
+      ) {
+        return freshDetails;
+      }
+      const oldMarkets = new Map(
+        (oldDetails.markets || []).map((m) => [String(m.subTypeId), m])
+      );
+      return {
+        ...freshDetails,
+        markets: (freshDetails.markets || []).map((market) => {
+          const old = oldMarkets.get(String(market.subTypeId));
+          if (!old) return market;
+          const merged =
+            old.isOpened === undefined
+              ? market
+              : { ...market, isOpened: old.isOpened };
+          // A market the user drilled into keeps its loaded outcomes if the
+          // poll payload came back without them.
+          if (!market.matchOutcomes?.length && old.matchOutcomes?.length) {
+            return { ...merged, matchOutcomes: old.matchOutcomes };
+          }
+          return merged;
+        }),
+      };
+    },
+    async fetchMatchDetailsSubtype(subTypeId) {
+      const queryParamsStore = useSportsQueryParamsStore();
+      const { resetToDefaults, setSubTypeId, setMatchId } = queryParamsStore;
+      const { getParams } = storeToRefs(queryParamsStore);
+      const matchId = this.matchDetails?.parentMatchId;
       try {
         resetToDefaults();
         this.subtypePending = true;
+        this.subtypeLoadingId = subTypeId;
         this.error = {
           hasError: false,
           message: "",
@@ -429,18 +478,30 @@ export const useMatchesStore = defineStore("matches-store", {
         };
         this.responseOK = false;
 
+        // resetToDefaults blanks matchId — restore it or the API returns
+        // this subtype's markets for the wrong (unscoped) match set.
+        setMatchId(matchId);
         setSubTypeId(subTypeId);
         const response = await API().get(MATCHES_PATH, {
           params: getParams.value,
         });
 
-        if (response?.data?.data?.markets[0]) {
-          this.matchDetails.markets[index] = response.data.data.markets[0];
+        // Only merge into the match this request was made for.
+        const fetched = response?.data?.data?.markets?.[0];
+        const target =
+          String(this.matchDetails?.parentMatchId) === String(matchId)
+            ? this.findMarket(subTypeId)
+            : null;
+        if (fetched && target) {
+          Object.assign(target, fetched, { isOpened: true });
         }
         setSubTypeId("");
         this.subtypePending = false;
+        this.subtypeLoadingId = null;
         this.responseOK = true;
       } catch (err) {
+        this.subtypePending = false;
+        this.subtypeLoadingId = null;
         this.afterAPICallErrorState(err);
       }
     },
@@ -510,18 +571,28 @@ export const useMatchesStore = defineStore("matches-store", {
       }
       this.chunkArray[index] = competition;
     },
-    toggleMarketOutcomes(index) {
-      const matchDetail = this.matchDetails.markets[index];
-      if (!matchDetail) {
+    // By subTypeId, not array index: the market list in MatchDetails.vue is
+    // group-filtered, so a position in the rendered list is not a position
+    // in matchDetails.markets. The old index-based toggle also could only
+    // ever set isOpened to false, which made expanded markets uncollapsible.
+    toggleMarketOutcomes(subTypeId) {
+      const market = this.findMarket(subTypeId);
+      if (!market) {
         return;
       }
+      // Markets render open by default when they already carry outcomes, so
+      // an untoggled market's effective state is derived, not stored.
+      const currentlyOpen =
+        market.isOpened === undefined
+          ? (market.matchOutcomes?.length || 0) > 0
+          : market.isOpened;
+      market.isOpened = !currentlyOpen;
+    },
 
-      if (matchDetail["isOpened"]) {
-        matchDetail.isOpened = !matchDetail.isOpened;
-      } else {
-        matchDetail["isOpened"] = false;
-      }
-      this.matchDetails[index] = matchDetail;
+    findMarket(subTypeId) {
+      return (this.matchDetails?.markets || []).find(
+        (market) => String(market.subTypeId) === String(subTypeId)
+      );
     },
     setMatchDetailIsLive(payload) {
       this.matchDetailIsLive = payload;

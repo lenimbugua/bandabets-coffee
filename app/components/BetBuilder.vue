@@ -11,12 +11,12 @@ import { useRoute } from "vue-router";
 
 const route = useRoute();
 
-const { toggleMarketOutcomes, fetchMatchDetailsSubtype } = useMatchesStore();
+const { fetchMatchDetailsSubtype } = useMatchesStore();
 
 const {
   matchDetails,
   subtypePending,
-  subTypeId,
+  subtypeLoadingId,
 } = toRefs(useMatchesStore());
 
 const { markDisabledWithFallbackMatching, fetchBetBuilderMatches } =
@@ -32,29 +32,39 @@ function hasMatches(matchDetail) {
   }
   return outcomes.length > 0;
 }
-function fetchMatches(market, index) {
+// By subTypeId, not v-for index: the rendered list is group-filtered, so a
+// position in it is not a position in data.markets. The toggle also mutates
+// THIS view's copy (betbuilder store data), which the old code never did —
+// it toggled the matches store, so collapsing a module was a no-op here.
+function fetchMatches(market) {
   if (hasMatches(market)) {
-    toggleMarketOutcomes(index);
+    const owned = (data.value?.markets || []).find(
+      (m) => String(m.subTypeId) === String(market.subTypeId)
+    );
+    if (owned) {
+      owned.isOpened = !isOpened(owned);
+    }
     return;
   }
 
-  fetchMatchDetailsSubtype(market.subTypeId, index);
+  fetchMatchDetailsSubtype(market.subTypeId);
 }
 
-function isOpened(index) {
-  const matchDetail = data?.value?.markets[index];
-  if (!matchDetail) {
+function isOpened(market) {
+  if (!market) {
     return false;
   }
-
-  if (matchDetail["isOpened"]) {
-    return matchDetail.isOpened;
+  if (market.isOpened !== undefined) {
+    return market.isOpened;
   }
-  return hasMatches(matchDetail);
+  return hasMatches(market);
 }
 
 function subtypeIsLoading(subType) {
-  return subtypePending.value && subTypeId.value === subType;
+  return (
+    subtypePending.value &&
+    String(subtypeLoadingId.value) === String(subType)
+  );
 }
 
 const selectedGroup = ref(0);
@@ -166,22 +176,22 @@ function getSpecifier(outcome) {
             <!-- Premium market modules -->
             <div class="px-3 pt-2 pb-4 space-y-2">
               <div
-                v-for="(market, index) in filterByGroupId(
+                v-for="market in filterByGroupId(
                   data.markets,
                   selectedGroup
                 )"
-                :key="market.name"
+                :key="market.subTypeId"
                 class="market-module rounded-xl bg-white dark:bg-white/[0.015] overflow-hidden transition-all duration-200"
               >
                 <!-- Market header row -->
                 <div
                   class="flex items-center justify-between px-4 py-3 cursor-pointer group"
-                  @click="fetchMatches(market, index)"
+                  @click="fetchMatches(market)"
                 >
                   <div class="flex items-center gap-2.5 min-w-0">
                     <Icon
                       name="tabler:chevron-down"
-                      :class="isOpened(index) ? 'rotate-180' : ''"
+                      :class="isOpened(market) ? 'rotate-180' : ''"
                       class="w-3 h-3 text-gray-400 dark:text-white/15 shrink-0 transition-transform duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] group-hover:text-gray-500 dark:group-hover:text-white/25"
                     />
                     <span class="text-[0.7rem] font-semibold text-gray-600 dark:text-white/55 truncate tracking-[0.02em]">
@@ -190,7 +200,7 @@ function getSpecifier(outcome) {
                   </div>
 
                   <span class="text-[0.5rem] font-medium text-gray-400 dark:text-white/12 shrink-0 tabular-nums">
-                    {{ isOpened(index) && market.matchOutcomes?.length ? market.matchOutcomes.length : '' }}
+                    {{ isOpened(market) && market.matchOutcomes?.length ? market.matchOutcomes.length : '' }}
                   </span>
                 </div>
 
@@ -200,7 +210,7 @@ function getSpecifier(outcome) {
 
                 <!-- 3-COLUMN MARKET (1X2 style) -->
                 <div
-                  v-if="isOpened(index) && market.matchOutcomes?.length && is3ColumnMarket(market)"
+                  v-if="isOpened(market) && market.matchOutcomes?.length && is3ColumnMarket(market)"
                   class="grid grid-cols-3 gap-1.5 px-3 pb-3"
                 >
                   <BetBuilderButton
@@ -228,7 +238,7 @@ function getSpecifier(outcome) {
 
                 <!-- TABLE MARKET (Over/Under style with headers + specifiers) -->
                 <div
-                  v-else-if="isOpened(index) && market.matchOutcomes?.length && isTableMarket(market)"
+                  v-else-if="isOpened(market) && market.matchOutcomes?.length && isTableMarket(market)"
                   class="px-3 pb-3"
                 >
                   <!-- Column headers -->
@@ -277,7 +287,7 @@ function getSpecifier(outcome) {
 
                 <!-- 2-COLUMN FLAT (simple binary markets) -->
                 <div
-                  v-else-if="isOpened(index) && market.matchOutcomes?.length"
+                  v-else-if="isOpened(market) && market.matchOutcomes?.length"
                   class="grid grid-cols-2 gap-1.5 px-3 pb-3"
                 >
                   <BetBuilderButton

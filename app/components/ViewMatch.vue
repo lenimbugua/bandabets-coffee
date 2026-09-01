@@ -178,12 +178,11 @@ onUnmounted(() => {
 });
 </script>
 <template>
-  <AnimatePulse v-if="pending" :rows="10" />
-  <div v-else>
+  <div>
     <div
       class="view-match-container w-full mt-2 md:mt-0 overflow-hidden rounded-2xl md:rounded-none"
     >
-      <!-- Header bar -->
+      <!-- Header bar: stays put while loading so navigation feels anchored -->
       <div
         class="sticky top-0 z-55 header-bar"
       >
@@ -202,7 +201,9 @@ onUnmounted(() => {
         </div>
       </div>
 
-      <div v-if="matchDetails">
+      <MatchDetailsSkeleton v-if="pending" />
+
+      <div v-else-if="matchDetails">
         <MatchDetailsMatch :match-details />
 
         <AppTabs>

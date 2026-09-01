@@ -17,7 +17,7 @@ const {
   matchDetails,
   marketGroups,
   subtypePending,
-  subTypeId,
+  subtypeLoadingId,
   matchDetailIsLive,
 } = toRefs(useMatchesStore());
 
@@ -32,29 +32,34 @@ function hasMatches(matchDetail) {
   }
   return outcomes.length > 0;
 }
-function fetchMatches(market, index) {
+
+// Everything below addresses markets by subTypeId, never by v-for index:
+// the rendered list is group-filtered, so positions here don't line up with
+// positions in matchDetails.markets.
+function fetchMatches(market) {
   if (hasMatches(market)) {
-    toggleMarketOutcomes(index);
+    toggleMarketOutcomes(market.subTypeId);
     return;
   }
 
-  fetchMatchDetailsSubtype(market.subTypeId, index);
+  fetchMatchDetailsSubtype(market.subTypeId);
 }
 
-function isOpened(index) {
-  const matchDetail = matchDetails?.value?.markets[index];
-  if (!matchDetail) {
+function isOpened(market) {
+  if (!market) {
     return false;
   }
-
-  if (matchDetail["isOpened"]) {
-    return matchDetail.isOpened;
+  if (market.isOpened !== undefined) {
+    return market.isOpened;
   }
-  return hasMatches(matchDetail);
+  return hasMatches(market);
 }
 
 function subtypeIsLoading(subType) {
-  return subtypePending.value && subTypeId.value === subType;
+  return (
+    subtypePending.value &&
+    String(subtypeLoadingId.value) === String(subType)
+  );
 }
 
 const selectedGroup = ref(0);
@@ -127,11 +132,8 @@ function marketHasSelection(market) {
     <!-- Market cards -->
     <div class="space-y-2">
       <div
-        v-for="(market, index) in filterByGroupId(
-          matchDetails.markets,
-          selectedGroup
-        )"
-        :key="market.name"
+        v-for="market in filterByGroupId(matchDetails.markets, selectedGroup)"
+        :key="market.subTypeId"
         class="market-card rounded-xl overflow-hidden"
         :class="[
           marketHasSelection(market) ? 'ring-1 ring-brand-bright/15' : '',
@@ -140,7 +142,7 @@ function marketHasSelection(market) {
         <!-- Market header -->
         <div
           class="market-header flex items-center justify-between px-3 py-2 cursor-pointer select-none"
-          @click="fetchMatches(market, index)"
+          @click="fetchMatches(market)"
         >
           <div class="flex items-center gap-2 min-w-0">
             <span
@@ -162,14 +164,14 @@ function marketHasSelection(market) {
 
           <div class="flex items-center gap-1.5 shrink-0">
             <span
-              v-if="isOpened(index) && market.matchOutcomes"
+              v-if="isOpened(market) && market.matchOutcomes"
               class="text-[0.5rem] font-medium text-gray-400 dark:text-white/50 tabular-nums"
             >
               {{ market.matchOutcomes.length }}
             </span>
             <Icon
               name="tabler:chevron-down"
-              :class="isOpened(index) ? 'rotate-180' : ''"
+              :class="isOpened(market) ? 'rotate-180' : ''"
               class="w-3 h-3 text-gray-400 dark:text-white/50 transition-transform duration-200"
             />
           </div>
@@ -182,7 +184,7 @@ function marketHasSelection(market) {
 
         <!-- Outcomes grid -->
         <div
-          v-if="isOpened(index)"
+          v-if="isOpened(market)"
           class="grid gap-1.5 px-3 pb-3 pt-1"
           :class="[
             market.matchOutcomes.length % 3 === 0
