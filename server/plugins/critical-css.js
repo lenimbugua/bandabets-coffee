@@ -35,12 +35,18 @@ export default defineNitroPlugin((nitroApp) => {
         const match = html.head[i].match(ENTRY_LINK_RE);
         if (!match) continue;
         const href = match[1];
-        html.head[i] = html.head[i].replace(
-          ENTRY_LINK_RE,
+        const replacement =
           `<style data-critical>${critical}</style>` +
-            `<link rel="stylesheet" href="${href}" media="print" onload="this.media='all'" crossorigin>` +
-            `<noscript><link rel="stylesheet" href="${href}" crossorigin></noscript>`
-        );
+          `<link rel="stylesheet" href="${href}" media="print" onload="this.media='all'" crossorigin>` +
+          `<noscript><link rel="stylesheet" href="${href}" crossorigin></noscript>`;
+        // A replacer FUNCTION, not a string: String.replace treats a string
+        // replacement's "$&"/"$`"/"$'"/"$1" etc as special patterns, and
+        // `critical` is untrusted-shaped (generated CSS, committed but not
+        // hand-reviewed per byte) — a future artifact containing one of
+        // those sequences would get silently mangled (e.g. "$'" splices the
+        // rest of html.head[i] into the middle of the <style> block). A
+        // function return value is inserted verbatim, no reinterpretation.
+        html.head[i] = html.head[i].replace(ENTRY_LINK_RE, () => replacement);
         return; // exactly one entry stylesheet
       }
     } catch {

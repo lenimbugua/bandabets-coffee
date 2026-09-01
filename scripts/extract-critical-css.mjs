@@ -44,7 +44,20 @@ import Beasties from "beasties";
 
 const rootDir = join(dirname(fileURLToPath(import.meta.url)), "..");
 const PORT = 3131;
-const ROUTES = ["/", "/promotions", "/share-bets", "/login", "/leagues"];
+// Fix round 3: added /terms-and-conditions (SSR, indexable — was missing
+// legal-page typography utilities like list-disc/pl-6/max-w-5xl/
+// text-blue-600, visibly unstyled on cold first paint) and /match-details
+// (see the fetch-status comment in the harvest loop below for why this
+// literal path is expected to 404, and what it's actually harvesting).
+const ROUTES = [
+  "/",
+  "/promotions",
+  "/share-bets",
+  "/login",
+  "/leagues",
+  "/terms-and-conditions",
+  "/match-details",
+];
 const GZIP_BUDGET_BYTES = 15 * 1024;
 // This app's design-system `[data-theme="light"]` token overrides
 // (app/assets/css/style.css's Semantics layer) live inside Tailwind's
@@ -517,8 +530,8 @@ try {
   // `@layer properties`/`@layer theme`, which stay in the plain "other"
   // bucket since their content doesn't vary by route) and are swapped for
   // the real, ordered, deduped block once every route has been processed.
-  const UTILITIES_PLACEHOLDER = " __CRITICAL_CSS_UTILITIES__ ";
-  const BASE_PLACEHOLDER = " __CRITICAL_CSS_BASE__ ";
+  const UTILITIES_PLACEHOLDER = "@__CRITICAL_CSS_UTILITIES__;";
+  const BASE_PLACEHOLDER = "@__CRITICAL_CSS_BASE__;";
   const utilitiesHarvestedNormalized = new Set();
   const baseHarvestedNormalized = new Set();
   let utilitiesPlaceholderAdded = false;
@@ -526,7 +539,20 @@ try {
 
   for (const route of ROUTES) {
     const res = await fetch(`http://localhost:${PORT}${route}`);
-    if (!res.ok) {
+    // Fix round 3: "/match-details" is deliberately in ROUTES even though
+    // it 404s — it isn't a real route (the actual match-details path is
+    // /sports/:sport/:country/:league/:matchSlug(.*)-:id, a fused dynamic
+    // segment nuxt.config.js's pages:extend hook rewrites onto, and
+    // exercising it for real needs live match data this local build has
+    // no access to). Fetching the literal "/match-details" string lands on
+    // Nuxt's catch-all 404 page (app/pages/[...slug].vue) instead, which
+    // is exactly the point: that page is real, frequently-hit content
+    // (broken links, typos, stale bookmarks) with its own substantial
+    // styling (min-h-dvh, py-24, bg-linear-to-*, shadow-xl, ...) that was
+    // otherwise never captured. 404 is Nuxt's correct, intentional status
+    // for that page, so it's allowed through here; anything else
+    // unexpected (5xx, a route that's actually broken) still fails loudly.
+    if (!res.ok && res.status !== 404) {
       throw new Error(
         `GET ${route} returned ${res.status} — is the build healthy?`,
       );
@@ -656,7 +682,20 @@ try {
     ...baseHarvestedNormalized,
     ...[...seenRuleStrings].map(normalizeForComparison),
   ]);
-  const lightThemeBlocks = extractLightThemeBlocks(entryCss);
+  // Fix round 3: extractLightThemeBlocks() unwraps @layer but doesn't
+  // otherwise flatten — a comma-selector light-theme rule would stay one
+  // combined chunk (duplicating content already present per-selector via
+  // the utilities-layer harvest above, since normalizeForComparison keys
+  // wouldn't match a combined chunk against its own split-apart
+  // selectors), and it never runs the interaction-pseudo trim, so a
+  // future `[data-theme=light] .hover\:x:hover{...}` rule would sneak
+  // into the artifact ungated by isInteractionOnlySelector. Piping through
+  // flattenToLeafUnits (which both flattens to one-selector-per-unit AND
+  // applies the interaction trim, per fix round 2) keeps this fallback
+  // consistent with how everything else in the union is compared.
+  const lightThemeBlocks = flattenToLeafUnits(
+    extractLightThemeBlocks(entryCss),
+  );
   let lightThemeAdded = 0;
   for (const block of lightThemeBlocks) {
     const key = normalizeForComparison(block);
