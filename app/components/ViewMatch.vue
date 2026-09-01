@@ -157,7 +157,7 @@ onBeforeRouteLeave(() => {
     >
       <!-- Header bar -->
       <div
-        class="sticky top-0 z-60 header-bar"
+        class="sticky top-0 z-55 header-bar"
       >
         <div class="flex items-center justify-between px-4 h-12">
           <button
@@ -182,7 +182,7 @@ onBeforeRouteLeave(() => {
           <div
             role="tablist"
             aria-label="Match detail tabs"
-            class="sticky top-12 md:top-24 lg:top-30 z-60 flex gap-2 mx-3 mt-4 mb-3 overflow-x-auto scrollbar-hide"
+            class="sticky top-12 md:top-24 lg:top-30 z-55 flex gap-2 mx-3 mt-4 mb-3 overflow-x-auto scrollbar-hide"
           >
             <AppTab
               v-for="tab in matchDetails.isLiveCoverage
